@@ -26,16 +26,16 @@ The Google adapter uses the narrow
 `calendar.events.freebusy` OAuth scope. Access tokens enter the adapter for one
 request and are not logged or returned.
 
-## Connection flow to implement next
+## Implemented connection flow
 
-1. Create OAuth endpoints for Google authorization, callback, and revocation.
-2. Validate OAuth state and use PKCE where supported.
-3. Exchange the authorization code only on the server.
-4. Encrypt refresh tokens at rest in a server-side connection store.
-5. Keep short-lived access tokens out of browser storage.
-6. Add a settings screen that shows connection health and allows revocation.
-7. Fetch a bounded availability window and pass the normalized context to the
-   decision engine.
+1. Google verifies the user's identity through Auth.js; no password is stored.
+2. Calendar permission is requested separately with a short-lived, HTTP-only
+   OAuth state cookie.
+3. The authorization code is exchanged only on the server.
+4. Access and refresh tokens are encrypted with AES-256-GCM before PostgreSQL
+   persistence and never enter browser storage.
+5. The account page shows connection health and supports disconnect, sign-out,
+   and account deletion.
 
 The connection store should own `userId`, `providerId`, encrypted credentials,
 granted scopes, provider account identifier, connection timestamps, and last
@@ -66,9 +66,18 @@ entries so setup copy, credentials, and support diagnostics can differ.
 - Calendar disconnect must revoke provider access when possible and remove the
   stored connection.
 
+## Deployment setup
+
+Run `npm run db:migrate`, then configure the variables shown in `.env.example`.
+Generate independent random values for `AUTH_SECRET` and the 32-byte base64
+`CALENDAR_TOKEN_ENCRYPTION_KEY`. In Google Cloud, allow both callback URLs:
+
+- `/api/auth/callback/google` for identity;
+- `/api/calendar/google/callback` for the separate calendar consent.
+
 ## Not implemented yet
 
-This slice does not include a user account system, encrypted token storage,
-OAuth callback endpoints, background sync, webhooks, event details, or a live
-calendar settings UI. Those require deployment credentials and a persistent
-server-side identity/connection store.
+This slice does not yet replace the demo scenario with live availability. Token
+refresh, a bounded calendar-context endpoint, background sync, webhooks, and
+event details remain later work. The deployed app also needs real Google OAuth
+credentials and a PostgreSQL database before sign-in becomes available.
