@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320" role="img" aria-labelledby="t d">
+  <title id="t">Пауза для глаз: от экрана к дальнему предмету</title>
+  <desc id="d">Слева монитор, справа окно с удалённым деревом; стрелка направлена от монитора к окну.</desc>
+  <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M1 1 L7 4 L1 7" fill="none" stroke="#0B6B4F" stroke-width="2"/></marker></defs>
+  <rect width="640" height="320" rx="24" fill="#F7F8F4"/>
+  <g fill="#FFFFFF" stroke="#26394C" stroke-width="6" stroke-linejoin="round"><rect x="56" y="83" width="197" height="127" rx="10"/><rect x="414" y="63" width="176" height="166" rx="8"/></g>
+  <g fill="none" stroke="#26394C" stroke-width="6" stroke-linecap="round"><path d="M154 211v31 M107 244h94 M502 64v164 M414 146h176"/></g>
+  <g fill="none" stroke="#0B6B4F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M284 145h105" marker-end="url(#arrow)"/><path d="M501 184v33 M501 180l-27 22 M501 180l28 22"/><circle cx="501" cy="166" r="22"/></g>
+  <g fill="#26394C" font-family="Arial,sans-serif" font-size="19" font-weight="700" text-anchor="middle"><text x="155" y="279">SCREEN</text><text x="501" y="279">LOOK FAR AWAY</text></g>
+</svg>

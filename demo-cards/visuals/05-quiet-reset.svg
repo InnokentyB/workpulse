@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320" role="img" aria-labelledby="t d">
+  <title id="t">Спокойная пауза сидя</title>
+  <desc id="d">Схематичный человек удобно сидит на стуле, обе стопы имеют опору.</desc>
+  <rect width="640" height="320" rx="24" fill="#F7F8F4"/>
+  <circle cx="320" cy="156" r="115" fill="#E1E8EE"/>
+  <g fill="none" stroke="#26394C" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="320" cy="89" r="23"/>
+    <path d="M320 113v78 M319 151l-34 35 M321 151l34 35 M319 191h-50 M321 191h50 M269 191v52 M371 191v52 M269 243h-27 M371 243h27"/>
+    <path d="M272 150v41h100" stroke="#8D9992"/>
+  </g>
+  <text x="320" y="290" fill="#26394C" font-family="Arial,sans-serif" font-size="19" font-weight="700" text-anchor="middle">A QUIET MOMENT</text>
+</svg>

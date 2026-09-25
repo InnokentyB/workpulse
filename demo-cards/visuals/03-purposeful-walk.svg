@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320" role="img" aria-labelledby="t d">
+  <title id="t">Четыре лёгкие цели для короткой прогулки</title>
+  <desc id="d">Схематичные варианты: вода, окно, балкон или просто несколько шагов.</desc>
+  <rect width="640" height="320" rx="24" fill="#F7F8F4"/>
+  <g fill="#FFFFFF" stroke="#C9D0CB" stroke-width="2"><rect x="24" y="64" width="138" height="192" rx="18"/><rect x="175" y="64" width="138" height="192" rx="18"/><rect x="326" y="64" width="138" height="192" rx="18"/><rect x="477" y="64" width="138" height="192" rx="18"/></g>
+  <g fill="none" stroke="#0B6B4F" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M61 124h64l-8 70H69z M67 143h52"/>
+    <path d="M204 116h80v78h-80z M244 116v78 M204 155h80 M230 142l-9 9 M258 140l10 10"/>
+    <path d="M356 116h78v78h-78z M395 116v78 M349 169h92 M352 169v37 M438 169v37"/>
+    <path d="M511 139c0-12 19-12 19 0v21c0 12-19 12-19 0z M548 165c0-12 19-12 19 0v21c0 12-19 12-19 0z" transform="rotate(-12 539 160)"/>
+  </g>
+  <g fill="#26394C" font-family="Arial,sans-serif" font-size="17" font-weight="700" text-anchor="middle"><text x="93" y="228">WATER</text><text x="244" y="228">WINDOW</text><text x="395" y="228">BALCONY</text><text x="546" y="228">WALK</text></g>
+  <text x="320" y="40" fill="#26394C" font-family="Arial,sans-serif" font-size="20" font-weight="700" text-anchor="middle">CHOOSE ONE EASY GOAL</text>
+</svg>
