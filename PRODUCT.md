@@ -10,6 +10,8 @@ web
 
 The primary user is Alex, a remote product manager who spends most of the day at a laptop and ignores generic movement reminders because they arrive at inconvenient moments.
 
+The initial buyer is an HR or People Operations lead responsible for employee wellbeing, sustainable work habits, and adoption of workplace programmes without adding disruptive overhead.
+
 ## Product Purpose
 
 WorkPulse proves one idea: movement need alone is not enough to justify an interruption. The MVP succeeds when a viewer immediately understands why a 12-minute gap produces `MOVE NOW` while a 2-minute gap produces `NOT NOW`.
@@ -21,6 +23,8 @@ WorkPulse is a contextual coworker that can deliberately choose not to act. It b
 ## Operating Context
 
 The MVP is a responsive, single-page web demo for a laptop pitch and a 360px mobile viewport. It uses exactly two fixed scenarios and requires no setup or external services.
+
+The initial commercial hypothesis is a limited team pilot, followed by per-active-employee software pricing and an enterprise tier for integrations, governance, and support. Pricing, willingness to pay, procurement, and employer outcomes remain unvalidated until tested with buyers.
 
 ## Capabilities and Constraints
 
@@ -35,6 +39,7 @@ The MVP is a responsive, single-page web demo for a laptop pitch and a 360px mob
 - Never record, store, upload, or play back video, and never request microphone access.
 - Work without authentication, real calendar access, a database, cross-device persistence, or an LLM service.
 - Frame activities as workplace-wellbeing suggestions, not medical advice.
+- Distinguish working product evidence from roadmap capabilities and unvalidated commercial hypotheses.
 
 ## Brand Commitments
 
@@ -42,7 +47,7 @@ The product name is WorkPulse. The tagline is “Move more. Interrupt less.” T
 
 ## Evidence on Hand
 
-`WORKPULSE_SPEC.md` is the canonical MVP contract. No customer claims, clinical evidence, production integrations, or deployment URL are present and none may be fabricated.
+`WORKPULSE_SPEC.md` is the canonical MVP contract. The working demo, deterministic decision logic, automated tests, and optional on-device verification are available as product evidence. No validated customer pricing, paid pilots, testimonials, clinical evidence, measured employer ROI, or production integrations are present and none may be fabricated.
 
 ## Product Principles
 

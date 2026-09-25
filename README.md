@@ -23,6 +23,11 @@ activities are recorded in a local, browser-only history with time, duration,
 verification mode, and movement count; the history also summarizes today's count
 and the latest activity.
 
+The `/for-teams` route presents the buyer story for HR and People Operations:
+the interruption problem, WorkPulse's contextual decision model, a bounded
+pilot, validation metrics, and explicitly labelled commercial hypotheses. It
+does not claim validated pricing or employer outcomes.
+
 The canonical product and engineering specification remains
 [`WORKPULSE_SPEC.md`](./WORKPULSE_SPEC.md).
 
@@ -38,6 +43,9 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+- Product demo: [http://localhost:3000](http://localhost:3000)
+- Commercial presentation: [http://localhost:3000/for-teams](http://localhost:3000/for-teams)
 
 ## Verify
 
