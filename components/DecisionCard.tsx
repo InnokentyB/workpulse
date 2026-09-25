@@ -1,7 +1,9 @@
 import { ArrowIcon } from "@/components/icons";
-import type { DecisionResult } from "@/lib/types";
+import type { Activity, DecisionResult } from "@/lib/types";
 
 type DecisionCardProps = {
+  activities?: readonly Activity[];
+  onActivitySelect?: (activityId: string) => void;
   result: DecisionResult;
   onStart?: () => void;
 };
@@ -16,6 +18,8 @@ function Signal({ label, value }: { label: string; value: string }) {
 }
 
 export function DecisionCard({
+  activities,
+  onActivitySelect,
   result,
   onStart,
 }: DecisionCardProps) {
@@ -39,9 +43,37 @@ export function DecisionCard({
       </div>
       {canMove ? (
         <div className="activity-offer">
-          <p>Smallest useful move</p>
-          <h3>{result.activity?.name}</h3>
-          <span>About {result.activity?.durationSeconds} seconds</span>
+          <p>Choose a short reset</p>
+          {activities && activities.length > 1 ? (
+            <fieldset className="activity-picker">
+              <legend>Available activities</legend>
+              {activities.map((activity) => (
+                <label
+                  data-selected={result.activity?.id === activity.id}
+                  key={activity.id}
+                >
+                  <input
+                    checked={result.activity?.id === activity.id}
+                    name="activity"
+                    onChange={() => onActivitySelect?.(activity.id)}
+                    type="radio"
+                    value={activity.id}
+                  />
+                  <span>
+                    <strong>{activity.name}</strong>
+                    <small>
+                      About {activity.durationSeconds} sec · {activity.guide === "camera-neck" ? "Camera optional" : "Screen guided"}
+                    </small>
+                  </span>
+                </label>
+              ))}
+            </fieldset>
+          ) : (
+            <>
+              <h3>{result.activity?.name}</h3>
+              <span>About {result.activity?.durationSeconds} seconds</span>
+            </>
+          )}
         </div>
       ) : null}
       <div className="decision-reason">
@@ -50,7 +82,12 @@ export function DecisionCard({
       </div>
       {canMove ? (
         <div className="decision-actions">
-          <button className="button button--primary" onClick={onStart} type="button">
+          <button
+            aria-label={`Start activity: ${result.activity?.name}`}
+            className="button button--primary"
+            onClick={onStart}
+            type="button"
+          >
             Start activity <ArrowIcon />
           </button>
         </div>

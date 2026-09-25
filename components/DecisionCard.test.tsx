@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { DecisionCard } from "@/components/DecisionCard";
+import { ACTIVITIES } from "@/lib/activity-selector";
 import type { DecisionResult } from "@/lib/types";
 
 const recommendation: DecisionResult = {
@@ -16,6 +17,7 @@ const recommendation: DecisionResult = {
     instructions:
       "Slowly turn side to side, lower your chin, and lift your gaze within a comfortable range.",
     durationSeconds: 45,
+    guide: "camera-neck",
   },
 };
 
@@ -37,6 +39,25 @@ describe("DecisionCard", () => {
     fireEvent.click(screen.getByRole("button", { name: /start activity/i }));
 
     expect(onStart).toHaveBeenCalledOnce();
+  });
+
+  it("lets the user choose between the two available activities", () => {
+    const onActivitySelect = vi.fn();
+    render(
+      <DecisionCard
+        activities={ACTIVITIES}
+        onActivitySelect={onActivitySelect}
+        onStart={vi.fn()}
+        result={recommendation}
+      />,
+    );
+
+    expect(screen.getByRole("radio", { name: /neck reset/i })).toHaveProperty(
+      "checked",
+      true,
+    );
+    fireEvent.click(screen.getByRole("radio", { name: /shoulder rolls/i }));
+    expect(onActivitySelect).toHaveBeenCalledWith("shoulder-rolls");
   });
 
   it("never offers an activity for NOT_NOW", () => {

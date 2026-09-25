@@ -2,7 +2,7 @@ export const ACTIVITY_HISTORY_STORAGE_KEY = "workpulse.activity-history";
 export const ACTIVITY_HISTORY_VERSION = 2;
 export const ACTIVITY_HISTORY_LIMIT = 100;
 
-export type ActivityCompletionMode = "camera" | "manual";
+export type ActivityCompletionMode = "camera" | "guided" | "manual";
 
 export type ActivityHistoryEntry = {
   activityId: string;
@@ -23,7 +23,11 @@ type HistoryPayload = {
   entries: ActivityHistoryEntry[];
 };
 
-const completionModes = new Set<ActivityCompletionMode>(["camera", "manual"]);
+const completionModes = new Set<ActivityCompletionMode>([
+  "camera",
+  "guided",
+  "manual",
+]);
 
 function isHistoryEntry(value: unknown): value is ActivityHistoryEntry {
   if (!value || typeof value !== "object") return false;

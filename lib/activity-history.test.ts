@@ -70,4 +70,17 @@ describe("activity history", () => {
 
     expect(recordActivityCompletion(storage, completion)).toHaveLength(1);
   });
+
+  it("accepts a screen-guided completion mode", () => {
+    const storage = memoryStorage();
+    const history = recordActivityCompletion(storage, {
+      ...completion,
+      activityId: "shoulder-rolls",
+      activityName: "Shoulder rolls",
+      completionMode: "guided",
+      movements: 3,
+    });
+
+    expect(history[0].completionMode).toBe("guided");
+  });
 });

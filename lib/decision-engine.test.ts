@@ -22,6 +22,7 @@ describe("evaluateIntervention", () => {
         id: "neck-reset",
         name: "Neck reset",
         durationSeconds: 45,
+        guide: "camera-neck",
       },
     });
     expect(result.reason).toContain("12-minute window");

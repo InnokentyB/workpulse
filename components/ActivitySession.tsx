@@ -45,6 +45,7 @@ type CameraStatus =
   | "error";
 
 export type ActivityCompletion = {
+  mode: "camera" | "guided" | "manual";
   movements: number;
   verified: boolean;
 };
@@ -135,7 +136,7 @@ function drawPose(
   }
 }
 
-export function ActivitySession({
+function CameraNeckSession({
   activity,
   onComplete,
 }: ActivitySessionProps) {
@@ -170,7 +171,11 @@ export function ActivitySession({
   const finish = useCallback(
     (verified: boolean, movements: number) => {
       stopCamera();
-      onComplete({ movements, verified });
+      onComplete({
+        mode: verified ? "camera" : "manual",
+        movements,
+        verified,
+      });
     },
     [onComplete, stopCamera],
   );
@@ -414,4 +419,65 @@ export function ActivitySession({
       </div>
     </section>
   );
+}
+
+function GuidedStepsSession({
+  activity,
+  onComplete,
+}: ActivitySessionProps) {
+  const steps = activity.steps ?? [activity.instructions];
+
+  return (
+    <section aria-live="polite" className="activity-session activity-session--guided">
+      <div className="activity-session__heading">
+        <div>
+          <p>Screen-guided activity · no camera needed</p>
+          <h2>{activity.name}</h2>
+        </div>
+        <div className="guided-duration">
+          <strong>{activity.durationSeconds}</strong>
+          <span>sec</span>
+        </div>
+      </div>
+
+      <p className="guided-intro">{activity.instructions}</p>
+      <ol className="guided-steps">
+        {steps.map((step, index) => (
+          <li key={step}>
+            <span>{index + 1}</span>
+            <p>{step}</p>
+          </li>
+        ))}
+      </ol>
+
+      <p className="activity-safety-note">
+        Move slowly and stay within a comfortable range. Stop if you feel pain
+        or dizziness.
+      </p>
+
+      <div className="activity-session__actions">
+        <button
+          className="button button--complete"
+          onClick={() =>
+            onComplete({
+              mode: "guided",
+              movements: activity.movementCount ?? steps.length,
+              verified: false,
+            })
+          }
+          type="button"
+        >
+          <CheckIcon /> Complete activity
+        </button>
+      </div>
+    </section>
+  );
+}
+
+export function ActivitySession(props: ActivitySessionProps) {
+  if (props.activity.guide === "guided-steps") {
+    return <GuidedStepsSession {...props} />;
+  }
+
+  return <CameraNeckSession {...props} />;
 }

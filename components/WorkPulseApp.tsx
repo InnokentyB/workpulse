@@ -18,6 +18,7 @@ import {
   recordActivityCompletion,
   type ActivityHistoryEntry,
 } from "@/lib/activity-history";
+import { ACTIVITIES, selectActivity } from "@/lib/activity-selector";
 import { evaluateIntervention } from "@/lib/decision-engine";
 import type { DecisionResult, WorkPulseState } from "@/lib/types";
 
@@ -55,6 +56,12 @@ export function WorkPulseApp() {
 
   function evaluate() {
     const nextResult = evaluateIntervention(scenario.context);
+    const lastActivityId = history.at(-1)?.activityId;
+    if (nextResult.activity) {
+      nextResult.activity = selectActivity(
+        lastActivityId === "neck-reset" ? "shoulder-rolls" : "neck-reset",
+      );
+    }
     setResult(nextResult);
     setState(nextResult.decision === "MOVE_NOW" ? "RECOMMENDED" : "NOT_NOW");
   }
@@ -110,6 +117,14 @@ export function WorkPulseApp() {
 
           {isResultVisible && result ? (
             <DecisionCard
+              activities={ACTIVITIES}
+              onActivitySelect={(activityId) =>
+                setResult((current) =>
+                  current
+                    ? { ...current, activity: selectActivity(activityId) }
+                    : current,
+                )
+              }
               onStart={() => setState("ACTIVE")}
               result={result}
             />
@@ -124,7 +139,7 @@ export function WorkPulseApp() {
                   recordActivityCompletion(window.localStorage, {
                     activityId: result.activity!.id,
                     activityName: result.activity!.name,
-                    completionMode: nextCompletion.verified ? "camera" : "manual",
+                    completionMode: nextCompletion.mode,
                     durationSeconds: result.activity!.durationSeconds,
                     movements: nextCompletion.movements,
                   }),
@@ -143,13 +158,15 @@ export function WorkPulseApp() {
                 <p>{completion?.verified ? "Movement verified" : "Activity complete"}</p>
                 <h2>
                   {completion?.verified
-                    ? "Nice work. Neck reset verified."
-                    : "Nice work. Back to your day."}
+                    ? `Nice work. ${result?.activity?.name ?? "Movement"} verified.`
+                    : `Nice work. ${result?.activity?.name ?? "Activity"} complete.`}
                 </h2>
                 <span>
                   {completion?.verified
                     ? "Four movements confirmed on this device. No video was recorded. Camera is off."
-                    : "Completed without camera verification."}
+                    : completion?.mode === "guided"
+                      ? "Completed with on-screen guidance. No camera was used."
+                      : "Completed without camera verification."}
                 </span>
               </div>
               <button className="button button--quiet" onClick={runAgain} type="button">

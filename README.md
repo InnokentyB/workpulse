@@ -13,13 +13,15 @@ The core product principle is:
 The MVP is a responsive single-page demo built around one proof: two contexts
 with high movement need produce different decisions because interruption cost
 is different. It includes deterministic `MOVE NOW` / `NOT NOW` decisions,
-clear explanations, one fixed activity, and a minimal `Start → Done` loop.
+clear explanations, two selectable activities, and a minimal `Start → Done` loop.
 The context panel labels the calendar input as demo data. During the movement
 activity, the user can explicitly enable the browser camera and let an on-device
-pose model guide a four-movement neck reset. Video is never recorded, stored, or
-uploaded, and the camera stops when verification completes. Completed activities
-are recorded in a local, browser-only history with time, duration, verification
-mode, and movement count.
+pose model guide a four-movement neck reset. A second shoulder-roll activity uses
+screen guidance and does not request camera access. Video is never recorded,
+stored, or uploaded, and the camera stops when verification completes. Completed
+activities are recorded in a local, browser-only history with time, duration,
+verification mode, and movement count; the history also summarizes today's count
+and the latest activity.
 
 The canonical product and engineering specification remains
 [`WORKPULSE_SPEC.md`](./WORKPULSE_SPEC.md).

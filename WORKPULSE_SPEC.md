@@ -58,8 +58,9 @@ Primary job:
 - Equal-authority `MOVE NOW` and `NOT NOW` presentation.
 - Visible movement-need and interruption-cost levels.
 - A plain-language explanation for every decision.
-- One fixed activity for `MOVE NOW`: a neck reset in about 45 seconds.
+- Two selectable activities for `MOVE NOW`: a neck reset in about 45 seconds and shoulder rolls in about 60 seconds.
 - Optional on-device guidance for four gentle neck movements.
+- Camera-free, on-screen guidance for shoulder rolls.
 - Explicit camera consent, loading, active, denied, unavailable, and error states.
 - Manual completion fallback that does not require camera access.
 - Camera shutdown after completion, cancellation, or component exit.
@@ -71,7 +72,7 @@ Primary job:
 
 - A third low-movement-need scenario.
 - Dismissal, cooldown, or preference learning.
-- Multiple activities or preference learning.
+- Preference learning or a broader activity catalog.
 - Continuous or background camera observation.
 - Video recording, storage, upload, playback, or microphone access.
 - Real calendar data, background scheduling, or notifications.
@@ -168,15 +169,17 @@ score < 0.65  → NOT_NOW
 ### 7.3 Invariants
 
 - Every result includes a non-empty reason.
-- `MOVE_NOW` includes the fixed MVP activity.
+- `MOVE_NOW` includes the MVP activity choices.
 - `NOT_NOW` includes no activity and no start action.
 - The same context always produces the same result.
 - Domain logic does not import React or browser APIs.
 - Camera logic cannot change the `MOVE_NOW` / `NOT_NOW` decision.
 
-## 8. Neck-reset activity
+## 8. MVP activities
 
-The current activity is a gentle neck reset lasting approximately 45 seconds.
+### 8.1 Neck reset
+
+The camera-capable activity is a gentle neck reset lasting approximately 45 seconds.
 
 Instruction:
 
@@ -196,6 +199,13 @@ The verified sequence is:
 6. Return to neutral to complete verification.
 
 The UI summarizes this as four guided movements after neutral calibration. Full neck circles, deep extension, forceful movement, pain diagnosis, and therapeutic claims are prohibited.
+
+### 8.2 Shoulder rolls
+
+The second activity is a camera-free shoulder reset lasting approximately 60 seconds.
+The user makes three slow shoulder circles forward and then three backward, within
+a comfortable range. The interface shows the sequence as short numbered steps and
+records completion as screen-guided rather than camera-verified.
 
 ## 9. Camera and privacy contract
 
@@ -258,9 +268,10 @@ The UI shows the decision, movement need, interruption cost, and plain-language 
 
 **Acceptance:** a viewer can explain the contrast without reading source code or relying on colour.
 
-### FR-04 — Offer the neck reset only for `MOVE_NOW`
+### FR-04 — Offer activity choices only for `MOVE_NOW`
 
-`MOVE_NOW` includes `Neck reset`, approximate duration, explanation, and `Start activity`.
+`MOVE_NOW` includes `Neck reset` and `Shoulder rolls`, their approximate durations,
+guidance mode, explanation, and `Start activity`.
 
 **Acceptance:** `NOT_NOW` contains no activity and no start action.
 
@@ -321,7 +332,7 @@ Denied permission, missing camera, model failure, and tracking loss produce acti
 
 Required automated checks:
 
-- good window returns `MOVE_NOW`, high need, low cost, reason, and neck reset;
+- good window returns `MOVE_NOW`, high need, low cost, reason, and the two activity choices;
 - meeting-soon gate returns `NOT_NOW`, high need, high cost, and no activity;
 - the five-minute meeting boundary returns `NOT_NOW`;
 - the UI switches between scenarios without stale state;
@@ -345,8 +356,8 @@ The MVP is done when a viewer can:
 
 1. compare both scenarios;
 2. understand why the decisions differ;
-3. start the neck reset only from `MOVE_NOW`;
-4. complete manually or optionally verify four guided movements on-device;
+3. choose and start either activity only from `MOVE_NOW`;
+4. complete shoulder rolls with screen guidance, or complete the neck reset manually or with four on-device guided movements;
 5. see that the camera is off after the session;
 6. repeat the demo reliably on desktop and mobile;
 7. run the decision demo if camera verification is unavailable.
@@ -356,7 +367,7 @@ The MVP is done when a viewer can:
 ### Current MVP — implemented slice
 
 - Two-scenario decision contrast.
-- Fixed neck reset.
+- Selectable neck reset and shoulder-roll activities.
 - Optional local camera verification with manual fallback.
 - Local completion history; no accounts or external services.
 

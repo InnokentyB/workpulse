@@ -26,7 +26,7 @@ describe("WorkPulseApp", () => {
     expect(screen.getByText("HIGH")).toBeDefined();
     expect(screen.getByText("LOW")).toBeDefined();
     expect(screen.getByText("Neck reset")).toBeDefined();
-    expect(screen.getByText("About 45 seconds")).toBeDefined();
+    expect(screen.getByText(/about 45 sec/i)).toBeDefined();
     expect(screen.getByRole("button", { name: /start activity/i })).toBeDefined();
   });
 
@@ -83,5 +83,27 @@ describe("WorkPulseApp", () => {
     fireEvent.click(screen.getByRole("button", { name: /run again/i }));
     expect(screen.getByRole("button", { name: /ask workpulse/i })).toBeDefined();
     expect(screen.queryByText(/nice work/i)).toBeNull();
+  });
+
+  it("offers and records the second screen-guided activity", async () => {
+    render(<WorkPulseApp />);
+    await screen.findByText("No completed activities yet.");
+
+    fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
+    fireEvent.click(screen.getByRole("radio", { name: /shoulder rolls/i }));
+    fireEvent.click(
+      screen.getByRole("button", { name: /start activity: shoulder rolls/i }),
+    );
+
+    expect(screen.getByRole("heading", { name: "Shoulder rolls" })).toBeDefined();
+    expect(
+      screen.getAllByText(/three slow shoulder circles forward/i),
+    ).toHaveLength(2);
+    fireEvent.click(screen.getByRole("button", { name: /complete activity/i }));
+
+    expect(screen.getByText(/shoulder rolls complete/i)).toBeDefined();
+    expect(screen.getByText("Completed with on-screen guidance")).toBeDefined();
+    expect(screen.getByText("exercise")).toBeDefined();
+    expect(screen.getByText("Just now")).toBeDefined();
   });
 });

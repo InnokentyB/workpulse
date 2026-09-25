@@ -15,6 +15,9 @@ export type Activity = {
   name: string;
   durationSeconds: number;
   instructions: string;
+  guide: "camera-neck" | "guided-steps";
+  movementCount?: number;
+  steps?: readonly string[];
 };
 
 export type DecisionResult = {

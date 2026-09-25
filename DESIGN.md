@@ -173,7 +173,7 @@ The palette pairs quiet paper neutrals with grounded ink-green surfaces, a warm-
 
 The page sits in a centered 1440px shell with 48px desktop gutters. A compact header anchors the brand on the left while the tagline stays quiet in the center. The premise uses a wide-to-narrow editorial split, then the demo shifts to a 285px scenario rail beside one flexible decision stage with a 40px gutter.
 
-The context and decision areas read as one instrument: the raised paper context panel has only its top corners rounded, while the dark action or decision surface rounds only its bottom corners. Three context metrics divide the panel with one-pixel rules. The browser-local history section follows the demo in the same 285px/flexible-content grid; its title and privacy explanation occupy the left rail, while summary counts and completed-activity rows occupy the content column. The roadmap uses the same rail for a proposed P0.5 feature register, with the next phase and exploration separated by tonal surfaces and ruled rows.
+The context and decision areas read as one instrument: the raised paper context panel has only its top corners rounded, while the dark action or decision surface rounds only its bottom corners. Three context metrics divide the panel with one-pixel rules. The browser-local history section follows the demo in the same 285px/flexible-content grid; its title and privacy explanation occupy the left rail, while today's count, the latest completion, and completed-activity rows occupy the content column. The roadmap uses the same rail for a proposed P0.5 feature register, with the next phase and exploration separated by tonal surfaces and ruled rows.
 
 At 920px, the two-scenario rail becomes a two-column horizontal strip; history and roadmap rails stack above their content. At 640px, page gutters tighten to 18px, the scenario choices collapse into a single 50px select, the metrics become a two-column grid with the third metric spanning the next row, and actions stack to full width. The header places its links beneath the brand, history rows become a date/time column beside an activity column with details underneath, and roadmap phase cells stack vertically. The same context-to-decision reading order is preserved from a 360px viewport upward.
 
@@ -231,11 +231,11 @@ The compact header uses an inline pulse mark and bold product name on the left, 
 
 ### Decision Surface
 
-The signature component begins with a small state label, follows with oversized explicit state typography, then a ruled two-column comparison of movement need and interruption cost. GO adds the smallest useful activity and one primary action; HOLD omits activity controls but preserves the reason and structural authority. On mobile, signals and actions stack without changing their order.
+The signature component begins with a small state label, follows with oversized explicit state typography, then a ruled two-column comparison of movement need and interruption cost. GO offers the two fixed prototype activities as accessible ruled radio rows, marking each duration and whether it is camera-optional or screen-guided, followed by one primary action for the selected activity. HOLD omits activity controls but preserves the reason and structural authority. On mobile, signals and actions stack without changing their order.
 
-### Camera Activity Surface
+### Activity Session Surfaces
 
-The activity state keeps the green decision surface and replaces the static instructions with an explicit camera-consent step. Once permission is granted, a mirrored native video preview and lime upper-body pose trace make local detection visible. A large `0 / 4` movement indicator, one instruction at a time, persistent “no video recording” copy, and an always-available stop action keep the session legible and trustworthy. Permission denial and unavailable-camera states stay within the same surface and offer recovery plus a manual fallback.
+The activity state keeps the green decision surface and adapts to the selected guide. Neck reset begins with explicit camera consent; once permission is granted, a mirrored native video preview and lime upper-body pose trace make local detection visible. A large `0 / 4` movement indicator, one instruction at a time, persistent “no video recording” copy, and an always-available stop action keep the session legible and trustworthy. Permission denial and unavailable-camera states stay within the same surface and offer recovery plus a manual fallback. Shoulder rolls never request camera access: the same surface instead shows a prominent tabular duration, a short introduction, and numbered ruled steps, followed by one explicit completion action.
 
 ### Work Context Metrics
 
@@ -243,7 +243,7 @@ Three metrics use large tight values, small muted units, and tabular numerals. T
 
 ### Activity History
 
-The browser-local ledger continues the paper-and-rule language beneath the demo. Its left rail names the section and explains that completed records stay on this device when browser storage is available. Three restrained, tabular summary numerals show completed, today, and camera-verified counts. The empty state leaves a clear ruled area and a plain invitation to finish an activity. Completed entries appear newest first as ruled rows with date and time, activity name, explicit camera or manual completion language, estimated duration, and movement count. On mobile, each row keeps time beside the activity and moves the two facts below the activity text.
+The browser-local ledger continues the paper-and-rule language beneath the demo. Its left rail names the section and explains that completed records stay on this device when browser storage is available. A two-column summary shows today's activity count and the latest completion as relative time plus activity name. The empty state leaves a clear ruled area and a plain invitation to finish either activity. Completed entries appear newest first as ruled rows with date and time, activity name, explicit camera, screen-guided, or manual completion language, estimated duration, and movement count. On mobile, each row keeps time beside the activity and moves the two facts below the activity text.
 
 ### Roadmap Register
 

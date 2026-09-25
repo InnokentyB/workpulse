@@ -27,9 +27,10 @@ The MVP is a responsive, single-page web demo for a laptop pitch and a 360px mob
 - Show sedentary time, time to the next meeting, and time since the last movement.
 - Identify calendar context as demo data and keep camera state visible at all times.
 - Deterministically return `MOVE NOW` or `NOT NOW`, movement need, interruption cost, and a reason.
-- Attach one fixed activity—a neck reset in about 45 seconds—only to `MOVE NOW`.
+- Offer two prototype activities only for `MOVE NOW`: a 45-second neck reset and 60-second shoulder rolls.
 - Support optional on-device verification for four guided neck movements, plus a manual fallback.
-- Keep a browser-only history of completed activities with time, estimated duration, verification mode, and movement count when local storage is available.
+- Guide shoulder rolls on screen without requesting camera access.
+- Keep a browser-only history of completed activities with time, estimated duration, verification mode, and movement count when local storage is available; summarize today's count and the latest completion.
 - Request camera access only during the activity and stop it immediately after completion or cancellation.
 - Never record, store, upload, or play back video, and never request microphone access.
 - Work without authentication, real calendar access, a database, cross-device persistence, or an LLM service.
