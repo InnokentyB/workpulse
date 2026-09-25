@@ -17,18 +17,6 @@ export type Activity = {
   instructions: string;
 };
 
-export type InterventionOutcome = "completed" | "dismissed" | "skipped";
-
-export type InterventionRecord = {
-  id: string;
-  createdAt: string;
-  context: WorkContext;
-  decision: Decision;
-  reason: string;
-  activity?: Activity;
-  outcome?: InterventionOutcome;
-};
-
 export type DecisionResult = {
   decision: Decision;
   movementNeed: Level;
@@ -43,14 +31,11 @@ export type DemoScenario = {
   label: string;
   description: string;
   context: WorkContext;
-  expectedDecision: Decision;
 };
 
 export type WorkPulseState =
   | "IDLE"
-  | "EVALUATING"
   | "NOT_NOW"
   | "RECOMMENDED"
   | "ACTIVE"
-  | "DISMISSED"
   | "COMPLETED";

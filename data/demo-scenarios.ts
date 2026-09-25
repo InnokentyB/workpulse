@@ -12,7 +12,6 @@ export const demoScenarios: DemoScenario[] = [
       currentTime: "14:03",
       nextMeetingTitle: "Design Review",
     },
-    expectedDecision: "MOVE_NOW",
   },
   {
     id: "meeting-soon",
@@ -25,19 +24,5 @@ export const demoScenarios: DemoScenario[] = [
       currentTime: "14:18",
       nextMeetingTitle: "Design Review",
     },
-    expectedDecision: "NOT_NOW",
-  },
-  {
-    id: "low-need",
-    label: "Low movement need",
-    description: "There is time available, but an intervention is unnecessary.",
-    context: {
-      sedentaryMinutes: 25,
-      minutesToNextMeeting: 30,
-      minutesSinceLastActivity: 25,
-      currentTime: "11:15",
-      nextMeetingTitle: "Team Sync",
-    },
-    expectedDecision: "NOT_NOW",
   },
 ];
