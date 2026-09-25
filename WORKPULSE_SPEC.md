@@ -305,7 +305,7 @@ Audio-only call; walking enabled → walking pad or headphone walk
 Interactive meeting → seated adjustment or no intervention
 ```
 
-This is a P0.5 scenario. It begins only after the deployed P0 passes its acceptance cases. The meeting-soon hard gate still wins: two minutes before a meeting, WorkPulse returns `NOT_NOW` rather than filling the remaining time with another prompt.
+This is a P0+ scenario. It begins only after the deployed P0 passes its acceptance cases. The meeting-soon hard gate still wins: two minutes before a meeting, WorkPulse returns `NOT_NOW` rather than filling the remaining time with another prompt.
 
 ### US-08 — Respect the working-day boundary
 
@@ -320,7 +320,7 @@ Near planned end → optional wrap-up cue
 After workday → no work-extending movement prompt
 ```
 
-This is a P0.5 scenario and requires user-defined local workday settings. It is not required for the hackathon pitch.
+This is a P0+ scenario and requires user-defined local workday settings. It is not required for the hackathon pitch.
 
 ---
 
@@ -341,7 +341,7 @@ This is a P0.5 scenario and requires user-defined local workday settings. It is 
 - Cooldown after dismissal.
 - Public deployment.
 
-### P0.5 — only if time remains after deployed P0 passes acceptance
+### P0+ — only if time remains after deployed P0 passes acceptance
 
 - User-defined workday start and end stored locally.
 - Deterministic outside-work-hours gate.
@@ -617,9 +617,9 @@ ELSE prefer squats
 
 An optional LLM may personalize activity or wording only after `MOVE_NOW`. The deterministic selector remains the fallback, and the LLM cannot override hard gates.
 
-### 15.5 P0.5 context expansion
+### 15.5 P0+ context expansion
 
-P0.5 may add explicit local context for activity fit and workday boundaries. These fields are not required by the P0 decision engine and must not be added as hidden assumptions to the canonical demo scenarios.
+P0+ may add explicit local context for activity fit and workday boundaries. These fields are not required by the P0 decision engine and must not be added as hidden assumptions to the canonical demo scenarios.
 
 ```ts
 type ActivityContext = {
@@ -639,7 +639,7 @@ type WorkdaySettings = {
 };
 ```
 
-P0.5 selection rules:
+P0+ selection rules:
 
 ```text
 IF outside the configured workday
@@ -724,13 +724,13 @@ After P0 is deployed, the selector may use outcomes to prefer better-performing 
 
 **Acceptance:** the learned-preference fixture selects stretch under the stated preference rule.
 
-### FR-11 — Respect workday boundaries, conditional P0.5
+### FR-11 — Respect workday boundaries, conditional P0+
 
 The user can define a local start time, end time, working days, and time zone. When enabled, the system shall apply the workday boundary before evaluating an ordinary movement intervention.
 
 **Acceptance:** the same high-need context can return `MOVE_NOW` during the configured workday and `NOT_NOW` with an outside-hours reason after the configured end. Missing settings preserve P0 behaviour.
 
-### FR-12 — Select a context-suitable activity, conditional P0.5
+### FR-12 — Select a context-suitable activity, conditional P0+
 
 After a `MOVE_NOW` decision, the selector may use explicit activity context to choose an activity that fits the available time, ability to stand, ability to leave the desk, participation mode, equipment, and exclusions.
 
@@ -884,12 +884,12 @@ These tests are required only for the corresponding post-P0 slice:
 | P0.6 | Responsive polish and reset | Pitch can be repeated from a known state |
 | P0.7 | Deployment | Public URL passes the end-to-end pitch path |
 | P0.8 | Submission assets | TAIKAI copy, screenshot, and backup demo are ready |
-| P0.5 | Workday boundary and activity fit | Runs only after deployed P0; existing A/B/C cases remain unchanged |
+| P0+ | Workday boundary and activity fit | Runs only after deployed P0; existing A/B/C cases remain unchanged |
 | P1 | Personal routines and adaptation | Meal windows and preferences remain useful without AI; therapy ships only after safety and privacy gates |
 | P2 | Ambient assistance | Every camera, sensor, and device input is optional, revocable, and has a manual fallback |
 | P3 | Calendar and cross-device platform | Deferred beyond the hackathon and preceded by explicit synchronization controls |
 
-**Gate:** no P0.5, P1, or P2 work begins until deployed P0 passes scenarios A and B. P0.5 must also preserve all P0 acceptance cases before the build can be called stable.
+**Gate:** no P0+, P1, or P2 work begins until deployed P0 passes scenarios A and B. P0+ must also preserve all P0 acceptance cases before the build can be called stable.
 
 ---
 
@@ -1096,7 +1096,7 @@ This section incorporates the broader product direction without turning it into 
 
 ### 26.1 Safe second-stage options
 
-If the public P0 has passed scenarios A–F and time remains, implementation may choose one coherent P0.5 slice:
+If the public P0 has passed scenarios A–F and time remains, implementation may choose one coherent P0+ slice:
 
 1. **Workday boundary:** local start/end settings plus the outside-hours gate; or
 2. **Activity fit:** explicit ability-to-stand and available-duration controls plus the four-activity library.
@@ -1105,7 +1105,7 @@ Combining both is allowed only if each slice has tests and the live demo remains
 
 ### 26.2 Initial extended activity library
 
-| Activity | Minimum window | User context | P0.5 eligibility |
+| Activity | Minimum window | User context | P0+ eligibility |
 |---|---:|---|---|
 | Neck and shoulder reset | 1 minute | Seated; can briefly pause | Yes |
 | Eye-distance break | 1 minute | Can look away from the screen | Yes |
@@ -1159,7 +1159,7 @@ These may be future directions, but introducing them during P0 would weaken the 
 
 | Risk | Mitigation |
 |---|---|
-| Feature creep | Enforce the P0 deployment gate before any P0.5/P1/P2 work |
+| Feature creep | Enforce the P0 deployment gate before any P0+/P1/P2 work |
 | LLM latency or outage | Keep core decisions and fallback activity fully deterministic |
 | Venue Wi-Fi failure | Maintain a local build plus backup recording/screenshots |
 | Camera permission or pose failure | Manual completion is the default P0 path |
