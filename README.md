@@ -36,6 +36,13 @@ The `/roadmap` page translates the near-term direction from
 [`PRODUCT_VISION.md`](./PRODUCT_VISION.md) into a public, clearly labelled view
 of proposed, tentative, and exploratory features.
 
+The first real-calendar infrastructure is provider-neutral and documented in
+[`CALENDAR_INTEGRATION.md`](./CALENDAR_INTEGRATION.md). Google Calendar is the
+primary adapter and reads free/busy data only; Microsoft, Apple, and generic
+CalDAV are registered as planned providers. Live connection still requires
+OAuth endpoints, server-side encrypted token storage, and deployment
+credentials.
+
 ## Run locally
 
 ```bash
@@ -60,8 +67,10 @@ npm run build
 
 ```text
 app/                    Next.js App Router entry points, including /roadmap
+app/api/calendar/       Safe provider discovery endpoint
 components/             Responsive product UI and interaction tests
 data/demo-scenarios.ts  Stable scenarios for the live demo
+lib/calendar/           Provider contracts, registry, Google adapter, context
 lib/types.ts            Domain contracts
 lib/decision-engine.ts  Reliable MOVE_NOW / NOT_NOW decision logic and tests
 lib/activity-selector.ts
@@ -72,6 +81,7 @@ WORKPULSE_SPEC.md       Canonical product, engineering, and pitch spec
 
 The MVP exists only to prove that a correct decision not to interrupt is as
 valuable as a decision to intervene. Dismissal cooldowns, personalization,
-continuous camera monitoring, video recording, real calendar integration,
-authentication, databases, and LLM
-dependencies are explicitly outside this slice.
+continuous camera monitoring, video recording, live calendar authorization,
+authentication, databases, and LLM dependencies are explicitly outside this
+slice. Provider-neutral calendar infrastructure is present, but the demo still
+uses labelled fixed calendar data until the connection flow is implemented.
