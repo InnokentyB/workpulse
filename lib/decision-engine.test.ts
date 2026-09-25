@@ -5,7 +5,6 @@ import { evaluateIntervention } from "@/lib/decision-engine";
 import type { WorkContext } from "@/lib/types";
 
 const goodWindow = demoScenarios[0].context;
-const meetingSoon = demoScenarios.find(({ id }) => id === "meeting-soon")!;
 
 function context(overrides: Partial<WorkContext>): WorkContext {
   return { ...goodWindow, ...overrides };
@@ -29,7 +28,7 @@ describe("evaluateIntervention", () => {
   });
 
   it("lets an imminent meeting override high movement need", () => {
-    const result = evaluateIntervention(meetingSoon.context);
+    const result = evaluateIntervention(demoScenarios[1].context);
 
     expect(result).toMatchObject({
       decision: "NOT_NOW",
@@ -62,38 +61,6 @@ describe("evaluateIntervention", () => {
     expect(result.decision).toBe("MOVE_NOW");
     expect(result.interruptionCost).toBe("MEDIUM");
     expect(result.activity).toBeDefined();
-  });
-
-  it("selects a shoulder reset for a medium window after a longer pause", () => {
-    const result = evaluateIntervention(
-      context({
-        sedentaryMinutes: 72,
-        minutesSinceLastActivity: 100,
-        minutesToNextMeeting: 7,
-      }),
-    );
-
-    expect(result.activity).toMatchObject({
-      id: "shoulder-reset",
-      durationSeconds: 90,
-    });
-    expect(result.activityReason).toContain("7-minute window");
-    expect(result.activityReason).toContain("100 minutes ago");
-  });
-
-  it("selects a full-body reset when a long break fits", () => {
-    const result = evaluateIntervention(
-      context({
-        sedentaryMinutes: 95,
-        minutesSinceLastActivity: 130,
-        minutesToNextMeeting: 8,
-      }),
-    );
-
-    expect(result.activity).toMatchObject({
-      id: "full-body-reset",
-      durationSeconds: 180,
-    });
   });
 
   it("hard-gates contexts below forty sedentary minutes", () => {
@@ -143,20 +110,6 @@ describe("evaluateIntervention", () => {
     });
     expect(result.reason).toContain("not yet a strong enough");
     expect(result.activity).toBeUndefined();
-  });
-
-  it("does not recommend movement when no configured workout fits", () => {
-    const result = evaluateIntervention(
-      context({
-        sedentaryMinutes: 75,
-        minutesSinceLastActivity: 120,
-        minutesToNextMeeting: 5.5,
-      }),
-    );
-
-    expect(result.decision).toBe("NOT_NOW");
-    expect(result.activity).toBeUndefined();
-    expect(result.reason).toContain("configured activity fits");
   });
 
   it("explains a recommendation when no meeting is scheduled", () => {

@@ -5,7 +5,7 @@ import { ScenarioSelector } from "@/components/ScenarioSelector";
 import { demoScenarios } from "@/data/demo-scenarios";
 
 describe("ScenarioSelector", () => {
-  it("renders every demo choice in the native selector and radio group", () => {
+  it("renders both MVP choices in the native selector and radio group", () => {
     render(
       <ScenarioSelector
         scenarios={demoScenarios}
@@ -14,8 +14,8 @@ describe("ScenarioSelector", () => {
       />,
     );
 
-    expect(screen.getAllByRole("option")).toHaveLength(4);
-    expect(screen.getAllByRole("radio")).toHaveLength(4);
+    expect(screen.getAllByRole("option")).toHaveLength(2);
+    expect(screen.getAllByRole("radio")).toHaveLength(2);
     const selectedRadio = screen.getByRole("radio", {
       name: /good time to move/i,
     }) as HTMLInputElement;

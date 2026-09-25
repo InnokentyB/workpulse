@@ -25,13 +25,6 @@ export type NeckMotionState = {
   baselineHorizontal: number | null;
   baselineVertical: number | null;
   firstSideDirection: -1 | 1 | null;
-  visibility: {
-    face: boolean;
-    leftShoulder: boolean;
-    rightShoulder: boolean;
-  };
-  horizontalDelta: number | null;
-  verticalDelta: number | null;
 };
 
 const NOSE = 0;
@@ -39,13 +32,11 @@ const LEFT_SHOULDER = 11;
 const RIGHT_SHOULDER = 12;
 const MINIMUM_VISIBILITY = 0.55;
 const CALIBRATION_FRAMES = 8;
-export const NECK_MOTION_THRESHOLDS = {
-  turn: 0.1,
-  down: 0.08,
-  up: 0.06,
-  center: 0.07,
-  centeredHorizontal: 0.12,
-} as const;
+const SIDE_THRESHOLD = 0.1;
+const DOWN_THRESHOLD = 0.08;
+const UP_THRESHOLD = 0.06;
+const CENTER_THRESHOLD = 0.07;
+const CENTERED_HORIZONTAL_LIMIT = 0.12;
 
 export const INITIAL_NECK_MOTION_STATE: NeckMotionState = {
   stage: "calibrating",
@@ -57,13 +48,6 @@ export const INITIAL_NECK_MOTION_STATE: NeckMotionState = {
   baselineHorizontal: null,
   baselineVertical: null,
   firstSideDirection: null,
-  visibility: {
-    face: false,
-    leftShoulder: false,
-    rightShoulder: false,
-  },
-  horizontalDelta: null,
-  verticalDelta: null,
 };
 
 function isVisible(landmark: PoseLandmark | undefined): landmark is PoseLandmark {
@@ -82,33 +66,23 @@ export function updateNeckMotion(
   const nose = landmarks[NOSE];
   const leftShoulder = landmarks[LEFT_SHOULDER];
   const rightShoulder = landmarks[RIGHT_SHOULDER];
-  const visibility = {
-    face: isVisible(nose),
-    leftShoulder: isVisible(leftShoulder),
-    rightShoulder: isVisible(rightShoulder),
-  };
 
-  if (!Object.values(visibility).every(Boolean)) {
+  if (![nose, leftShoulder, rightShoulder].every(isVisible)) {
     if (state.stage !== "calibrating") {
-      return { ...state, tracking: "out-of-frame", visibility };
+      return { ...state, tracking: "out-of-frame" };
     }
 
     return {
       ...state,
       tracking: "out-of-frame",
-      visibility,
       calibrationFrames: 0,
       horizontalTotal: 0,
       verticalTotal: 0,
-      horizontalDelta: null,
-      verticalDelta: null,
     };
   }
 
   const shoulderWidth = Math.abs(rightShoulder.x - leftShoulder.x);
-  if (shoulderWidth < 0.05) {
-    return { ...state, tracking: "out-of-frame", visibility };
-  }
+  if (shoulderWidth < 0.05) return { ...state, tracking: "out-of-frame" };
 
   const shoulderMidX = (leftShoulder.x + rightShoulder.x) / 2;
   const shoulderMidY = (leftShoulder.y + rightShoulder.y) / 2;
@@ -124,7 +98,6 @@ export function updateNeckMotion(
       return {
         ...state,
         tracking: "ready",
-        visibility,
         calibrationFrames,
         horizontalTotal,
         verticalTotal,
@@ -135,37 +108,25 @@ export function updateNeckMotion(
       ...state,
       stage: "first-side",
       tracking: "ready",
-      visibility,
       calibrationFrames,
       horizontalTotal,
       verticalTotal,
       baselineHorizontal: horizontalTotal / calibrationFrames,
       baselineVertical: verticalTotal / calibrationFrames,
-      horizontalDelta: 0,
-      verticalDelta: 0,
     };
   }
 
+  if (state.stage === "complete") return { ...state, tracking: "ready" };
+
   const horizontalDelta = horizontal - (state.baselineHorizontal ?? 0);
   const verticalDelta = vertical - (state.baselineVertical ?? 0);
-  const measuredState = {
-    ...state,
-    tracking: "ready" as const,
-    visibility,
-    horizontalDelta,
-    verticalDelta,
-  };
 
-  if (state.stage === "complete") return measuredState;
-
-  if (
-    state.stage === "first-side" &&
-    Math.abs(horizontalDelta) >= NECK_MOTION_THRESHOLDS.turn
-  ) {
+  if (state.stage === "first-side" && Math.abs(horizontalDelta) >= SIDE_THRESHOLD) {
     return {
-      ...measuredState,
+      ...state,
       stage: "opposite-side",
       movements: 1,
+      tracking: "ready",
       firstSideDirection: horizontalDelta < 0 ? -1 : 1,
     };
   }
@@ -173,34 +134,34 @@ export function updateNeckMotion(
   if (
     state.stage === "opposite-side" &&
     state.firstSideDirection !== null &&
-    horizontalDelta * state.firstSideDirection <= -NECK_MOTION_THRESHOLDS.turn
+    horizontalDelta * state.firstSideDirection <= -SIDE_THRESHOLD
   ) {
-    return { ...measuredState, stage: "down", movements: 2 };
+    return { ...state, stage: "down", movements: 2, tracking: "ready" };
   }
 
   if (
     state.stage === "down" &&
-    Math.abs(horizontalDelta) <= NECK_MOTION_THRESHOLDS.centeredHorizontal &&
-    verticalDelta >= NECK_MOTION_THRESHOLDS.down
+    Math.abs(horizontalDelta) <= CENTERED_HORIZONTAL_LIMIT &&
+    verticalDelta >= DOWN_THRESHOLD
   ) {
-    return { ...measuredState, stage: "up", movements: 3 };
+    return { ...state, stage: "up", movements: 3, tracking: "ready" };
   }
 
   if (
     state.stage === "up" &&
-    Math.abs(horizontalDelta) <= NECK_MOTION_THRESHOLDS.centeredHorizontal &&
-    verticalDelta <= -NECK_MOTION_THRESHOLDS.up
+    Math.abs(horizontalDelta) <= CENTERED_HORIZONTAL_LIMIT &&
+    verticalDelta <= -UP_THRESHOLD
   ) {
-    return { ...measuredState, stage: "center", movements: 4 };
+    return { ...state, stage: "center", movements: 4, tracking: "ready" };
   }
 
   if (
     state.stage === "center" &&
-    Math.abs(horizontalDelta) <= NECK_MOTION_THRESHOLDS.center &&
-    Math.abs(verticalDelta) <= NECK_MOTION_THRESHOLDS.center
+    Math.abs(horizontalDelta) <= CENTER_THRESHOLD &&
+    Math.abs(verticalDelta) <= CENTER_THRESHOLD
   ) {
-    return { ...measuredState, stage: "complete" };
+    return { ...state, stage: "complete", tracking: "ready" };
   }
 
-  return measuredState;
+  return { ...state, tracking: "ready" };
 }

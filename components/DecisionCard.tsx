@@ -4,7 +4,6 @@ import type { DecisionResult } from "@/lib/types";
 type DecisionCardProps = {
   result: DecisionResult;
   onStart?: () => void;
-  onSkip?: () => void;
 };
 
 function Signal({ label, value }: { label: string; value: string }) {
@@ -16,22 +15,11 @@ function Signal({ label, value }: { label: string; value: string }) {
   );
 }
 
-function formatActivityDuration(totalSeconds: number): string {
-  if (totalSeconds < 60) return `${totalSeconds} seconds`;
-  if (totalSeconds % 60 === 0) {
-    const minutes = totalSeconds / 60;
-    return `${minutes} ${minutes === 1 ? "minute" : "minutes"}`;
-  }
-
-  return `${Math.floor(totalSeconds / 60)} min ${totalSeconds % 60} sec`;
-}
-
 export function DecisionCard({
   result,
   onStart,
-  onSkip,
 }: DecisionCardProps) {
-  const activity = result.decision === "MOVE_NOW" ? result.activity : undefined;
+  const canMove = result.decision === "MOVE_NOW" && result.activity;
 
   return (
     <section
@@ -49,30 +37,22 @@ export function DecisionCard({
         <Signal label="Movement need" value={result.movementNeed} />
         <Signal label="Interruption cost" value={result.interruptionCost} />
       </div>
-      {activity ? (
+      {canMove ? (
         <div className="activity-offer">
-          <p>Best fit for this window</p>
-          <h3>{activity.name}</h3>
-          <span>About {formatActivityDuration(activity.durationSeconds)}</span>
-          {result.activityReason ? (
-            <p className="activity-offer__reason">{result.activityReason}</p>
-          ) : null}
+          <p>Smallest useful move</p>
+          <h3>{result.activity?.name}</h3>
+          <span>About {result.activity?.durationSeconds} seconds</span>
         </div>
       ) : null}
       <div className="decision-reason">
         <span>Why this decision</span>
         <p>{result.reason}</p>
       </div>
-      {activity ? (
+      {canMove ? (
         <div className="decision-actions">
           <button className="button button--primary" onClick={onStart} type="button">
             Start activity <ArrowIcon />
           </button>
-          {onSkip ? (
-            <button className="button button--quiet" onClick={onSkip} type="button">
-              Skip for now
-            </button>
-          ) : null}
         </div>
       ) : null}
     </section>

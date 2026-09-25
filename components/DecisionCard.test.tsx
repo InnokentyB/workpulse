@@ -10,21 +10,12 @@ const recommendation: DecisionResult = {
   interruptionCost: "LOW",
   score: 0.75,
   reason: "Movement need is high and the interruption window is favorable.",
-  activityReason:
-    "Selected for your 12-minute window and because you last moved 78 minutes ago.",
   activity: {
     id: "neck-reset",
     name: "Neck reset",
     instructions:
       "Slowly turn side to side, lower your chin, and lift your gaze within a comfortable range.",
     durationSeconds: 45,
-    sessionType: "camera-neck",
-    steps: [
-      "Turn to one side",
-      "Turn to the other side",
-      "Lower your chin",
-      "Lift your gaze slightly",
-    ],
   },
 };
 
@@ -37,7 +28,6 @@ describe("DecisionCard", () => {
     expect(screen.getByText("LOW")).toBeDefined();
     expect(screen.getByText(recommendation.reason)).toBeDefined();
     expect(screen.getByText("Neck reset")).toBeDefined();
-    expect(screen.getByText(recommendation.activityReason!)).toBeDefined();
   });
 
   it("starts the offered activity", () => {

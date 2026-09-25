@@ -20,16 +20,15 @@ WorkPulse is a contextual coworker that can deliberately choose not to act. It b
 
 ## Operating Context
 
-The MVP is a responsive, single-page web demo for a laptop pitch and a 360px mobile viewport. It uses four fixed scenarios to demonstrate three activity windows plus a deliberate `NOT NOW`, and requires no setup or external services.
+The MVP is a responsive, single-page web demo for a laptop pitch and a 360px mobile viewport. It uses exactly two fixed scenarios and requires no setup or external services.
 
 ## Capabilities and Constraints
 
 - Show sedentary time, time to the next meeting, and time since the last movement.
 - Identify calendar context as demo data and keep camera state visible at all times.
 - Deterministically return `MOVE NOW` or `NOT NOW`, movement need, interruption cost, and a reason.
-- Select among 45-second, 90-second, and three-minute activities based on time until the next meeting and time since the last movement.
+- Attach one fixed activity—a neck reset in about 45 seconds—only to `MOVE NOW`.
 - Support optional on-device verification for four guided neck movements, plus a manual fallback.
-- Guide longer activities with an in-memory timer, step progression, pause, and manual completion.
 - Request camera access only during the activity and stop it immediately after completion or cancellation.
 - Never record, store, upload, or play back video, and never request microphone access.
 - Work without authentication, real calendar access, a database, local persistence, or an LLM service.
