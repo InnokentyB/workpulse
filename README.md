@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# WorkPulse
 
-## Getting Started
+**Move more. Interrupt less.**
 
-First, run the development server:
+WorkPulse is a hackathon prototype for the Workplace Wellbeing track. It is an AI coworker that decides whether now is a good moment to interrupt a desk worker for a short movement break.
+
+The core product principle is:
+
+> Use deterministic logic for decisions that must be reliable; use AI for choices that benefit from flexibility.
+
+## Current status
+
+This repository contains:
+
+- a runnable Next.js, TypeScript, and Tailwind starter;
+- the canonical product and engineering specification in [`WORKPULSE_SPEC.md`](./WORKPULSE_SPEC.md);
+- typed domain contracts;
+- a deterministic decision-engine starter;
+- a deterministic activity selector;
+- browser-local persistence helpers;
+- canonical demo scenarios.
+
+The product UI has intentionally not been implemented yet.
+
+## Run locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Verify
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint
+npm run build
+```
 
-## Learn More
+## Project structure
 
-To learn more about Next.js, take a look at the following resources:
+```text
+app/                    Next.js App Router entry points
+components/             Product UI components
+data/demo-scenarios.ts  Stable scenarios for the live demo
+lib/types.ts            Domain contracts
+lib/decision-engine.ts  Reliable MOVE_NOW / NOT_NOW decision logic
+lib/activity-selector.ts
+lib/storage.ts          localStorage boundary
+WORKPULSE_SPEC.md       Canonical product, engineering, and pitch spec
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scope guardrail
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+P0 is complete only when the deployed demo reliably shows that a correct decision not to interrupt is as valuable as a decision to intervene. Camera verification, real calendar integration, authentication, and LLM personalization must not block that core loop.
