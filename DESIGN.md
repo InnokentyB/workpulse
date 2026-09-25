@@ -231,7 +231,7 @@ The compact header uses an inline pulse mark and bold product name on the left, 
 
 ### Decision Surface
 
-The signature component begins with a small state label, follows with oversized explicit state typography, then a ruled two-column comparison of movement need and interruption cost. GO offers the two fixed prototype activities as accessible ruled radio rows, marking each duration and whether it is camera-optional or screen-guided; Shoulder rolls carries a compact lime outline pictogram beside its name. One primary action follows for the selected activity. HOLD omits activity controls but preserves the reason and structural authority. On mobile, signals and actions stack without changing their order.
+The signature component begins with a small state label, follows with oversized explicit state typography, then a ruled two-column comparison of movement need and interruption cost. GO offers the two fixed prototype activities as accessible ruled radio rows, marking each duration and whether it is camera-optional or screen-guided; both rows carry a compact lime outline pictogram beside the activity name. Before the session starts, the selected activity also appears in an instruction preview: a larger version of its pictogram sits inside a restrained circle beside a “How to do…” heading and the activity’s instruction copy. The one primary action names the selected activity (`Start neck reset` or `Start shoulder rolls`) so the choice, guidance, and next step stay aligned. On compact screens, the preview circle reduces from 62px to 48px while the text remains beside it. HOLD omits activity controls but preserves the reason and structural authority. On mobile, signals and actions stack without changing their order.
 
 ### Activity Session Surfaces
 

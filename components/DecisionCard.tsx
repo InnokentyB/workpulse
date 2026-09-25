@@ -1,4 +1,8 @@
-import { ArrowIcon, ShoulderRollsIcon } from "@/components/icons";
+import {
+  ArrowIcon,
+  NeckResetIcon,
+  ShoulderRollsIcon,
+} from "@/components/icons";
 import type { Activity, DecisionResult } from "@/lib/types";
 
 type DecisionCardProps = {
@@ -14,6 +18,14 @@ function Signal({ label, value }: { label: string; value: string }) {
       <span>{label}</span>
       <strong data-level={value}>{value}</strong>
     </div>
+  );
+}
+
+function ActivityIcon({ activity }: { activity: Activity }) {
+  return activity.id === "shoulder-rolls" ? (
+    <ShoulderRollsIcon />
+  ) : (
+    <NeckResetIcon />
   );
 }
 
@@ -61,9 +73,7 @@ export function DecisionCard({
                   />
                   <span className="activity-picker__copy">
                     <span className="activity-picker__name">
-                      {activity.id === "shoulder-rolls" ? (
-                        <ShoulderRollsIcon />
-                      ) : null}
+                      <ActivityIcon activity={activity} />
                       <strong>{activity.name}</strong>
                     </span>
                     <small>
@@ -79,6 +89,17 @@ export function DecisionCard({
               <span>About {result.activity?.durationSeconds} seconds</span>
             </>
           )}
+          {result.activity ? (
+            <div className="activity-preview">
+              <span className="activity-preview__icon">
+                <ActivityIcon activity={result.activity} />
+              </span>
+              <div>
+                <h3>How to do {result.activity.name.toLowerCase()}</h3>
+                <p>{result.activity.instructions}</p>
+              </div>
+            </div>
+          ) : null}
         </div>
       ) : null}
       <div className="decision-reason">
@@ -88,12 +109,11 @@ export function DecisionCard({
       {canMove ? (
         <div className="decision-actions">
           <button
-            aria-label={`Start activity: ${result.activity?.name}`}
             className="button button--primary"
             onClick={onStart}
             type="button"
           >
-            Start activity <ArrowIcon />
+            Start {result.activity?.name.toLowerCase()} <ArrowIcon />
           </button>
         </div>
       ) : null}

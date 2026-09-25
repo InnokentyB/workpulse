@@ -36,7 +36,7 @@ describe("DecisionCard", () => {
     const onStart = vi.fn();
     render(<DecisionCard result={recommendation} onStart={onStart} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /start activity/i }));
+    fireEvent.click(screen.getByRole("button", { name: /start neck reset/i }));
 
     expect(onStart).toHaveBeenCalledOnce();
   });
@@ -56,7 +56,10 @@ describe("DecisionCard", () => {
       "checked",
       true,
     );
+    expect(container.querySelector('[data-icon="neck-reset"]')).not.toBeNull();
     expect(container.querySelector('[data-icon="shoulder-rolls"]')).not.toBeNull();
+    expect(screen.getByRole("heading", { name: /how to do neck reset/i })).toBeDefined();
+    expect(screen.getByText(recommendation.activity!.instructions)).toBeDefined();
     fireEvent.click(screen.getByRole("radio", { name: /shoulder rolls/i }));
     expect(onActivitySelect).toHaveBeenCalledWith("shoulder-rolls");
   });
@@ -75,6 +78,6 @@ describe("DecisionCard", () => {
 
     expect(screen.getByRole("heading", { name: /not now/i })).toBeDefined();
     expect(screen.queryByText("Neck reset")).toBeNull();
-    expect(screen.queryByRole("button", { name: /start activity/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^start /i })).toBeNull();
   });
 });

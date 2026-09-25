@@ -147,3 +147,38 @@ export function ShoulderRollsIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+export function NeckResetIcon({ className }: IconProps) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      data-icon="neck-reset"
+      fill="none"
+      viewBox="0 0 48 48"
+    >
+      <circle cx="24" cy="21" r="8.5" stroke="currentColor" strokeWidth="2.2" />
+      <path
+        d="M19.5 30v4M28.5 30v4M11 41c1.5-5.2 5.8-7.8 13-7.8S35.5 35.8 37 41"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2.2"
+      />
+      <path
+        d="M7 9h12M7 9l3.5-3.5M7 9l3.5 3.5M41 9H29M41 9l-3.5-3.5M41 9l-3.5 3.5"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2.2"
+      />
+      <path
+        d="M24 7V3m0 36v6m0-42-3 3m3-3 3 3m-3 39-3-3m3 3 3-3"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2.2"
+      />
+    </svg>
+  );
+}

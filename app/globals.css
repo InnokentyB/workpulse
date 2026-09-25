@@ -308,6 +308,11 @@ button { color: inherit; }
 .activity-picker strong { color: #f8f8f1; font-size: 1rem; font-weight: 650; }
 .activity-picker small { color: #b6cdbf; font-size: .7rem; }
 .activity-picker label[data-selected="true"] small { color: #d5e9bf; }
+.activity-preview { align-items: center; border-top: 1px solid rgba(255, 255, 255, .19); display: grid; gap: 20px; grid-template-columns: 66px minmax(0, 1fr); margin-top: 26px; padding-top: 26px; }
+.activity-preview__icon { align-items: center; border: 1px solid rgba(255, 255, 255, .28); border-radius: 50%; color: var(--signal-bright); display: flex; height: 62px; justify-content: center; width: 62px; }
+.activity-preview__icon svg { height: 42px; width: 42px; }
+.activity-preview h3 { font-size: 1rem; font-weight: 650; letter-spacing: -.015em; margin: 0; }
+.activity-preview p { color: #d5e2da; font-size: 1rem; line-height: 1.55; margin: 7px 0 0; max-width: 62ch; }
 .decision-reason { margin-top: 38px; max-width: 68ch; }
 .decision-reason p { font-size: 1.05rem; line-height: 1.56; margin: 0; }
 .decision-actions { display: flex; gap: 12px; margin-top: 40px; }
@@ -649,6 +654,9 @@ footer p { font-size: .7rem; margin: 0; }
   .decision-signal + .decision-signal { border-left: 0; border-top: 1px solid rgba(255, 255, 255, .19); padding-left: 0; }
   .decision-actions { flex-direction: column; }
   .decision-actions .button { width: 100%; }
+  .activity-preview { align-items: start; grid-template-columns: 52px minmax(0, 1fr); }
+  .activity-preview__icon { height: 48px; width: 48px; }
+  .activity-preview__icon svg { height: 33px; width: 33px; }
   .activity-session { min-height: 520px; padding: 36px 24px; }
   .activity-session__heading { align-items: start; flex-direction: column; }
   .activity-session__heading h2 { font-size: 2.65rem; }

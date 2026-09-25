@@ -27,7 +27,8 @@ describe("WorkPulseApp", () => {
     expect(screen.getByText("LOW")).toBeDefined();
     expect(screen.getByText("Neck reset")).toBeDefined();
     expect(screen.getByText(/about 45 sec/i)).toBeDefined();
-    expect(screen.getByRole("button", { name: /start activity/i })).toBeDefined();
+    expect(screen.getByRole("button", { name: /start neck reset/i })).toBeDefined();
+    expect(screen.getByRole("heading", { name: /how to do neck reset/i })).toBeDefined();
   });
 
   it("supports the compact selector and clears the previous decision", () => {
@@ -57,14 +58,14 @@ describe("WorkPulseApp", () => {
     expect(screen.getAllByText("HIGH")).toHaveLength(2);
     expect(screen.getByText(/next meeting starts in 2 minutes/i)).toBeDefined();
     expect(screen.queryByText("Neck reset")).toBeNull();
-    expect(screen.queryByRole("button", { name: /start activity/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^start /i })).toBeNull();
   });
 
   it("completes the minimal activity loop and records it locally", async () => {
     render(<WorkPulseApp />);
     await screen.findByText("No completed activities yet.");
     fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
-    fireEvent.click(screen.getByRole("button", { name: /start activity/i }));
+    fireEvent.click(screen.getByRole("button", { name: /start neck reset/i }));
 
     expect(screen.getByRole("heading", { name: "Neck reset" })).toBeDefined();
     expect(screen.getByText(/does not record, save, or upload video/i)).toBeDefined();
@@ -91,8 +92,16 @@ describe("WorkPulseApp", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
     fireEvent.click(screen.getByRole("radio", { name: /shoulder rolls/i }));
+    expect(
+      screen.getByRole("heading", { name: /how to do shoulder rolls/i }),
+    ).toBeDefined();
+    expect(
+      screen.getByText(
+        "Make three slow shoulder circles forward, then three backward. Stay within a comfortable range.",
+      ),
+    ).toBeDefined();
     fireEvent.click(
-      screen.getByRole("button", { name: /start activity: shoulder rolls/i }),
+      screen.getByRole("button", { name: /start shoulder rolls/i }),
     );
 
     expect(screen.getByRole("heading", { name: "Shoulder rolls" })).toBeDefined();
