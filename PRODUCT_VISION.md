@@ -238,6 +238,7 @@ The product should prefer derived facts such as “movement need high” over re
 **Outcome:** make the prototype useful for one person's real workday without adding medical complexity.
 
 - User-defined workday start and end.
+- A short, kind end-of-day recap grounded in recorded actions.
 - Meal and long-break windows without nutrition analysis.
 - Activity selection by available time and ability to stand.
 - Initial seated, standing, eye, and walking activities.
@@ -251,6 +252,7 @@ The product should prefer derived facts such as “movement need high” over re
 **Outcome:** coordinate recurring wellbeing commitments privately.
 
 - User-defined medication and therapy reminders with safeguards.
+- Optional menstrual-cycle and symptom tracking with approximate predictions and private explanations.
 - Completion/dismissal-based activity preference learning.
 - Calendar participation context where available.
 - Private notification controls and data export/deletion.
@@ -296,3 +298,44 @@ These assumptions should be tested independently. Failure of a later health modu
 - What level of reminder persistence is acceptable for medication without creating alarm fatigue?
 - How should meal prompting accommodate fasting, shift work, eating disorders, caregiving, and cultural differences?
 - Which data must remain local for the product to earn trust, even if cross-device sync becomes available?
+
+## 13. Optional cycle awareness and wellbeing explanations
+
+This module is for users who want their menstrual cycle considered during the workday. It is separately enabled. It does not assume that every woman menstruates or that cycles follow a universal pattern. Its purpose is to offer a short, understandable explanation and help select a comfortable activity, not to diagnose a condition or prescribe exercise by phase.
+
+Users may enter period start dates and, optionally, symptoms such as fatigue or discomfort, activity constraints, and preferences. WorkPulse shows an **approximate window** for the next period, not an exact date or a confirmed hormonal phase. Users can correct the estimate and turn reminders off. With insufficient data or irregular cycles, the product communicates uncertainty and may decline to predict.
+
+Example message:
+
+> “Based on your entries, your period may start in the next few days. Some people feel more tired around this time; sleep, workload, and other factors may also affect how you feel. Does that fit today?”
+
+The user may respond “Suggest something gentle,” “Use normal suggestions,” or “Do not use cycle information today.” Without confirmation of current symptoms, WorkPulse does not assert that the user is tired, replace their chosen activity, or attribute every mood change to the cycle. If repeated entries support a personal pattern, it may say “You recorded fatigue before your period in several cycles.” This is an observation, not a diagnosis. For severe or disruptive symptoms, a neutral suggestion to discuss them with a qualified professional is appropriate.
+
+Cycle and symptom records are sensitive personal data. They remain local by default, are hidden from notification previews and shared screens, are never available to employers, and can be deleted separately. Cycle awareness does not override the core decision engine's privacy rules or hard gates.
+
+## 14. Caring explanations and end-of-day reflection
+
+Each activity suggestion briefly answers **why now**, **why this movement**, and **what general purpose it serves**. Copy uses observed context and does not promise a measured health outcome.
+
+Before an activity:
+
+> “You have been sitting for 57 minutes and have 12 minutes before your meeting. A short walk fits this window and breaks up a long period of sitting.”
+
+After completion, WorkPulse names a verifiable action first, then gives a careful explanation:
+
+> “You walked for two minutes and interrupted a long sitting period. Even light movement can be part of a more active day. How do you feel?”
+
+For a stretch it can say “You changed position and moved your shoulders gently”; for squats, “You used the muscles in your legs.” It must not claim that a single brief activity treated pain, produced a measured circulation improvement, or changed this user's disease risk. Users may optionally record how they feel after an activity; this self-report is not a medical measurement.
+
+Near the end of the user-defined workday, WorkPulse offers an optional short recap when it will not interrupt a meeting or important action. It praises **recorded actions** and restates the purpose: move at suitable moments and finish work on time. For example:
+
+> “Today you took three short movement breaks and finished work on time. You made room for movement without interrupting important meetings. That is a step toward a more active, more considerate workday. Enjoy your rest.”
+
+If no actions were recorded, it invents no achievement and applies no guilt: “There was no good window today. We can try again tomorrow.” The recap can be disabled. After the workday ends, WorkPulse does not encourage the user to resume work to complete an activity.
+
+### Evidence for these copy rules
+
+- [NHS: premenstrual syndrome](https://www.nhs.uk/conditions/pre-menstrual-syndrome/) describes fatigue as a possible symptom and notes variation between people and months.
+- [ACOG: premenstrual syndrome](https://www.acog.org/womens-health/faqs/Premenstrual-Syndrome) supports tracking recurring personal symptoms and notes that other conditions can cause similar symptoms.
+- [Systematic review of cycle phase and exercise performance](https://pmc.ncbi.nlm.nih.gov/articles/7497427/) does not support a universal phase-based activity prescription and recommends an individual approach.
+- [WHO guidelines on physical activity and sedentary behaviour](https://www.who.int/publications/i/item/9789240014886) support reducing sedentary time and replacing it with movement, including light activity. This grounds a general explanation, not a claim of measured benefit from one break.
