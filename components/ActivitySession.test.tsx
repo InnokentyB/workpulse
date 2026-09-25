@@ -10,6 +10,13 @@ const activity = {
   instructions:
     "Slowly turn side to side, lower your chin, and lift your gaze within a comfortable range.",
   durationSeconds: 45,
+  sessionType: "camera-neck" as const,
+  steps: [
+    "Turn to one side",
+    "Turn to the other side",
+    "Lower your chin",
+    "Lift your gaze slightly",
+  ],
 };
 
 afterEach(() => {
@@ -31,6 +38,13 @@ describe("ActivitySession", () => {
 
     expect(screen.getByRole("heading", { name: "Neck reset" })).toBeDefined();
     expect(screen.getByLabelText("0 of 4 neck movements")).toBeDefined();
+    expect(
+      screen.getByRole("heading", { name: "Your movement sequence" }),
+    ).toBeDefined();
+    expect(screen.getByText("Turn to one side")).toBeDefined();
+    expect(screen.getByText("Turn to the other")).toBeDefined();
+    expect(screen.getByText("Lower your chin")).toBeDefined();
+    expect(screen.getByText("Lift your gaze slightly")).toBeDefined();
     expect(screen.getByText(/does not record, save, or upload video/i)).toBeDefined();
     expect(screen.getByText(/stop if you feel pain or dizziness/i)).toBeDefined();
     expect(screen.getByRole("button", { name: /enable camera/i })).toBeDefined();
@@ -49,7 +63,11 @@ describe("ActivitySession", () => {
       screen.getByRole("button", { name: /finish without camera/i }),
     );
 
-    expect(onComplete).toHaveBeenCalledWith({ movements: 0, verified: false });
+    expect(onComplete).toHaveBeenCalledWith({
+      completedSteps: 0,
+      mode: "manual",
+      verified: false,
+    });
   });
 
   it("explains how to recover when camera permission is declined", async () => {

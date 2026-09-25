@@ -56,6 +56,36 @@ describe("WorkPulseApp", () => {
     expect(screen.queryByRole("button", { name: /start activity/i })).toBeNull();
   });
 
+  it("offers and opens the shoulder timer for a medium window", () => {
+    render(<WorkPulseApp />);
+
+    fireEvent.change(screen.getByLabelText(/choose the workday context/i), {
+      target: { value: "shoulder-window" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
+
+    expect(screen.getByText("Shoulder reset")).toBeDefined();
+    expect(screen.getByText("About 1 min 30 sec")).toBeDefined();
+    expect(screen.getByText(/100 minutes ago/i)).toBeDefined();
+
+    fireEvent.click(screen.getByRole("button", { name: /start activity/i }));
+    expect(screen.getByRole("heading", { name: "Shoulder reset" })).toBeDefined();
+    expect(screen.getByText("1:30")).toBeDefined();
+    expect(screen.getByRole("button", { name: /start exercise/i })).toBeDefined();
+  });
+
+  it("offers the full-body reset for a long movement gap", () => {
+    render(<WorkPulseApp />);
+
+    fireEvent.change(screen.getByLabelText(/choose the workday context/i), {
+      target: { value: "full-reset-window" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
+
+    expect(screen.getByText("Full-body reset")).toBeDefined();
+    expect(screen.getByText("About 3 minutes")).toBeDefined();
+  });
+
   it("completes the minimal activity loop", () => {
     render(<WorkPulseApp />);
     fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
@@ -72,5 +102,9 @@ describe("WorkPulseApp", () => {
     fireEvent.click(screen.getByRole("button", { name: /run again/i }));
     expect(screen.getByRole("button", { name: /ask workpulse/i })).toBeDefined();
     expect(screen.queryByText(/nice work/i)).toBeNull();
+    expect(screen.getByText("0")).toBeDefined();
+
+    fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
+    expect(screen.getByRole("heading", { name: /not now/i })).toBeDefined();
   });
 });

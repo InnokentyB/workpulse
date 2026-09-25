@@ -15,6 +15,14 @@ export type Activity = {
   name: string;
   durationSeconds: number;
   instructions: string;
+  sessionType: "camera-neck" | "timer";
+  steps: string[];
+};
+
+export type ActivityCompletion = {
+  completedSteps: number;
+  mode: "camera" | "timer" | "manual";
+  verified: boolean;
 };
 
 export type DecisionResult = {
@@ -24,6 +32,7 @@ export type DecisionResult = {
   score: number;
   reason: string;
   activity?: Activity;
+  activityReason?: string;
 };
 
 export type DemoScenario = {

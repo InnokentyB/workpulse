@@ -13,13 +13,18 @@ import type {
 
 import { CameraIcon, CheckIcon } from "@/components/icons";
 import {
+  LiveNeckCue,
+  NeckMovementPreview,
+} from "@/components/NeckMovementGuide";
+import { TimedActivitySession } from "@/components/TimedActivitySession";
+import {
   INITIAL_NECK_MOTION_STATE,
   TARGET_NECK_MOVEMENTS,
   updateNeckMotion,
   type NeckMotionState,
   type PoseLandmark,
 } from "@/lib/neck-motion-tracker";
-import type { Activity } from "@/lib/types";
+import type { Activity, ActivityCompletion } from "@/lib/types";
 
 const WASM_ROOT =
   "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.0.1/wasm";
@@ -43,11 +48,6 @@ type CameraStatus =
   | "denied"
   | "unavailable"
   | "error";
-
-export type ActivityCompletion = {
-  movements: number;
-  verified: boolean;
-};
 
 type ActivitySessionProps = {
   activity: Activity;
@@ -135,7 +135,7 @@ function drawPose(
   }
 }
 
-export function ActivitySession({
+function CameraActivitySession({
   activity,
   onComplete,
 }: ActivitySessionProps) {
@@ -170,7 +170,11 @@ export function ActivitySession({
   const finish = useCallback(
     (verified: boolean, movements: number) => {
       stopCamera();
-      onComplete({ movements, verified });
+      onComplete({
+        completedSteps: movements,
+        mode: verified ? "camera" : "manual",
+        verified,
+      });
     },
     [onComplete, stopCamera],
   );
@@ -329,23 +333,29 @@ export function ActivitySession({
           </div>
         ) : null}
         {status === "active" ? (
-          <div className="camera-stage__live">
-            <span aria-hidden="true" /> Camera active
-          </div>
+          <>
+            <div className="camera-stage__live">
+              <span aria-hidden="true" /> Camera active
+            </div>
+            <LiveNeckCue motion={motion} />
+          </>
         ) : null}
       </div>
 
       {status === "idle" ? (
-        <div className="camera-consent">
-          <CameraIcon />
-          <div>
-            <h3>Follow four gentle neck movements</h3>
-            <p>
-              Your image is processed on this device. WorkPulse does not record,
-              save, or upload video. The camera switches off after the movement check.
-            </p>
+        <>
+          <div className="camera-consent">
+            <CameraIcon />
+            <div>
+              <h3>Follow four gentle neck movements</h3>
+              <p>
+                Your image is processed on this device. WorkPulse does not record,
+                save, or upload video. The camera switches off after the movement check.
+              </p>
+            </div>
           </div>
-        </div>
+          <NeckMovementPreview />
+        </>
       ) : null}
 
       {status === "active" ? (
@@ -414,4 +424,12 @@ export function ActivitySession({
       </div>
     </section>
   );
+}
+
+export function ActivitySession(props: ActivitySessionProps) {
+  if (props.activity.sessionType === "timer") {
+    return <TimedActivitySession {...props} />;
+  }
+
+  return <CameraActivitySession {...props} />;
 }

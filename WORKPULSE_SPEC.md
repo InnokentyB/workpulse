@@ -1,6 +1,6 @@
 # WorkPulse — MVP Specification
 
-**Version:** 1.3
+**Version:** 1.4
 **Date:** 25 September 2026
 **Tagline:** Move more. Interrupt less.
 
@@ -30,16 +30,18 @@ Alex needs a clear recommendation that fits the workday without setup, guilt, or
 ## 4. In scope
 
 - One responsive web page.
-- Exactly two fixed demo scenarios.
+- Four fixed demo scenarios covering three activity selections and the meeting gate.
 - Visible sedentary time, time to the next meeting, and time since the last movement.
 - Visible context provenance: calendar information is labelled as demo data and camera status is explicit.
 - A deterministic decision engine with hard gates and scoring.
 - Equal-weight `MOVE NOW` and `NOT NOW` presentation.
 - Visible movement-need and interruption-cost levels.
 - A plain-language explanation for every decision.
-- One fixed activity for `MOVE NOW`: a neck reset in about 45 seconds.
+- A deterministic activity catalog: 45-second neck reset, 90-second shoulder reset, and three-minute full-body reset.
+- Activity selection based on time since the last movement and the usable window before the next meeting.
+- A validated build-time workout configuration with editor-readable JSON Schema.
 - Optional on-device guidance for four neck movements during the activity.
-- A minimal `Start → Enable camera → Complete four movements → Run again` activity loop, with a manual fallback.
+- Guided timer sessions with visible steps, pause/resume, automatic completion, and a manual fallback.
 - Keyboard accessibility, visible focus, and a usable 360px mobile layout.
 - Focused automated tests for the two decisions and the activity loop.
 
@@ -47,7 +49,7 @@ Alex needs a clear recommendation that fits the workday without setup, guilt, or
 
 - A third low-movement-need demo scenario.
 - Dismissal, cooldown, history, or `localStorage`.
-- Preference learning or multiple activities.
+- Preference learning or personalized activity generation.
 - Continuous or background camera observation.
 - Video recording, storage, upload, playback, or microphone access.
 - Real calendar data, background scheduling, or notifications.
@@ -62,6 +64,8 @@ Public deployment and a backup recording are launch tasks, not product functiona
 | Scenario | Sitting | Next meeting | Last movement | Expected decision |
 |---|---:|---:|---:|---|
 | Good window | 57 min | 12 min | 78 min ago | `MOVE NOW` |
+| Shoulder window | 72 min | 7 min | 100 min ago | `MOVE NOW` |
+| Full reset window | 95 min | 8 min | 130 min ago | `MOVE NOW` |
 | Meeting soon | 72 min | 2 min | 90 min ago | `NOT NOW` |
 
 ### Good window result
@@ -115,7 +119,8 @@ score < 0.65  → NOT_NOW
 Invariants:
 
 - Every result has a non-empty reason.
-- `MOVE_NOW` always includes the fixed activity.
+- `MOVE_NOW` always includes the deterministic best-fit activity and an activity-selection explanation.
+- If no configured activity fits the protected window, the result is `NOT_NOW`.
 - `NOT_NOW` never includes an activity or start action.
 - The same context always produces the same result.
 - Domain logic does not import React or browser APIs.
@@ -138,20 +143,24 @@ Selecting another scenario clears the previous result before the next evaluation
 
 1. Good window displays `57 / 12 / 78` and deterministically returns `MOVE NOW`, `HIGH` need, `LOW` cost, a reason, and the neck reset.
 2. Meeting soon displays `72 / 2 / 90` and deterministically returns `NOT NOW`, `HIGH` need, `HIGH` cost, and a meeting-gate reason.
-3. `NOT NOW` shows no activity and no start action.
-4. Switching `A → B → A` never leaves stale values or controls.
-5. `Start → Enable camera → Complete four guided neck movements → Run again` works without persistence.
-6. Both decisions remain understandable without relying on color.
-7. The core flow works at 360px and on a presentation-size desktop.
-8. The decision demo works without external services; camera verification loads the pose model on demand.
-9. Calendar context is visibly identified as demo data.
-10. Camera access is requested only after an explicit user action and never requests microphone access.
-11. Camera frames are processed locally and are never recorded, stored, or uploaded.
-12. The activity calibrates a neutral pose, then verifies one turn to either side, a turn to the opposite side, chin down, a gentle gaze up, and a return to neutral in that order.
-13. The camera stops automatically after the verified sequence and whenever the session ends.
-14. Permission denial and unavailable-camera states explain how to recover and retain a manual fallback.
-15. Tests, lint, and the production build pass.
-16. Guidance avoids full neck circles and deep extension, asks for a comfortable range, and tells the user to stop for pain or dizziness.
+3. The `72 / 7 / 100` context selects the 90-second shoulder reset and explains why it fits.
+4. The `95 / 8 / 130` context selects the three-minute full-body reset and explains why it fits.
+5. `NOT NOW` shows no activity and no start action.
+6. Switching between scenarios never leaves stale values or controls.
+7. `Start → Enable camera → Complete four guided neck movements → Run again` works without persistence.
+8. Timed activities show their sequence, advance by elapsed time, support pause/resume, and complete at zero.
+9. Completing any activity sets the in-memory time since last movement to zero for the next decision.
+10. Both decisions remain understandable without relying on color.
+11. The core flow works at 360px and on a presentation-size desktop.
+12. The decision demo works without external services; camera verification loads the pose model on demand.
+13. Calendar context is visibly identified as demo data.
+14. Camera access is requested only after an explicit user action and never requests microphone access.
+15. Camera frames are processed locally and are never recorded, stored, or uploaded.
+16. The camera activity calibrates a neutral pose, then verifies one turn to either side, a turn to the opposite side, chin down, a gentle gaze up, and a return to neutral in that order.
+17. The camera stops automatically after the verified sequence and whenever the session ends.
+18. Permission denial and unavailable-camera states explain how to recover and retain a manual fallback.
+19. Guidance avoids full neck circles and deep extension, asks for a comfortable range, and tells the user to stop for pain or dizziness.
+20. Tests, lint, and the production build pass.
 
 ## 10. Architecture
 
@@ -159,6 +168,8 @@ Selecting another scenario clears the previous result before the next evaluation
 Fixed scenarios
       ↓
 Pure decision engine
+      ↓
+Best-fit activity selector
       ↓
 Responsive React UI
       ↓
@@ -177,20 +188,22 @@ Stack:
 - Tailwind CSS plus project CSS
 - Vitest and Testing Library
 
-There is no backend, authentication layer, database, real calendar integration, video storage, or AI service. Browser-native camera access feeds MediaPipe Pose Landmarker during the short activity session. Only neutral-position calibration and movement progress remain in React state, and both are discarded on reload.
+There is no backend, authentication layer, database, real calendar integration, video storage, or AI service. Browser-native camera access feeds MediaPipe Pose Landmarker during the neck reset. Timer progress, neutral-position calibration, and movement progress exist only in React state and are discarded on reload.
 
 ## 11. Test contract
 
 Required automated checks:
 
-- canonical good window returns `MOVE NOW` with the fixed activity;
+- canonical good window returns `MOVE NOW` with the neck reset;
+- medium and long windows return the shoulder and full-body resets respectively;
 - meeting-soon hard gate returns `NOT NOW` without an activity;
 - the five-minute meeting boundary returns `NOT NOW`;
-- UI switches between both scenarios without stale state;
+- UI switches between all scenarios without stale state;
 - minimal `Start → Done → Run again` flow works.
 - face and shoulder visibility is required before calibration or verification;
 - the side-to-side, down, up, and neutral sequence advances only in order;
 - camera permission denial produces a recoverable state.
+- timed sessions advance, pause, resume, and complete deterministically.
 
 Required verification commands:
 
@@ -202,4 +215,4 @@ npm run build
 
 ## 12. Definition of done
 
-The MVP is done when a viewer can compare the two scenarios, understand why the decisions differ, optionally verify the guided neck reset through a permissioned camera session, see that the camera has stopped, and repeat the demo reliably on desktop and mobile.
+The MVP is done when a viewer can compare the four scenarios, understand why the decisions and selected activity durations differ, complete either a camera-guided neck reset or a timer-guided longer reset, and repeat the demo reliably on desktop and mobile.

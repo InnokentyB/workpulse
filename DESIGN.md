@@ -235,7 +235,11 @@ The signature component begins with a small state label, follows with oversized 
 
 ### Camera Activity Surface
 
-The activity state keeps the green decision surface and replaces the static instructions with an explicit camera-consent step. Once permission is granted, a mirrored native video preview and lime upper-body pose trace make local detection visible. A large `0 / 4` movement indicator, one instruction at a time, persistent “no video recording” copy, and an always-available stop action keep the session legible and trustworthy. Permission denial and unavailable-camera states stay within the same surface and offer recovery plus a manual fallback.
+The activity state keeps the green decision surface and replaces the static instructions with an explicit camera-consent step. Before permission, a four-frame geometric movement sequence shows the turn, opposite turn, chin-down, and gentle gaze-up actions. Once permission is granted, a mirrored native video preview and lime upper-body pose trace make local detection visible while a high-contrast cue overlays only the current movement. A large `0 / 4` movement indicator, persistent “no video recording” copy, and an always-available stop action keep the session legible and trustworthy. Permission denial and unavailable-camera states stay within the same surface and offer recovery plus a manual fallback.
+
+### Timed Activity Surface
+
+Shoulder and full-body resets reuse the green activity surface without implying camera verification. Before start, the complete sequence appears as a ruled list alongside a prominent duration. During the exercise, the current movement replaces the list, a native progress track shows elapsed time, and pause, resume, and finish actions remain explicit. The timer and step index use tabular numerals and collapse to a single-column sequence on mobile.
 
 ### Work Context Metrics
 

@@ -1,0 +1,53 @@
+{
+  "$schema": "./workouts.schema.json",
+  "transitionBufferSeconds": 300,
+  "workouts": [
+    {
+      "id": "neck-reset",
+      "name": "Neck reset",
+      "durationSeconds": 45,
+      "instructions": "Slowly turn side to side, lower your chin, and lift your gaze within a comfortable range.",
+      "sessionType": "camera-neck",
+      "steps": [
+        "Turn to one side",
+        "Turn to the other side",
+        "Lower your chin",
+        "Lift your gaze slightly"
+      ],
+      "selection": {
+        "minimumMinutesSinceLastActivity": 0
+      }
+    },
+    {
+      "id": "shoulder-reset",
+      "name": "Shoulder reset",
+      "durationSeconds": 90,
+      "instructions": "Release upper-body tension with slow shoulder and shoulder-blade movements.",
+      "sessionType": "timer",
+      "steps": [
+        "Roll your shoulders slowly backward",
+        "Draw your shoulder blades gently together",
+        "Let your arms hang and release"
+      ],
+      "selection": {
+        "minimumMinutesSinceLastActivity": 90
+      }
+    },
+    {
+      "id": "full-body-reset",
+      "name": "Full-body reset",
+      "durationSeconds": 180,
+      "instructions": "Stand up and move through a short sequence for your sides, legs, and shoulders.",
+      "sessionType": "timer",
+      "steps": [
+        "Stand tall and reach overhead",
+        "Bend gently to each side",
+        "Complete slow calf raises",
+        "Shake out your arms and settle"
+      ],
+      "selection": {
+        "minimumMinutesSinceLastActivity": 120
+      }
+    }
+  ]
+}

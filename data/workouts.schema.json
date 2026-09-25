@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://workpulse.local/workouts.schema.json",
+  "title": "WorkPulse workout settings",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["transitionBufferSeconds", "workouts"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "transitionBufferSeconds": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Time protected before the next meeting after an exercise ends."
+    },
+    "workouts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "durationSeconds",
+          "instructions",
+          "sessionType",
+          "steps",
+          "selection"
+        ],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "name": { "type": "string", "minLength": 1 },
+          "durationSeconds": { "type": "integer", "minimum": 1 },
+          "instructions": { "type": "string", "minLength": 1 },
+          "sessionType": {
+            "enum": ["timer", "camera-neck"],
+            "description": "Use timer for data-only additions. camera-neck is reserved for the implemented neck detector."
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "selection": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["minimumMinutesSinceLastActivity"],
+            "properties": {
+              "minimumMinutesSinceLastActivity": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

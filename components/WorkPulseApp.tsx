@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 
 import {
   ActivitySession,
-  type ActivityCompletion,
 } from "@/components/ActivitySession";
 import { DecisionCard } from "@/components/DecisionCard";
 import { ArrowIcon, CheckIcon, PulseMark } from "@/components/icons";
@@ -12,7 +11,11 @@ import { ScenarioSelector } from "@/components/ScenarioSelector";
 import { WorkContextCard } from "@/components/WorkContextCard";
 import { demoScenarios } from "@/data/demo-scenarios";
 import { evaluateIntervention } from "@/lib/decision-engine";
-import type { DecisionResult, WorkPulseState } from "@/lib/types";
+import type {
+  ActivityCompletion,
+  DecisionResult,
+  WorkPulseState,
+} from "@/lib/types";
 
 const INITIAL_SCENARIO_ID = "good-window";
 
@@ -21,11 +24,22 @@ export function WorkPulseApp() {
   const [state, setState] = useState<WorkPulseState>("IDLE");
   const [result, setResult] = useState<DecisionResult | null>(null);
   const [completion, setCompletion] = useState<ActivityCompletion | null>(null);
+  const [minutesSinceLastActivityOverride, setMinutesSinceLastActivityOverride] =
+    useState<number | null>(null);
 
   const scenario = useMemo(
     () =>
       demoScenarios.find((item) => item.id === selectedId) ?? demoScenarios[0],
     [selectedId],
+  );
+  const activeContext = useMemo(
+    () => ({
+      ...scenario.context,
+      minutesSinceLastActivity:
+        minutesSinceLastActivityOverride ??
+        scenario.context.minutesSinceLastActivity,
+    }),
+    [minutesSinceLastActivityOverride, scenario.context],
   );
 
   function selectScenario(scenarioId: string) {
@@ -33,10 +47,11 @@ export function WorkPulseApp() {
     setState("IDLE");
     setResult(null);
     setCompletion(null);
+    setMinutesSinceLastActivityOverride(null);
   }
 
   function evaluate() {
-    const nextResult = evaluateIntervention(scenario.context);
+    const nextResult = evaluateIntervention(activeContext);
     setResult(nextResult);
     setState(nextResult.decision === "MOVE_NOW" ? "RECOMMENDED" : "NOT_NOW");
   }
@@ -76,12 +91,12 @@ export function WorkPulseApp() {
           />
           <div className="privacy-note">
             <span aria-hidden="true">Demo</span>
-            <p>Two fixed contexts. No calendar connection or setup required.</p>
+            <p>Four fixed contexts. No calendar connection or setup required.</p>
           </div>
         </aside>
 
         <div className="demo-stage">
-          <WorkContextCard context={scenario.context} />
+          <WorkContextCard context={activeContext} />
 
           {state === "IDLE" ? (
             <section className="ready-panel" aria-labelledby="ready-heading">
@@ -108,6 +123,7 @@ export function WorkPulseApp() {
               activity={result.activity}
               onComplete={(nextCompletion) => {
                 setCompletion(nextCompletion);
+                setMinutesSinceLastActivityOverride(0);
                 setState("COMPLETED");
               }}
             />
@@ -122,13 +138,15 @@ export function WorkPulseApp() {
                 <p>{completion?.verified ? "Movement verified" : "Activity complete"}</p>
                 <h2>
                   {completion?.verified
-                    ? "Nice work. Neck reset verified."
-                    : "Nice work. Back to your day."}
+                    ? `Nice work. ${result?.activity?.name ?? "Movement"} verified.`
+                    : `Nice work. ${result?.activity?.name ?? "Activity"} complete.`}
                 </h2>
                 <span>
                   {completion?.verified
                     ? "Four movements confirmed on this device. No video was recorded. Camera is off."
-                    : "Completed without camera verification."}
+                    : completion?.mode === "timer"
+                      ? "Guided sequence complete."
+                      : "Completed without camera verification."}
                 </span>
               </div>
               <button className="button button--quiet" onClick={runAgain} type="button">

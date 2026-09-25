@@ -14,6 +14,30 @@ export const demoScenarios: DemoScenario[] = [
     },
   },
   {
+    id: "shoulder-window",
+    label: "Time for shoulders",
+    description: "A longer movement gap with enough time for a focused reset.",
+    context: {
+      sedentaryMinutes: 72,
+      minutesToNextMeeting: 7,
+      minutesSinceLastActivity: 100,
+      currentTime: "14:13",
+      nextMeetingTitle: "Design Review",
+    },
+  },
+  {
+    id: "full-reset-window",
+    label: "Time for a full reset",
+    description: "A long movement gap with room for a three-minute break.",
+    context: {
+      sedentaryMinutes: 95,
+      minutesToNextMeeting: 8,
+      minutesSinceLastActivity: 130,
+      currentTime: "15:22",
+      nextMeetingTitle: "Roadmap Review",
+    },
+  },
+  {
     id: "meeting-soon",
     label: "Meeting starts soon",
     description: "Movement is needed, but interruption cost is too high.",

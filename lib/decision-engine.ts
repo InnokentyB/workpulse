@@ -66,6 +66,18 @@ export function evaluateIntervention(
       context.minutesToNextMeeting === null
         ? "no upcoming meeting"
         : `a ${context.minutesToNextMeeting}-minute window before your next meeting`;
+    const activity = selectActivity(context);
+
+    if (!activity) {
+      return {
+        decision: "NOT_NOW",
+        movementNeed,
+        interruptionCost,
+        score,
+        reason:
+          "Movement would be useful, but no configured activity fits the protected time before your next meeting.",
+      };
+    }
 
     return {
       decision: "MOVE_NOW",
@@ -73,7 +85,11 @@ export function evaluateIntervention(
       interruptionCost,
       score,
       reason: `You've been sitting for ${context.sedentaryMinutes} minutes and have ${windowDescription}.`,
-      activity: selectActivity(),
+      activity,
+      activityReason:
+        context.minutesToNextMeeting === null
+          ? `Selected because your calendar is open and you last moved ${context.minutesSinceLastActivity} minutes ago.`
+          : `Selected for your ${context.minutesToNextMeeting}-minute window and because you last moved ${context.minutesSinceLastActivity} minutes ago.`,
     };
   }
 
