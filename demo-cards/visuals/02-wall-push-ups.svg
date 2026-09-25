@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320" role="img" aria-labelledby="t d">
+  <title id="t">Отжимание от стены в двух положениях</title>
+  <desc id="d">Слева исходная позиция с ладонями на стене, справа локти согнуты и корпус ближе к стене.</desc>
+  <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M1 1 L7 4 L1 7" fill="none" stroke="#0B6B4F" stroke-width="2"/></marker></defs>
+  <rect width="640" height="320" rx="24" fill="#F7F8F4"/>
+  <rect x="24" y="24" width="286" height="272" rx="18" fill="#FFFFFF" stroke="#C9D0CB"/>
+  <rect x="330" y="24" width="286" height="272" rx="18" fill="#FFFFFF" stroke="#C9D0CB"/>
+  <g fill="none" stroke="#8D9992" stroke-width="9" stroke-linecap="round"><path d="M270 58v195 M576 58v195"/></g>
+  <g fill="none" stroke="#26394C" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="140" cy="87" r="21"/><path d="M146 109l21 68-14 59 M167 177l-54 63 M160 131l110 0"/>
+    <circle cx="482" cy="87" r="21"/><path d="M488 109l11 68-14 59 M499 177l-54 63 M498 132l43 18 35-18"/>
+  </g>
+  <path d="M293 155h27" stroke="#0B6B4F" stroke-width="5" marker-end="url(#arrow)"/>
+  <g fill="#26394C" font-family="Arial,sans-serif" font-size="18" font-weight="700" text-anchor="middle"><text x="167" y="275">START</text><text x="473" y="275">BEND ELBOWS</text></g>
+</svg>

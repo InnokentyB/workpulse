@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320" role="img" aria-labelledby="t d">
+  <title id="t">Круги плечами: три вперёд, три назад</title>
+  <desc id="d">Два схематичных положения верхней части тела со стрелками направления движения плеч.</desc>
+  <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M1 1 L7 4 L1 7" fill="none" stroke="#0B6B4F" stroke-width="2"/></marker></defs>
+  <rect width="640" height="320" rx="24" fill="#F7F8F4"/>
+  <rect x="24" y="24" width="286" height="272" rx="18" fill="#FFFFFF" stroke="#C9D0CB"/>
+  <rect x="330" y="24" width="286" height="272" rx="18" fill="#FFFFFF" stroke="#C9D0CB"/>
+  <g fill="none" stroke="#26394C" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="167" cy="110" r="30"/><path d="M167 141v25 M104 190q14-25 49-25h28q35 0 49 25 M104 190v53 M230 190v53"/>
+    <circle cx="473" cy="110" r="30"/><path d="M473 141v25 M410 190q14-25 49-25h28q35 0 49 25 M410 190v53 M536 190v53"/>
+  </g>
+  <path d="M87 179c-18-34 2-67 34-68" fill="none" stroke="#0B6B4F" stroke-width="5" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <path d="M553 111c34 4 48 40 28 69" fill="none" stroke="#0B6B4F" stroke-width="5" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <g fill="#26394C" font-family="Arial,sans-serif" font-size="18" font-weight="700" text-anchor="middle"><text x="167" y="275">3 FORWARD</text><text x="473" y="275">3 BACKWARD</text></g>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320" role="img" aria-labelledby="t d">
+  <title id="t">Мягкий танцевальный шаг из стороны в сторону</title>
+  <desc id="d">Два положения стоп и стрелка переноса веса между ними; начало и завершение медленные.</desc>
+  <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M1 1 L7 4 L1 7" fill="none" stroke="#0B6B4F" stroke-width="2"/></marker></defs>
+  <rect width="640" height="320" rx="24" fill="#F7F8F4"/>
+  <rect x="35" y="38" width="570" height="206" rx="18" fill="#FFFFFF" stroke="#C9D0CB"/>
+  <g fill="none" stroke="#26394C" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M168 118c-16 0-29 14-28 32l4 48c1 11 9 17 19 17s18-8 18-19v-48c0-18-4-30-13-30z M215 117c16 0 29 14 28 32l-4 48c-1 11-9 17-19 17s-18-8-18-19v-48c0-18 4-30 13-30z"/>
+    <path d="M426 118c-16 0-29 14-28 32l4 48c1 11 9 17 19 17s18-8 18-19v-48c0-18-4-30-13-30z M500 117c16 0 29 14 28 32l-4 48c-1 11-9 17-19 17s-18-8-18-19v-48c0-18 4-30 13-30z"/>
+  </g>
+  <path d="M280 157h81" fill="none" stroke="#0B6B4F" stroke-width="5" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <g fill="#26394C" font-family="Arial,sans-serif" font-size="17" font-weight="700" text-anchor="middle"><text x="195" y="274">STEP LEFT</text><text x="462" y="274">STEP RIGHT</text></g>
+</svg>
