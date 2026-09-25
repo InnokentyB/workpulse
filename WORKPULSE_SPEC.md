@@ -1,6 +1,6 @@
 # WorkPulse — Canonical Product & Engineering Specification
 
-**Version:** 0.4  
+**Version:** 0.5
 **Date:** 25 September 2026  
 **Track:** Workplace Wellbeing  
 **Tagline:** Move more. Interrupt less.  
@@ -166,6 +166,10 @@ Hard scheduling gates, cooldowns, scores, and safety constraints are determinist
 
 Every recommendation can be declined. A decline creates a cooldown, not punishment, guilt, or an escalating notification.
 
+### 7.8 Protect the whole working day
+
+Movement timing sits inside a larger boundary: the product should not optimize activity while silently encouraging the user to work through meals, planned breaks, or the end of the working day. Workday boundaries and user-defined routines are deterministic constraints. They may broaden the product after P0, but they do not change the core hackathon decision loop.
+
 ---
 
 ## 8. Core product loop
@@ -287,6 +291,37 @@ Expected next selection: `60-second shoulder stretch`.
 
 This is a P1 scenario and must not delay P0.
 
+### US-07 — Fit the activity to the available window
+
+> When movement is appropriate, I want the activity to match what I can physically and practically do right now rather than receive a generic exercise.
+
+Example contexts:
+
+```text
+Cannot stand; 60 seconds available → neck and shoulder reset
+Can stand; 3 minutes available → standing mobility or squats
+Can leave the desk; 5 minutes available → short walk
+Audio-only call; walking enabled → walking pad or headphone walk
+Interactive meeting → seated adjustment or no intervention
+```
+
+This is a P0.5 scenario. It begins only after the deployed P0 passes its acceptance cases. The meeting-soon hard gate still wins: two minutes before a meeting, WorkPulse returns `NOT_NOW` rather than filling the remaining time with another prompt.
+
+### US-08 — Respect the working-day boundary
+
+> When my planned working day has not started or has already ended, I want WorkPulse to protect that boundary rather than encourage me to keep optimizing work.
+
+Expected behaviour:
+
+```text
+Before workday → no ordinary movement intervention
+During workday → normal contextual decisions
+Near planned end → optional wrap-up cue
+After workday → no work-extending movement prompt
+```
+
+This is a P0.5 scenario and requires user-defined local workday settings. It is not required for the hackathon pitch.
+
 ---
 
 ## 10. MVP scope
@@ -306,15 +341,32 @@ This is a P1 scenario and must not delay P0.
 - Cooldown after dismissal.
 - Public deployment.
 
-### P1 — only after deployed P0 passes acceptance
+### P0.5 — only if time remains after deployed P0 passes acceptance
+
+- User-defined workday start and end stored locally.
+- Deterministic outside-work-hours gate.
+- Activity selection by available duration and whether the user can stand or leave the desk.
+- Initial activity library: seated neck/shoulder reset, eye-distance break, squats or standing mobility, and a five-minute walk.
+- Explicit user preferences and exclusions; no activity is inferred from pain or medical data.
+
+### P1 — personal routines and adaptation
 
 - Preference-aware activity selection from local history.
+- User-defined meal and long-break windows without food scoring or nutrition analysis.
+- User-defined medication or ongoing-therapy reminders only after the privacy, reliability, and medical-safety requirements in section 26 are satisfied.
+- Calendar participation context where available: audio-only, interactive, presenting, or unknown.
+- Private notification controls plus export and deletion of sensitive routine data.
 - Optional LLM-generated wording or activity personalization with schema validation and deterministic fallback.
 - More polished transitions and activity timer.
 
-### P2 — wow feature
+### P2 — ambient assistance
 
 - User-initiated, on-device camera verification for squats.
+- Optional on-device posture checks.
+- Guided ergonomic workspace self-check.
+- User-controlled daylight and evening-screen routines.
+- Temperature, humidity, and CO2 sensor integrations where supported.
+- Wearable, walking-pad, and standing-desk integrations.
 
 ### P3 — post-hackathon
 
@@ -322,6 +374,7 @@ This is a P1 scenario and must not delay P0.
 - Background scheduling.
 - Richer behavioural learning.
 - Multiple device support.
+- Cross-device synchronization of explicitly selected data.
 
 ---
 
@@ -564,6 +617,49 @@ ELSE prefer squats
 
 An optional LLM may personalize activity or wording only after `MOVE_NOW`. The deterministic selector remains the fallback, and the LLM cannot override hard gates.
 
+### 15.5 P0.5 context expansion
+
+P0.5 may add explicit local context for activity fit and workday boundaries. These fields are not required by the P0 decision engine and must not be added as hidden assumptions to the canonical demo scenarios.
+
+```ts
+type ActivityContext = {
+  availableMinutes: number;
+  canStand: boolean;
+  canLeaveDesk: boolean;
+  interactionMode: "NONE" | "AUDIO_ONLY" | "INTERACTIVE" | "PRESENTING" | "UNKNOWN";
+  equipment: Array<"WALKING_PAD" | "STANDING_DESK">;
+  excludedActivityIds: string[];
+};
+
+type WorkdaySettings = {
+  startTime: string;
+  endTime: string;
+  workingDays: number[];
+  timeZone: string;
+};
+```
+
+P0.5 selection rules:
+
+```text
+IF outside the configured workday
+THEN do not create an ordinary movement intervention
+
+IF the P0 meeting, cooldown, or low-need gate returns NOT_NOW
+THEN do not use activity context to override it
+
+IF canStand = false
+THEN choose only a seated activity
+
+IF canLeaveDesk = true AND availableMinutes >= 5
+THEN a five-minute walk may be selected
+
+IF interactionMode is INTERACTIVE or PRESENTING
+THEN do not select walking or an exercise that disrupts participation
+```
+
+Missing activity-context data defaults to the existing deterministic P0 selector. Unknown context never grants more permission than the user explicitly configured.
+
 ---
 
 ## 16. Functional requirements
@@ -628,6 +724,30 @@ After P0 is deployed, the selector may use outcomes to prefer better-performing 
 
 **Acceptance:** the learned-preference fixture selects stretch under the stated preference rule.
 
+### FR-11 — Respect workday boundaries, conditional P0.5
+
+The user can define a local start time, end time, working days, and time zone. When enabled, the system shall apply the workday boundary before evaluating an ordinary movement intervention.
+
+**Acceptance:** the same high-need context can return `MOVE_NOW` during the configured workday and `NOT_NOW` with an outside-hours reason after the configured end. Missing settings preserve P0 behaviour.
+
+### FR-12 — Select a context-suitable activity, conditional P0.5
+
+After a `MOVE_NOW` decision, the selector may use explicit activity context to choose an activity that fits the available time, ability to stand, ability to leave the desk, participation mode, equipment, and exclusions.
+
+**Acceptance:** `canStand = false` never returns squats; five available minutes with `canLeaveDesk = true` may return a walk; the meeting-soon scenario remains `NOT_NOW` regardless of activity options.
+
+### FR-13 — Protect meal and long-break windows, P1
+
+The user can define named meal or long-break windows and a typical minimum duration. WorkPulse may identify a suitable calendar gap or warn before a sequence of commitments eliminates the window.
+
+**Acceptance:** the reminder offers `Ate` or `Completed`, `Later`, and `Skip today`; it does not score food, prescribe a diet, or claim a guaranteed health outcome.
+
+### FR-14 — Remind about medication or ongoing therapy, gated P1
+
+The user can enter a medication or therapy name, exact user-provided instructions, recurrence, acceptable window, and reminder preference. WorkPulse reproduces that schedule and records acknowledgement.
+
+**Acceptance:** a due reminder remains available according to the user's settings and supports `Taken` or `Completed`, `Remind me later`, and `Skip today`. The product never invents a dose, changes an instruction, recommends doubling a missed dose, or silently infers a relationship to meals.
+
 ---
 
 ## 17. Non-functional requirements
@@ -667,6 +787,14 @@ The presenter must be able to return to a known state in one action. The demo sh
 ### NFR-09 — Security
 
 No secrets may be placed in client code. Parsed browser storage is treated as untrusted, camera access is user initiated, and any future LLM output is schema validated before display.
+
+### NFR-10 — Sensitive-routine privacy
+
+Medication, therapy, pain, meal, and camera-derived information is sensitive personal data. Before any cloud synchronization, the product requires purpose-limited storage, private notification previews, explicit consent, encryption appropriate to the platform, revocation, export, deletion, and a prohibition on employer access by default.
+
+### NFR-11 — Prompt arbitration
+
+The product must coordinate reminders rather than allow independent features to create notification noise. The default priority is: user-defined medication or prescribed therapy; workday ending and rest boundaries; meal or long-break windows; contextual movement; posture, eyes, light, and environmental adjustments. A lower-priority prompt may not obscure or repeatedly compete with a higher-priority due item.
 
 ---
 
@@ -728,6 +856,20 @@ No secrets may be placed in client code. Parsed browser storage is treated as un
 - Rep counting does not retain images or video.
 - The camera indicator stops when the session ends.
 
+### 18.7 Conditional expansion tests
+
+These tests are required only for the corresponding post-P0 slice:
+
+- Before the configured workday, a high-need context returns `NOT_NOW` with an outside-hours reason.
+- After the configured workday, the same context returns `NOT_NOW` and does not offer an activity.
+- Missing workday settings preserve the canonical P0 result.
+- `canStand = false` never selects squats or standing mobility.
+- Five available minutes with `canLeaveDesk = true` can select the short walk.
+- `INTERACTIVE` or `PRESENTING` participation never selects walking.
+- Meal-window actions persist the user's acknowledgement without storing food details.
+- Medication instructions are displayed exactly as entered; missed-window handling never suggests a dose change.
+- A higher-priority due therapy reminder is not obscured by a movement prompt.
+
 ---
 
 ## 19. Implementation priorities
@@ -742,11 +884,12 @@ No secrets may be placed in client code. Parsed browser storage is treated as un
 | P0.6 | Responsive polish and reset | Pitch can be repeated from a known state |
 | P0.7 | Deployment | Public URL passes the end-to-end pitch path |
 | P0.8 | Submission assets | TAIKAI copy, screenshot, and backup demo are ready |
-| P1 | Preference adaptation and optional LLM | P0 remains functional if AI is unavailable |
-| P2 | Camera verification | User-initiated local verification is stable with fallback |
-| P3 | Calendar integration | Deferred beyond hackathon |
+| P0.5 | Workday boundary and activity fit | Runs only after deployed P0; existing A/B/C cases remain unchanged |
+| P1 | Personal routines and adaptation | Meal windows and preferences remain useful without AI; therapy ships only after safety and privacy gates |
+| P2 | Ambient assistance | Every camera, sensor, and device input is optional, revocable, and has a manual fallback |
+| P3 | Calendar and cross-device platform | Deferred beyond the hackathon and preceded by explicit synchronization controls |
 
-**Gate:** no P1 work begins until deployed P0 passes scenarios A and B.
+**Gate:** no P0.5, P1, or P2 work begins until deployed P0 passes scenarios A and B. P0.5 must also preserve all P0 acceptance cases before the build can be called stable.
 
 ---
 
@@ -947,7 +1090,49 @@ Outcome saved as completed and verified
 
 ---
 
-## 26. Non-goals
+## 26. Post-P0 expansion contract
+
+This section incorporates the broader product direction without turning it into hidden hackathon scope.
+
+### 26.1 Safe second-stage options
+
+If the public P0 has passed scenarios A–F and time remains, implementation may choose one coherent P0.5 slice:
+
+1. **Workday boundary:** local start/end settings plus the outside-hours gate; or
+2. **Activity fit:** explicit ability-to-stand and available-duration controls plus the four-activity library.
+
+Combining both is allowed only if each slice has tests and the live demo remains recoverable. Meal windows, medication, posture analysis, external calendar connections, and device integrations are not “quick polish” and do not enter the hackathon build merely because time remains.
+
+### 26.2 Initial extended activity library
+
+| Activity | Minimum window | User context | P0.5 eligibility |
+|---|---:|---|---|
+| Neck and shoulder reset | 1 minute | Seated; can briefly pause | Yes |
+| Eye-distance break | 1 minute | Can look away from the screen | Yes |
+| 10 squats or standing mobility | 1–3 minutes | Can stand; activity not excluded | Yes |
+| Short walk | 5 minutes | Can leave the desk, or walking pad explicitly enabled | Yes |
+
+Preparation time, clothing, outdoor weather, and return buffers remain later discovery topics. An audio-only call does not automatically authorize walking; the user must enable that behaviour.
+
+### 26.3 Meal and long-break contract
+
+Meal support protects a user-defined routine and suitable calendar window. It does not require food logging. Copy remains neutral: no calorie judgment, “good” or “bad” food labels, guaranteed prevention of snacking, or nutrition prescription. Fasting, shift work, caregiving, eating disorders, and cultural differences require discovery before broad release.
+
+### 26.4 Medication and therapy contract
+
+Medication and ongoing-therapy reminders reproduce user-entered or professionally supplied instructions; WorkPulse does not create medical instructions. A missed-window message directs the user back to the original instructions or qualified professional and never suggests compensating with another dose. Private notification previews, reliable delivery semantics, acknowledgement history, export, and deletion are release gates rather than optional polish.
+
+### 26.5 Ambient modules
+
+Posture, ergonomics, daylight, evening-screen routines, room temperature, humidity, CO2, wearables, walking pads, and standing desks remain exploratory. Camera use is separately opt-in and visibly active; raw video is not retained or transmitted. Environmental recommendations must not claim unsupported oxygen measurement and must consider whether the user controls the room.
+
+### 26.6 Data ownership
+
+The user owns work schedules, movement history, meal routines, therapy schedules, camera-derived results, wearable signals, and environment data. Prefer derived signals such as `movement need: high` over retaining raw sensitive input. Employer access, manager dashboards, and employee monitoring remain prohibited product directions unless the product is deliberately re-scoped with explicit user governance.
+
+---
+
+## 27. Non-goals
 
 The hackathon prototype will not include:
 
@@ -970,11 +1155,11 @@ These may be future directions, but introducing them during P0 would weaken the 
 
 ---
 
-## 27. Risks and mitigations
+## 28. Risks and mitigations
 
 | Risk | Mitigation |
 |---|---|
-| Feature creep | Enforce the P0 deployment gate before any P1/P2 work |
+| Feature creep | Enforce the P0 deployment gate before any P0.5/P1/P2 work |
 | LLM latency or outage | Keep core decisions and fallback activity fully deterministic |
 | Venue Wi-Fi failure | Maintain a local build plus backup recording/screenshots |
 | Camera permission or pose failure | Manual completion is the default P0 path |
@@ -983,10 +1168,13 @@ These may be future directions, but introducing them during P0 would weaken the 
 | Health claims create scrutiny | Position as workplace wellbeing, not healthcare |
 | Local state breaks the demo | Provide one-action reset and rehearse from a clean session |
 | Calendar integration consumes time | Use fixed, believable demo contexts |
+| Meal or therapy reminders create competing notifications | Apply the prompt-arbitration priority and user controls before release |
+| Medication scope implies clinical responsibility | Reproduce only user-entered instructions and enforce the gated P1 safety contract |
+| Camera or wearable data feels like surveillance | Separate opt-in, local processing where feasible, minimised retention, and no employer access |
 
 ---
 
-## 28. Final checklist
+## 29. Final checklist
 
 ### Product
 
@@ -1029,7 +1217,7 @@ These may be future directions, but introducing them during P0 would weaken the 
 
 ---
 
-## 29. Final product statement
+## 30. Final product statement
 
 WorkPulse is not a fitness tracker, a timer, or a chatbot with calendar access. It is a small, controlled agent that balances movement need with interruption cost and sometimes chooses not to act.
 
