@@ -7,8 +7,9 @@ import {
   type ActivityCompletion,
 } from "@/components/ActivitySession";
 import { DecisionCard } from "@/components/DecisionCard";
-import { ArrowIcon, CheckIcon, PulseMark } from "@/components/icons";
+import { ArrowIcon, CheckIcon } from "@/components/icons";
 import { ScenarioSelector } from "@/components/ScenarioSelector";
+import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { WorkContextCard } from "@/components/WorkContextCard";
 import { demoScenarios } from "@/data/demo-scenarios";
 import { evaluateIntervention } from "@/lib/decision-engine";
@@ -51,13 +52,7 @@ export function WorkPulseApp() {
 
   return (
     <main className="app-shell">
-      <header className="site-header">
-        <a className="brand" href="#top" aria-label="WorkPulse home">
-          <PulseMark />
-          <span>WorkPulse</span>
-        </a>
-        <p>Move more. Interrupt less.</p>
-      </header>
+      <SiteHeader current="demo" />
 
       <div className="intro" id="top">
         <h1>Your workday has a rhythm. Find the right moment to move.</h1>
@@ -139,13 +134,7 @@ export function WorkPulseApp() {
         </div>
       </section>
 
-      <footer>
-        <PulseMark />
-        <p>
-          A workplace wellbeing prototype. Activity suggestions are not medical
-          advice.
-        </p>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

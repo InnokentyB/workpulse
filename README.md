@@ -22,6 +22,10 @@ uploaded, and the camera stops when verification completes.
 The canonical product and engineering specification remains
 [`WORKPULSE_SPEC.md`](./WORKPULSE_SPEC.md).
 
+The `/roadmap` page translates the near-term direction from
+[`PRODUCT_VISION.md`](./PRODUCT_VISION.md) into a public, clearly labelled view
+of proposed, tentative, and exploratory features.
+
 ## Run locally
 
 ```bash
@@ -42,7 +46,7 @@ npm run build
 ## Project structure
 
 ```text
-app/                    Next.js App Router entry points
+app/                    Next.js App Router entry points, including /roadmap
 components/             Responsive product UI and interaction tests
 data/demo-scenarios.ts  Stable scenarios for the live demo
 lib/types.ts            Domain contracts
