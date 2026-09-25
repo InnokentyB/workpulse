@@ -12,6 +12,12 @@ export const metadata: Metadata = {
 
 const nearTermFeatures = [
   {
+    title: "Real calendar connection",
+    detail:
+      "With explicit permission, replace fixed demo context with upcoming events and free windows from the person’s own calendar.",
+    signal: "First integration priority",
+  },
+  {
     title: "Workday boundaries",
     detail:
       "Let people define when work starts, when it should end, and when ordinary movement prompts should stay quiet.",

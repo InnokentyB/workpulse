@@ -17,7 +17,9 @@ clear explanations, one fixed activity, and a minimal `Start → Done` loop.
 The context panel labels the calendar input as demo data. During the movement
 activity, the user can explicitly enable the browser camera and let an on-device
 pose model guide a four-movement neck reset. Video is never recorded, stored, or
-uploaded, and the camera stops when verification completes.
+uploaded, and the camera stops when verification completes. Completed activities
+are recorded in a local, browser-only history with time, duration, verification
+mode, and movement count.
 
 The canonical product and engineering specification remains
 [`WORKPULSE_SPEC.md`](./WORKPULSE_SPEC.md).
@@ -58,7 +60,7 @@ WORKPULSE_SPEC.md       Canonical product, engineering, and pitch spec
 ## Scope guardrail
 
 The MVP exists only to prove that a correct decision not to interrupt is as
-valuable as a decision to intervene. History, cooldowns, personalization,
+valuable as a decision to intervene. Dismissal cooldowns, personalization,
 continuous camera monitoring, video recording, real calendar integration,
 authentication, databases, and LLM
 dependencies are explicitly outside this slice.

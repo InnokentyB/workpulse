@@ -63,13 +63,14 @@ Primary job:
 - Explicit camera consent, loading, active, denied, unavailable, and error states.
 - Manual completion fallback that does not require camera access.
 - Camera shutdown after completion, cancellation, or component exit.
+- Local activity history with completion time, duration, verification mode, and movement count.
 - Keyboard accessibility, visible focus, reduced-motion support, and a usable 360 px layout.
 - Automated tests for both decisions, the interaction loop, and neck-motion tracking.
 
 ### 4.2 Current MVP non-goals
 
 - A third low-movement-need scenario.
-- Dismissal, cooldown, history, or `localStorage` persistence.
+- Dismissal, cooldown, or preference learning.
 - Multiple activities or preference learning.
 - Continuous or background camera observation.
 - Video recording, storage, upload, playback, or microphone access.
@@ -222,6 +223,8 @@ Permissioned browser camera
 On-device MediaPipe pose landmarks
         ↓
 In-memory movement progress and completion
+        ↓
+Versioned activity history in browser `localStorage`
 ```
 
 Stack:
@@ -233,7 +236,7 @@ Stack:
 - Vitest and Testing Library;
 - MediaPipe Tasks Vision, loaded on demand.
 
-There is no backend, authentication, database, real calendar integration, video storage, or AI service in the current MVP.
+There is no backend, authentication, database, real calendar integration, video storage, or AI service in the current MVP. Activity history is stored only in the current browser.
 
 ## 11. Current functional requirements
 
@@ -355,15 +358,16 @@ The MVP is done when a viewer can:
 - Two-scenario decision contrast.
 - Fixed neck reset.
 - Optional local camera verification with manual fallback.
-- No persistence, accounts, or external services.
+- Local completion history; no accounts or external services.
 
 ### P0+ — only after current MVP passes its acceptance contract
 
 Choose one coherent slice at a time:
 
-1. **Workday boundary:** local start/end settings plus an outside-hours `NOT_NOW` reason.
-2. **Activity fit:** explicit available duration, ability to stand, ability to leave the desk, meeting participation, exclusions, and a four-activity library.
-3. **Outcome memory:** dismissal, cooldown, local history, and the third low-need scenario from the earlier prototype plan.
+1. **Real calendar connection:** explicit authorization and revocation, upcoming events, and free-window context replacing fixed demo data.
+2. **Workday boundary:** local start/end settings plus an outside-hours `NOT_NOW` reason.
+3. **Activity fit:** explicit available duration, ability to stand, ability to leave the desk, meeting participation, exclusions, and a four-activity library.
+4. **Outcome memory:** dismissal, cooldown, and the third low-need scenario from the earlier prototype plan.
 
 P0+ may not weaken the meeting gate, camera privacy contract, manual fallback, or repeatable pitch path.
 

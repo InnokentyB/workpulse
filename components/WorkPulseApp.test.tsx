@@ -1,9 +1,13 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import { WorkPulseApp } from "@/components/WorkPulseApp";
 
 describe("WorkPulseApp", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+  });
+
   it("starts with the canonical good-window context", () => {
     render(<WorkPulseApp />);
 
@@ -56,8 +60,9 @@ describe("WorkPulseApp", () => {
     expect(screen.queryByRole("button", { name: /start activity/i })).toBeNull();
   });
 
-  it("completes the minimal activity loop", () => {
+  it("completes the minimal activity loop and records it locally", async () => {
     render(<WorkPulseApp />);
+    await screen.findByText("No completed activities yet.");
     fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
     fireEvent.click(screen.getByRole("button", { name: /start activity/i }));
 
@@ -67,7 +72,12 @@ describe("WorkPulseApp", () => {
       screen.getByRole("button", { name: /finish without camera/i }),
     );
     expect(screen.getByText(/nice work/i)).toBeDefined();
-    expect(screen.getByText(/without camera verification/i)).toBeDefined();
+    expect(
+      screen.getByText("Completed without camera verification."),
+    ).toBeDefined();
+    expect(screen.getByRole("heading", { name: /your movement history/i })).toBeDefined();
+    expect(screen.getByText("Completed manually without camera verification")).toBeDefined();
+    expect(screen.getByText("45 sec")).toBeDefined();
 
     fireEvent.click(screen.getByRole("button", { name: /run again/i }));
     expect(screen.getByRole("button", { name: /ask workpulse/i })).toBeDefined();

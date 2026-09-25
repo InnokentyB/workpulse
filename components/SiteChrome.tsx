@@ -14,6 +14,7 @@ export function SiteHeader({ current }: { current: "demo" | "roadmap" }) {
         <Link aria-current={current === "demo" ? "page" : undefined} href="/">
           Live demo
         </Link>
+        <Link href="/#history">History</Link>
         <Link
           aria-current={current === "roadmap" ? "page" : undefined}
           href="/roadmap"

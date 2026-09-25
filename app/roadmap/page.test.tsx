@@ -20,12 +20,16 @@ describe("RoadmapPage", () => {
   it("lists the product-vision features and links back to the demo", () => {
     render(<RoadmapPage />);
 
+    expect(screen.getByText("Real calendar connection")).toBeDefined();
     expect(screen.getByText("Workday boundaries")).toBeDefined();
     expect(screen.getByText("Meal and long-break windows")).toBeDefined();
     expect(screen.getByText("A practical starter library")).toBeDefined();
     expect(screen.getByRole("link", { name: /return to live demo/i })).toHaveProperty(
       "pathname",
       "/",
+    );
+    expect(screen.getAllByRole("heading", { level: 3 })[0].textContent).toBe(
+      "Real calendar connection",
     );
   });
 });

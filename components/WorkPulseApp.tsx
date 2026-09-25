@@ -1,17 +1,23 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   ActivitySession,
   type ActivityCompletion,
 } from "@/components/ActivitySession";
+import { ActivityHistory } from "@/components/ActivityHistory";
 import { DecisionCard } from "@/components/DecisionCard";
 import { ArrowIcon, CheckIcon } from "@/components/icons";
 import { ScenarioSelector } from "@/components/ScenarioSelector";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { WorkContextCard } from "@/components/WorkContextCard";
 import { demoScenarios } from "@/data/demo-scenarios";
+import {
+  loadActivityHistory,
+  recordActivityCompletion,
+  type ActivityHistoryEntry,
+} from "@/lib/activity-history";
 import { evaluateIntervention } from "@/lib/decision-engine";
 import type { DecisionResult, WorkPulseState } from "@/lib/types";
 
@@ -22,6 +28,17 @@ export function WorkPulseApp() {
   const [state, setState] = useState<WorkPulseState>("IDLE");
   const [result, setResult] = useState<DecisionResult | null>(null);
   const [completion, setCompletion] = useState<ActivityCompletion | null>(null);
+  const [history, setHistory] = useState<ActivityHistoryEntry[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    void Promise.resolve().then(() => {
+      if (active) setHistory(loadActivityHistory(window.localStorage));
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const scenario = useMemo(
     () =>
@@ -103,6 +120,15 @@ export function WorkPulseApp() {
               activity={result.activity}
               onComplete={(nextCompletion) => {
                 setCompletion(nextCompletion);
+                setHistory(
+                  recordActivityCompletion(window.localStorage, {
+                    activityId: result.activity!.id,
+                    activityName: result.activity!.name,
+                    completionMode: nextCompletion.verified ? "camera" : "manual",
+                    durationSeconds: result.activity!.durationSeconds,
+                    movements: nextCompletion.movements,
+                  }),
+                );
                 setState("COMPLETED");
               }}
             />
@@ -133,6 +159,8 @@ export function WorkPulseApp() {
           ) : null}
         </div>
       </section>
+
+      <ActivityHistory entries={history} />
 
       <SiteFooter />
     </main>

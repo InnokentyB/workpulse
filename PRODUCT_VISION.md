@@ -237,13 +237,14 @@ The product should prefer derived facts such as “movement need high” over re
 
 **Outcome:** make the prototype useful for one person's real workday without adding medical complexity.
 
+- Explicit connection to the user's real calendar, replacing fixed demo context with upcoming events and free windows.
 - User-defined workday start and end.
 - Meal and long-break windows without nutrition analysis.
 - Activity selection by available time and ability to stand.
 - Initial seated, standing, eye, and walking activities.
 - Explicit user preferences and exclusions.
 
-**Dependencies:** settings UI, local schedule persistence, arbitration between prompt types.
+**Dependencies:** calendar authorization and revocation, settings UI, local schedule persistence, arbitration between prompt types.
 **Success:** the user completes useful interventions while reporting that badly timed prompts remain rare.
 
 ### P1 — Personal routines and adaptation: tentative
