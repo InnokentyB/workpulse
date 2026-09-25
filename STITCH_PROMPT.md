@@ -1,175 +1,234 @@
 # WorkPulse — Google Stitch Generation Prompt
 
-Use this document as the generation brief for Google Stitch. It is intentionally narrower than `DESIGN_SPEC.md`. Stitch should create a visual reference for the P0 web demo; it must not invent product scope or decision logic.
+Generate a visual reference for the **current WorkPulse MVP only**. Do not invent roadmap features.
 
-## Primary prompt
+## Product
 
-Design a responsive single-page web application called **WorkPulse** with the tagline **“Move more. Interrupt less.”** It is a contextual workplace-wellbeing agent that decides whether interrupting a desk worker for movement is useful right now.
+WorkPulse is a contextual workplace-wellbeing agent with the tagline **“Move more. Interrupt less.”** It decides whether movement is worth interrupting the user right now.
 
-This is an operational product screen, not a marketing landing page, fitness tracker, medical dashboard, or AI chat interface. The central proof is a contrast between two states:
+The core contrast:
 
-1. **MOVE NOW:** the user has been sitting for 57 minutes, the next meeting starts in 12 minutes, movement need is HIGH, interruption cost is LOW, and the suggested activity is 10 squats in about one minute.
-2. **NOT NOW:** the user has been sitting for 72 minutes, the next meeting starts in 2 minutes, movement need is HIGH, interruption cost is HIGH, and the system protects the upcoming commitment instead of interrupting.
+1. After 57 sedentary minutes with 12 minutes before a meeting, WorkPulse says `MOVE NOW` and offers a 45-second neck reset.
+2. After 72 sedentary minutes with 2 minutes before a meeting, WorkPulse says `NOT NOW` because interruption cost is high.
 
-Build a calm decision instrument with editorial restraint and professional productivity-tool precision. Use one large bounded workspace with internal dividers rather than a grid of floating cards. The decision is the focal point. The demo-scenario control is always visible but visually secondary.
+`NOT NOW` is a successful decision with equal visual authority, not an error or fallback.
 
-## Required page anatomy
+## Visual direction
 
-Top to bottom:
+Create a calm **workday signal desk**: warm editorial paper, deep botanical ink, ruled dividers, joined context/decision surfaces, and one scarce lime action signal.
 
-1. Compact product header with `WORKPULSE`, `Move more. Interrupt less.`, `Demo data stays in this browser.`, and a `Reset demo` text action.
-2. A connected three-option `Demo scenario` selector: `Good time to move`, `Meeting starts soon`, and `Low movement need`.
-3. One large decision workspace. On desktop it uses a 4/8 split: work context on the left and the decision on the right. On mobile it becomes one column.
-4. The context region shows three plain numeric facts: sitting time, time to the next named meeting, and time since last movement.
-5. Two factor rails: `Movement need` and `Interruption cost`. Each has a text level plus three small rectangular segments. Do not use percentages, circular gauges, rings, or charts.
-6. A large decision region with the result, lead sentence, activity where appropriate, actions, and a plain-language reason.
-7. A compact `Today` history section stored only in the browser.
+- Operational product, not a marketing landing page or dashboard.
+- Editorial premise followed by one joined decision instrument.
+- Flat at rest; structure comes from rules and tonal layers.
+- Controlled asymmetric desktop layout.
+- No floating card grid.
 
-## Visual theme and atmosphere
+## Required page hierarchy
 
-Create a warm, restrained, instrument-like interface: calm enough for a workday, precise enough to trust during a live demo.
+1. Compact header: pulse mark, `WorkPulse`, centred tagline `Move more. Interrupt less.`
+2. Editorial premise:
+   - `Your workday has a rhythm. Find the right moment to move.`
+   - `WorkPulse weighs movement need against interruption cost, then makes one clear call — without another noisy reminder.`
+3. Decision demo:
+   - desktop scenario rail on the left;
+   - joined context and state surfaces on the right;
+   - mobile native-select representation above the joined instrument.
+4. Quiet footer disclaimer: `A workplace wellbeing prototype. Activity suggestions are not medical advice.`
 
-- Density: balanced operational app, approximately 6/10.
-- Variance: controlled asymmetry through the 4/8 workspace split, approximately 5/10.
-- Motion: restrained and immediate, approximately 3/10.
-- No decorative hero, photography, people, illustrations, mascots, or lifestyle imagery.
-- No centered landing-page composition.
-- No overlapping content.
+## Palette
 
-## Color palette
+Use exactly these roles:
 
-Use exactly this palette and preserve semantic roles:
+- Deep Ink `#16231D` — primary text.
+- Soft Ink `#526159` — descriptions.
+- Warm Paper `#F4F1E8` — canvas.
+- Raised Paper `#FBFAF5` — context panel and selected scenario.
+- Ruled Line `#D8D5CA` — dividers.
+- Signal Green `#15684A` — live status.
+- Signal Lime `#B8F36B` — primary action and active pose trace only.
+- Signal Soft `#DFF1CC` — subtle status support.
+- Decision Green `#183E2F` — `MOVE NOW` surface.
+- Hold Brown `#493125` — `NOT NOW` surface.
+- Hold Amber `#F2B56D` — high interruption-cost cue.
+- Focus Blue `#205FCA` — keyboard focus.
+- Inverse Text `#F8F8F1` — text on dark surfaces.
 
-- **Warm Canvas** `#F2F0E9` — page background.
-- **Paper Surface** `#FCFCF8` — workspace and controls.
-- **Botanical Ink** `#142019` — primary text.
-- **Muted Ink** `#56615B` — supporting text.
-- **Structural Line** `#C9D0CB` — borders and dividers.
-- **Move Green** `#0B6B4F` — MOVE NOW decision and primary action.
-- **Move Mist** `#DCEDE6` — supportive move background.
-- **Protective Slate** `#26394C` — NOT NOW meeting-protection state.
-- **Protective Mist** `#E1E8EE` — supportive hold background.
-- **Low-Need Neutral** `#E8E7DF` — low movement-need state.
-- **Focus Blue** `#005FCC` — keyboard focus only.
-- **White** `#FFFFFF` — text on solid decision fields.
+Do not use purple, neon blue, red for `NOT NOW`, glass, component gradients, or outer glow.
 
-Do not use gradients, purple, neon blue, outer glow, pure black, or red for `NOT NOW`. The protective slate state must feel equally confident and valuable as the green state.
+## Typography and shape
 
-## Typography
+- Geist Sans for the interface; tabular numerals for context values.
+- Decision result: fluid 64–112 px, semibold, tight tracking.
+- Editorial headline: fluid 45–74 px, semibold, tight tracking.
+- Body: 16 px / 26 px.
+- Labels: 12 px uppercase with controlled tracking.
+- Joined instrument outer radius: 14 px.
+- Controls: 10 px radius, minimum 48 px height.
+- Shared seam between context and state panels is square.
+- No default card shadows; primary hover may use one compact shadow.
 
-- Use **Geist Sans** for interface text and **Geist Mono** for times and changing numeric context.
-- Decision label: 56 px desktop and 40 px mobile, semibold, tightly tracked, never larger than 64 px.
-- Decision lead: 24 px with a 30 px line height.
-- Body: 16 px with a 24 px line height.
-- Wordmark: 14 px uppercase with generous tracking.
-- Eyebrows: 12 px uppercase with controlled tracking.
-- Use tabular figures for minute values.
-- Do not use Inter or serif typefaces.
+## Scenarios
 
-## Shape and spacing
+Exactly two:
 
-- Content maximum: 1200 px.
-- Desktop viewport: 1440 × 900 with the complete header, selector, context, and decision visible without scrolling.
-- Mobile reference: 390 × 844; minimum supported width 360 px.
-- Base spacing scale: 4, 8, 12, 16, 24, 32, 48, 64 px.
-- Main workspace radius: 20 px desktop, 16 px mobile.
-- Controls: 10–12 px radius; do not turn all labels into pills.
-- Buttons: minimum 48 px high and 44 px touch target.
-- Use crisp 1 px dividers. Avoid shadow by default; at most one very soft canvas-separation shadow on the main workspace.
+1. `Good time to move` — `High movement need and a safe gap before the next meeting.`
+2. `Meeting starts soon` — `Movement is needed, but interruption cost is too high.`
 
-## Required state 1 — MOVE NOW
+Supporting note:
+
+> Two fixed contexts. No calendar connection or setup required.
+
+Do not add a third low-need scenario.
+
+## Screen 1 — Desktop `MOVE NOW`
+
+Viewport reference: 1440 px wide.
 
 Show:
 
-- Selected scenario: `Good time to move`.
-- Current time: `14:03`.
-- `57 min` / `Sitting`.
-- `12 min` / `To Design Review`.
-- `78 min` / `Since last movement`.
-- `Movement need` → `HIGH` with three filled segments.
-- `Interruption cost` → `LOW` with one filled segment.
-- Decision: `MOVE NOW`.
-- Lead: `You have a good window.`
-- Activity: `10 squats · about 1 minute`.
-- Primary action: `Start activity`.
-- Secondary action: `Not now`.
-- Reason heading: `Why this decision`.
-- Reason: `You’ve been sitting for 57 minutes and have a 12-minute window before your next meeting.`
+- Good scenario selected.
+- `Right now`, `Work context at 14:03`, `Context ready`.
+- `57 min` — `You've been sitting`.
+- `in 12 min` — `Next meeting`, `Design Review`.
+- `78 min` — `Since last movement`.
+- Calendar source visibly identified as demo data.
+- State label `WINDOW OPEN`.
+- Decision `MOVE NOW`.
+- Movement need `HIGH`.
+- Interruption cost `LOW`.
+- `Smallest useful move`.
+- `Neck reset`.
+- `About 45 seconds`.
+- Reason: `You've been sitting for 57 minutes and have a 12-minute window before your next meeting.`
+- Lime primary action: `Start activity`.
 
-Use a solid Move Green decision field with white text. Do not add exclamation marks, celebration effects, calories, streaks, or fitness statistics.
+Use a deep green decision surface. Do not show squats, history, dismissal, or calories.
 
-## Required state 2 — NOT NOW
+## Screen 2 — Desktop `NOT NOW`
 
-Create a second complete screen with the same structure and visual weight:
+Use the same layout, scale, and structural authority.
 
-- Selected scenario: `Meeting starts soon`.
-- Current time: `14:18`.
-- `72 min` / `Sitting`.
-- `2 min` / `To Design Review`.
-- `90 min` / `Since last movement`.
-- `Movement need` → `HIGH` with three filled segments.
-- `Interruption cost` → `HIGH` with three filled segments.
-- Decision: `NOT NOW`.
-- Lead: `Protect the next commitment.`
-- Supporting copy: `Design Review starts in 2 minutes.`
-- Action: `Check another scenario`.
-- Reason: `You need movement, but your next meeting starts in 2 minutes. I’ll check again afterwards.`
+Show:
 
-Use a solid Protective Slate decision field with white text. Do not show `Start activity`. Do not use warning red, alert icons, errors, guilt, or a disabled-looking layout.
+- Meeting scenario selected.
+- `Right now`, `Work context at 14:18`, `Context ready`.
+- `72 min` sitting.
+- `in 2 min` to `Design Review`.
+- `90 min` since last movement.
+- State label `HOLD THIS MOMENT`.
+- Decision `NOT NOW`.
+- Movement need `HIGH`.
+- Interruption cost `HIGH`.
+- Reason: `You need movement, but your next meeting starts in 2 minutes. I'll check again afterwards.`
+- No activity and no start action.
 
-## History treatment
+Use a grounded warm-brown decision surface. Do not use warning red, alert icons, or disabled styling.
 
-Use a compact section, not an analytics table. Example row:
+## Screen 3 — Camera consent
 
-```text
-14:04   10 squats                          COMPLETED
-        Good time to move · 57 min sitting
-```
+This state appears only after `Start activity`; the camera is still off.
 
-The outcome uses text plus a simple check shape. Empty-state copy is `No interventions yet. Completed or dismissed activities will appear here.`
+Show:
 
-## Responsive behavior
+- `Camera-guided activity`.
+- `Neck reset`.
+- Progress `0 / 4`.
+- Heading `Follow four gentle neck movements`.
+- Privacy copy: `Your image is processed on this device. WorkPulse does not record, save, or upload video. The camera switches off after the movement check.`
+- Safety copy: `Use a comfortable range. Stop if you feel pain or dizziness.`
+- Primary action `Enable camera`.
+- Secondary action `Complete without camera`.
+- Quiet action `Stop activity`.
 
-- Below 768 px, collapse to one column.
-- Stack the header into two rows.
-- Stack all three scenario options vertically; no horizontal scroll.
-- Present context before factor rails, then decision.
-- Stack actions full width with the primary action first.
-- At 390 px, context may use three columns; at 360 px, use two columns with the third metric spanning both.
-- Ensure no clipped text, overlapping elements, or two-dimensional scrolling.
+Do not show a live preview yet. Permission is a dedicated action.
 
-## Interaction and motion
+## Screen 4 — Camera active
 
-- Scenario hover/selection: 120 ms.
-- State change: 180–220 ms opacity plus at most 8 px vertical movement.
-- Button press: subtle 1 px tactile shift.
-- No bounce, spring, shimmer, perpetual pulse, staggered page choreography, confetti, or simulated AI thinking delay.
-- Reduced-motion mode should be effectively instant.
+Show:
+
+- Mirrored 4:3 live-preview placeholder with a restrained lime face/shoulder pose trace.
+- Visible `Camera active` status.
+- Progress example `2 / 4`.
+- One instruction: `Return to center, then lower your chin gently.`
+- Safety copy and stop action.
+- Clear local-processing context.
+
+Do not show recording controls, red dots, confidence percentages, diagnostic angles, or raw data.
+
+## Screen 5 — Camera recovery
+
+Create one denied/error reference:
+
+- Heading `Camera permission is off`.
+- Explain that the user may change browser settings and no video was captured.
+- Actions `Try again` and `Complete without camera`.
+- Preserve the same activity surface and safety copy.
+
+This is a recoverable state, not a full-page failure.
+
+## Screen 6 — Verified completion
+
+Show:
+
+- Label `Movement verified`.
+- Heading `Nice work. Neck reset verified.`
+- Copy `Four movements confirmed on this device. No video was recorded. Camera is off.`
+- Action `Run again`.
+
+No confetti, score, streak, or celebration illustration.
+
+## Mobile behaviour
+
+Generate mobile `NOT NOW` and camera-consent references at 390 × 844.
+
+- 18 px page padding.
+- Header shows brand; tagline may hide.
+- Premise becomes one column.
+- Scenario selector becomes one full-width native-select treatment.
+- Context metrics become two columns with the third metric spanning the next row.
+- State content and actions stack.
+- Camera preview fills width without horizontal scroll.
+- Decision label must not clip at 360 px.
+
+## Motion
+
+- Decision reveal: 160–220 ms opacity plus at most 8 px vertical movement.
+- Button response: 160 ms, maximum 1 px lift/press.
+- Camera progress is restrained and non-celebratory.
+- No bounce, confetti, infinite shimmer, simulated AI thinking, or cinematic page choreography.
+- Reduced-motion mode is effectively immediate.
 
 ## Accessibility
 
-- Decision meaning is expressed through text and layout, not color alone.
-- Maintain strong WCAG AA contrast.
-- Provide highly visible blue keyboard focus outlines.
-- Maintain 44 × 44 px minimum pointer targets.
-- Keep logical reading order and plain, non-judgmental language.
+- Strong WCAG AA contrast.
+- Text and structure carry state meaning; colour is redundant.
+- Blue 3 px focus outline with visible offset.
+- Minimum 44 × 44 px targets.
+- Logical reading order.
+- Camera errors and status have explicit text.
+- No horizontal mobile overflow.
 
 ## Explicitly forbidden
 
-- AI chat layout, assistant avatar, sparkles, or “thinking” copy.
-- Generic wellness photography, illustrations, emojis, plants, yoga poses, or medical imagery.
-- Glassmorphism, gradients, glow, neon, excessive shadows, or decorative charts.
-- Three equal feature cards, metric rings, calories, streaks, gamification, or health scoring.
-- Marketing copy such as “revolutionary,” “seamless,” “next-generation,” or “unlock your potential.”
-- Any product feature not listed in this prompt.
+- Squats or any activity other than neck reset in current MVP screens.
+- Third scenario, history, cooldown, meal, medication, posture, workday settings, wearables, or analytics.
+- AI chat, assistant avatar, sparkles, or thinking indicator.
+- Metric rings, health score, calories, streaks, badges, or gamification.
+- Stock wellness photography, yoga imagery, mascots, or medical diagrams.
+- Automatic camera start, hidden camera state, microphone request, or recording metaphor.
+- Medical claims, posture diagnosis, or guaranteed outcome copy.
 
-## Expected Stitch output
+## Expected output
 
-Generate four screens:
+Generate eight references:
 
-1. Desktop `MOVE NOW`, 1440 × 900.
-2. Desktop meeting-gate `NOT NOW`, 1440 × 900.
-3. Mobile `MOVE NOW`, 390 × 844.
-4. Mobile meeting-gate `NOT NOW`, 390 × 844.
+1. Desktop `MOVE NOW`.
+2. Desktop `NOT NOW`.
+3. Desktop camera consent.
+4. Desktop camera active.
+5. Desktop camera recovery.
+6. Desktop verified completion.
+7. Mobile `NOT NOW` at 390 × 844.
+8. Mobile camera consent at 390 × 844.
 
-The desktop `MOVE NOW` screen is the primary submission visual. The `NOT NOW` screen must look equally intentional and polished.
+The `MOVE NOW` and `NOT NOW` screens are the primary pitch pair. The camera screens demonstrate trust and graceful fallback without redefining the product.

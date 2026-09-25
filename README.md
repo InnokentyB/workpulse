@@ -10,17 +10,17 @@ The core product principle is:
 
 ## Current status
 
-This repository contains:
+The MVP is a responsive single-page demo built around one proof: two contexts
+with high movement need produce different decisions because interruption cost
+is different. It includes deterministic `MOVE NOW` / `NOT NOW` decisions,
+clear explanations, one fixed activity, and a minimal `Start → Done` loop.
+The context panel labels the calendar input as demo data. During the movement
+activity, the user can explicitly enable the browser camera and let an on-device
+pose model guide a four-movement neck reset. Video is never recorded, stored, or
+uploaded, and the camera stops when verification completes.
 
-- a runnable Next.js, TypeScript, and Tailwind starter;
-- the canonical product and engineering specification in [`WORKPULSE_SPEC.md`](./WORKPULSE_SPEC.md);
-- typed domain contracts;
-- a deterministic decision-engine starter;
-- a deterministic activity selector;
-- browser-local persistence helpers;
-- canonical demo scenarios.
-
-The product UI has intentionally not been implemented yet.
+The canonical product and engineering specification remains
+[`WORKPULSE_SPEC.md`](./WORKPULSE_SPEC.md).
 
 ## Run locally
 
@@ -35,6 +35,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ```bash
 npm run lint
+npm test
 npm run build
 ```
 
@@ -42,15 +43,18 @@ npm run build
 
 ```text
 app/                    Next.js App Router entry points
-components/             Product UI components
+components/             Responsive product UI and interaction tests
 data/demo-scenarios.ts  Stable scenarios for the live demo
 lib/types.ts            Domain contracts
-lib/decision-engine.ts  Reliable MOVE_NOW / NOT_NOW decision logic
+lib/decision-engine.ts  Reliable MOVE_NOW / NOT_NOW decision logic and tests
 lib/activity-selector.ts
-lib/storage.ts          localStorage boundary
 WORKPULSE_SPEC.md       Canonical product, engineering, and pitch spec
 ```
 
 ## Scope guardrail
 
-P0 is complete only when the deployed demo reliably shows that a correct decision not to interrupt is as valuable as a decision to intervene. Camera verification, real calendar integration, authentication, and LLM personalization must not block that core loop.
+The MVP exists only to prove that a correct decision not to interrupt is as
+valuable as a decision to intervene. History, cooldowns, personalization,
+continuous camera monitoring, video recording, real calendar integration,
+authentication, databases, and LLM
+dependencies are explicitly outside this slice.

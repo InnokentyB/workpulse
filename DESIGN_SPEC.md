@@ -1,613 +1,482 @@
-# WorkPulse Demo Design Specification
+# WorkPulse — Product Design Specification
 
-**Status:** implementation-ready design handoff
-**Source of truth:** `WORKPULSE_SPEC.md` v0.4
-**Surface:** single-page responsive web demo
-**Primary viewport:** laptop presentation, with full usability from 360 px width
-**Mode:** operate, with a short persuasive demo sequence
-**Scope:** P0 only; this document does not add camera, authentication, live calendar, or LLM dependencies
+**Version:** 2.0
+**Product authority:** `WORKPULSE_SPEC.md` v1.4
+**Visual-system authority:** `DESIGN.md`
+**Implemented reference:** current React/CSS components and `.impeccable/review` captures
+**Mode:** operate with a pitch-ready decision reveal
 
-## 1. Design intent
+## 1. Design objective
 
-WorkPulse should feel like a calm decision instrument, not a fitness dashboard, habit tracker, or notification center. The page has one job: make it immediately obvious that WorkPulse weighs movement need against interruption cost and sometimes chooses not to intervene.
+WorkPulse is a calm **workday signal desk**. It presents measured work context, asks one question, and makes one legible call: move now or protect the current commitment.
 
-The defining visual contrast is:
+The design must prove three things:
 
-- `MOVE NOW`: movement need is high and interruption cost is low. The interface opens into an actionable green state.
-- `NOT NOW`: movement need is still high, but interruption cost is high. The interface settles into a protective deep-slate state.
+1. `MOVE NOW` and `NOT NOW` are equally deliberate outcomes.
+2. The reason is visible before the viewer has to trust the system.
+3. Camera guidance is optional, explicit, local, and never required for the core decision.
 
-The second state must feel equally intentional and valuable. It is not an error, rejection, warning, or disabled version of `MOVE NOW`.
+The current MVP is a working product surface, not a marketing site. The editorial introduction establishes the idea, but the joined context/decision instrument remains the centre of gravity.
 
-### Experience principles
+## 2. Scope boundary
 
-1. **Decision first.** The decision and its reason dominate; controls, history, and demo apparatus remain secondary.
-2. **Show the trade-off.** Movement need and interruption cost stay visible beside the result so a judge can understand the logic without narration.
-3. **Use plain evidence.** Prefer “57 minutes sitting” and “meeting in 12 minutes” over scores, charts, rings, or opaque AI language.
-4. **Make restraint visible.** `NOT NOW` receives the same scale, finish, and confidence as `MOVE NOW`.
-5. **Keep the demo recoverable.** Scenario switching and reset are always easy to find, but never compete with the decision.
+### Current design scope
 
-### Explicit anti-goals
+- Two fixed scenarios.
+- Idle question state.
+- `MOVE NOW` with the fixed neck reset.
+- `NOT NOW` meeting-gate state.
+- Activity consent and manual completion.
+- Camera loading, active guidance, tracking loss, denied, unavailable, and generic error states.
+- Verified and manual completion states.
+- Desktop, tablet, and 360 px mobile behaviour.
 
-- No generic wellness imagery, stock photography, mascots, confetti, streaks, calories, badges, or guilt language.
-- No faux AI chat interface, assistant avatar, sparkling AI icon, or “thinking” copy.
-- No gradients, glass effects, neon glow, dashboard gauge clusters, or card grid made from every content group.
-- No medical or guaranteed health claims.
-- Do not expose the raw decision score in the primary UI. The user needs the reason, not the implementation formula.
-- Do not animate the page in a way that delays or destabilizes the live pitch.
+### Not in the current screen set
 
-## 2. Information architecture
+- Third low-need scenario.
+- Dismissal, cooldown, history, or persisted outcomes.
+- Workday settings or activity preferences.
+- Meal, medication, posture, light, environment, or wearable screens.
 
-The page is one continuous surface with five regions in this order:
+Those features appear only in the design roadmap in section 14. They must not be silently added to the current demo or Stitch/Figma generation prompt.
 
-1. **Product header** — identity, product promise, local-data note, and `Reset demo`.
-2. **Demo scenario control** — three fixed scenarios; clearly a demo control and visually secondary.
-3. **Decision workspace** — current work context, decision factors, decision, explanation, and relevant action.
-4. **Activity or outcome area** — appears in place beneath the decision only when the state requires it.
-5. **Today’s history** — compact evidence that outcomes persist and affect later decisions.
+## 3. Experience principles
 
-The page must not add a marketing hero above the product. At desktop presentation height, the header, scenario selector, context, and full decision should all be visible without scrolling at 1440 × 900.
+1. **One instrument, not a dashboard.** Context and decision form one joined device; do not fragment them into metric cards.
+2. **The decision speaks largest.** The resolved result is the strongest type on the page.
+3. **Restraint has equal authority.** `NOT NOW` is warm, grounded, and complete—not an error or disabled state.
+4. **Provenance before intelligence.** Fixed calendar input is visibly labelled as demo data; camera status is explicit.
+5. **Permission is a state, not fine print.** Camera consent and local-processing copy are part of the activity flow.
+6. **Failure preserves the task.** Every camera failure keeps manual completion available.
+7. **No wellness theatre.** No streaks, calories, rings, mascots, stock photography, clinical graphs, or guilt.
 
-### Desktop hierarchy
+## 4. Page hierarchy
 
 ```text
-┌──────────────────────────────────────────────────────────────────────────┐
-│ WORKPULSE   Move more. Interrupt less.       Local to this browser  Reset│
-├──────────────────────────────────────────────────────────────────────────┤
-│ DEMO SCENARIO  [Good time to move] [Meeting starts soon] [Low need]     │
-├───────────────────────┬──────────────────────────────────────────────────┤
-│ WORK CONTEXT          │ DECISION                                         │
-│ 14:03                 │ MOVE NOW                                         │
-│                       │ You have a good window.                          │
-│ 57 min  Sitting       │                                                  │
-│ 12 min  To meeting    │ 10 squats · about 1 minute                      │
-│ 78 min  Since move    │ [Start activity]  [Not now]                     │
-│                       │                                                  │
-│ NEED  High ━━━━━      │ WHY                                              │
-│ COST  Low  ━━         │ You’ve been sitting for 57 minutes and have a   │
-│                       │ 12-minute window before your next meeting.       │
-├───────────────────────┴──────────────────────────────────────────────────┤
-│ TODAY  14:04  10 squats  Completed                         Clear history│
-└──────────────────────────────────────────────────────────────────────────┘
+Product header
+  Brand pulse + WorkPulse
+  Move more. Interrupt less.
+
+Editorial premise
+  Your workday has a rhythm. Find the right moment to move.
+  One-paragraph explanation
+
+Decision demo
+  Scenario rail / mobile select
+  Joined signal desk
+    Context panel
+      Context sources
+      Three work-context metrics
+    State surface
+      Idle question, decision, activity, recovery, or completion
+
+Product footer
+  Workplace-wellbeing disclaimer
 ```
 
-This is one bounded workspace with internal dividers, not a collection of floating cards. Use a single large panel for the working area and a single compact history region.
+The desktop opening viewport should show the premise, scenarios, current context, and the beginning of the state surface. The full decision may extend below 900 px height; the result label must still appear immediately after evaluation without unrelated content between context and state.
 
-## 3. Responsive layout
+## 5. Responsive layout
 
-### Global frame
+### Desktop: 921 px and above
 
-- Maximum content width: `1200px`.
-- Center in the viewport with `24px` page padding on desktop.
-- Desktop vertical padding: `24px` top and `32px` bottom.
-- Minimum supported width: `360px`.
-- The page may grow vertically after an activity begins or history accumulates.
+- App shell: maximum `1440px`, horizontal padding `48px`.
+- Header: three-column grid with brand left and tagline centred.
+- Premise: asymmetric two-column grid, approximately 1.45 / 0.55.
+- Demo: `285px` scenario rail plus flexible stage, `40px` gap.
+- Scenario rail may remain sticky at `24px` from the viewport top.
+- Context panel and state surface share a square seam and read as one instrument.
+- Context metrics use three equal columns with one-pixel rules.
 
-### Breakpoints
+### Tablet: 641–920 px
 
-#### Large desktop: 1100 px and above
+- Scenario rail becomes a horizontal two-option strip above the stage.
+- Premise may reduce its gap but keeps left-aligned editorial hierarchy.
+- Context and state remain joined.
+- Camera stage preserves at least a 4:3 visible preview area without forcing horizontal scroll.
 
-- Header is one row.
-- Scenario selector is a three-column connected control.
-- Decision workspace uses a 12-column grid: context/factors span 4 columns, decision span 8.
-- Internal divider separates context from decision.
-- Minimum decision workspace height: `430px`; avoid a viewport-filling hero.
-- History entries use a compact row layout.
+### Mobile: 360–640 px
 
-#### Tablet and small desktop: 768–1099 px
+- Page padding: `18px`.
+- Header keeps brand only; the centred tagline may hide.
+- Premise is one column.
+- Desktop radio rows become one native select labelled `Demo scenario`.
+- Context metrics use two columns; `Since last movement` spans a ruled second row.
+- State content stacks vertically.
+- Decision labels use fluid type and must not clip at 360 px.
+- Actions fill available width and remain at least `48px` high.
+- Camera preview fills the content width; progress and instructions remain above or below it in reading order.
+- No horizontal scrolling.
 
-- Header keeps brand and reset on the first row; supporting privacy text may wrap below.
-- Workspace uses a 5/7 column split when at least 900 px wide; below that it becomes one column.
-- At one column, order is context → factor comparison → decision → actions → history.
-- Scenario labels remain visible in three equal columns; descriptions are visually hidden but available to assistive technology.
+## 6. Visual system
 
-#### Mobile: 360–767 px
+### Atmosphere
 
-- Page padding: `16px`; top and bottom padding: `16px` and `24px`.
-- Header becomes two rows: brand/tagline first, local-data note and reset second.
-- Scenario control becomes three full-width rows. Do not use horizontally scrolling chips.
-- Context values form a three-column metric row if the viewport is at least 390 px; at 360–389 px use a two-column grid with the third metric spanning both columns.
-- Decision is below context in normal document flow.
-- Primary and secondary actions stack full width; `Start activity` comes first.
-- History entries stack timestamp/outcome beneath activity name.
-- Keep touch targets at least `44 × 44px` and never rely on hover.
-
-### Responsive priority
-
-Never hide the decision, reason, selected scenario, or the two factor levels. The next-meeting title may truncate to one line with the full value in accessible text. History may show the newest three records initially on mobile with a `Show all` disclosure if more exist.
-
-## 4. Visual direction
-
-### Character
-
-Use editorial restraint plus instrument-like precision: warm off-white paper, dark botanical ink, crisp rules, compact labels, and one decisive field of color. The design should feel credible beside a calendar or professional productivity tool while remaining more humane than an analytics dashboard.
-
-The signature element is the **decision balance**: two plainly labeled horizontal rails—`Movement need` and `Interruption cost`—shown immediately before the decision. The rails do not animate like gauges and do not display percentages. They show `LOW`, `MEDIUM`, or `HIGH` in text plus three discrete filled segments.
+Warm paper, deep botanical ink, ruled dividers, and a scarce lime signal create the feeling of an editorial work instrument. The page is flat at rest. Depth comes from tonal contrast and joined surfaces, not floating cards.
 
 ### Colour tokens
 
-| Token | Value | Use |
+| Token | Value | Role |
 |---|---:|---|
-| `canvas` | `#F2F0E9` | page background |
-| `surface` | `#FCFCF8` | main workspace and controls |
-| `ink` | `#142019` | primary text |
-| `ink-subtle` | `#56615B` | supporting copy |
-| `line` | `#C9D0CB` | dividers and default borders |
-| `line-strong` | `#8D9992` | selected control edges and rail outlines |
-| `move` | `#0B6B4F` | `MOVE NOW` field, primary action, completed outcome |
-| `move-soft` | `#DCEDE6` | selected good-window scenario and supportive background |
-| `hold` | `#26394C` | `NOT NOW` field and meeting-protection state |
-| `hold-soft` | `#E1E8EE` | selected meeting-soon scenario and supportive background |
-| `low-soft` | `#E8E7DF` | low-need state background |
-| `attention` | `#8A4B08` | high interruption-cost label or cooldown detail on light surfaces |
-| `danger` | `#9D3430` | destructive text action only; never for `NOT NOW` |
-| `focus` | `#005FCC` | keyboard focus outline |
-| `white` | `#FFFFFF` | text on `move` and `hold` |
+| `ink` | `#16231D` | primary text and icon colour |
+| `ink-soft` | `#526159` | descriptions and metadata |
+| `paper` | `#F4F1E8` | page canvas |
+| `paper-raised` | `#FBFAF5` | context and selected controls |
+| `rule` | `#D8D5CA` | dividers and borders |
+| `signal` | `#15684A` | live status and smaller positive signals |
+| `signal-bright` | `#B8F36B` | primary action and active pose trace |
+| `signal-soft` | `#DFF1CC` | subtle live-status field |
+| `hold` | `#9A4E27` | smaller hold cues |
+| `hold-bright` | `#F2B56D` | high interruption-cost cue |
+| `focus` | `#205FCA` | keyboard focus |
+| `desk-dark` | `#1D2A24` | idle and terminal state surface |
+| `decision-go` | `#183E2F` | `MOVE NOW` surface |
+| `decision-hold` | `#493125` | `NOT NOW` surface |
+| `inverse-text` | `#F8F8F1` | text on dark surfaces |
 
 Rules:
 
-- Decision meaning must always be conveyed by text and structure, not color alone.
-- Use `move` and `hold` as solid fields or strong borders, never gradients.
-- Reserve `danger` for `Clear history` if exposed separately. `Reset demo` is neutral because the data is explicitly disposable demo state.
-- Factor rails inherit the decision family only for filled segments; their text labels remain readable in `ink` or `ink-subtle`.
+- Bright lime is scarce: primary action, active pose trace, or a small live signal only.
+- `NOT NOW` uses warm brown, never warning red.
+- State meaning always includes text and structure.
+- The restrained radial lime canvas atmosphere may remain, but must never resemble a glowing card.
 
 ### Typography
 
-Use the existing local Next.js fonts; do not add a network or package dependency.
+Use the bundled Geist family.
 
-| Role | Typeface | Size / line-height | Weight | Notes |
-|---|---|---|---|---|
-| Product wordmark | Geist Sans | `14/18` | 700 | uppercase, tracking `0.16em` |
-| Page promise | Geist Sans | `15/20` | 450 | sentence case |
-| Decision label desktop | Geist Sans | `56/56` | 650 | `MOVE NOW` / `NOT NOW`; never larger than 64 px |
-| Decision label mobile | Geist Sans | `40/42` | 650 | fits 360 px without wrapping |
-| Decision lead | Geist Sans | `24/30` | 550 | plain-language summary |
-| Metric value | Geist Mono | `32/34` | 600 | tabular figures enabled |
-| Metric unit/label | Geist Sans | `13/18` | 550 | label beneath or beside value |
-| Body | Geist Sans | `16/24` | 400 | reasons and instructions |
-| Small/support | Geist Sans | `13/18` | 450 | privacy note and history metadata |
-| Eyebrow | Geist Sans | `12/16` | 700 | uppercase, tracking `0.12em` |
-| Control | Geist Sans | `15/20` | 600 | buttons and selector labels |
+| Role | Size / line-height | Weight | Notes |
+|---|---|---:|---|
+| Decision display | `clamp(4rem, 9vw, 7rem) / .9` | 600 | uppercase visual treatment |
+| Editorial headline | `clamp(2.8rem, 4.4vw, 4.65rem) / .98` | 610 | max about 18 characters per line |
+| State title | `clamp(1.55rem, 3vw, 2.5rem) / 1.12` | 570 | consent, completion, recovery |
+| Body | `1rem / 1.65` | 400 | max 65–68 characters |
+| System label | `.76rem / 1.5` | 680 | uppercase with `.08em` tracking |
+| Context numeral | `clamp(2.1rem, 4vw, 3.6rem) / .95` | 640 | tabular numerals |
 
-Use Geist Mono only for time and numeric context, not for whole sentences. Use tabular figures for changing minute values to prevent layout shift.
+Do not introduce Inter, serif display type, or decorative wellness typography.
 
-### Spacing and shape tokens
+### Shape and depth
 
-- Base unit: `4px`.
-- Space scale: `4, 8, 12, 16, 24, 32, 48, 64`.
-- Outer workspace radius: `20px` desktop, `16px` mobile.
-- Button/control radius: `10px`.
-- Small status marker radius: `4px`; avoid defaulting every label to a pill.
-- Border: `1px solid line`; selected scenario adds a `2px` inset edge or stronger bottom rule without changing dimensions.
-- Shadow: none by default. The main workspace may use `0 12px 32px rgba(20,32,25,.07)` only if separation from the canvas is insufficient.
+- Joined instrument outer radius: `14px`.
+- Controls: `10px` radius and `48px` minimum height.
+- Context and decision shared seam: square.
+- Default shadow: none.
+- Primary hover may lift `1px` with one compact shadow.
+- Focus: `3px` blue outline with `3px` offset.
 
-## 5. Page regions and components
+## 7. Core components
 
-### 5.1 Product header
+### Product header
 
-**Left:**
+- Brand pulse mark plus `WorkPulse` on the left.
+- Tagline centred on desktop: `Move more. Interrupt less.`
+- No navigation menu; the MVP has one task.
+- Brand link returns to the page start without resetting application state unexpectedly.
 
-- `WORKPULSE`
-- `Move more. Interrupt less.`
+### Editorial premise
 
-**Right:**
+- Heading: `Your workday has a rhythm. Find the right moment to move.`
+- Body: `WorkPulse weighs movement need against interruption cost, then makes one clear call — without another noisy reminder.`
+- It frames the product but must not push the instrument below the initial desktop view unnecessarily.
 
-- Shield or lock icon only if an existing icon solution is available; otherwise use text alone.
-- `Demo data stays in this browser.`
-- `Reset demo` text button.
+### Scenario selector
 
-The header is compact. It must not resemble a marketing navigation bar and has no unused nav links.
+Desktop/tablet uses native radios in ruled rows. Mobile uses a native select.
 
-#### Header actions
+Options:
 
-- `Reset demo` clears local history and restores the `Good time to move` scenario in the `IDLE` state.
-- Do not add a confirmation dialog; demo data is explicitly disposable and rapid recovery matters.
-- After reset, show a non-blocking status message: `Demo reset. Good time to move is ready.`
+1. `Good time to move` — `High movement need and a safe gap before the next meeting.`
+2. `Meeting starts soon` — `Movement is needed, but interruption cost is too high.`
 
-### 5.2 Scenario selector
+Supporting note:
 
-Label the group `Demo scenario`. Implement it as a radio group or tabs with correct single-selection semantics.
+> Two fixed contexts. No calendar connection or setup required.
 
-| Scenario | Visible label | Supporting line on desktop | Initial result after evaluation |
-|---|---|---|---|
-| `good-window` | `Good time to move` | `57 min sitting · meeting in 12 min` | `MOVE NOW` |
-| `meeting-soon` | `Meeting starts soon` | `72 min sitting · meeting in 2 min` | `NOT NOW` |
-| `low-need` | `Low movement need` | `25 min sitting · meeting in 30 min` | `NOT NOW` |
+States: default, hover, selected, focus-visible, disabled during an atomic state transition. Selection clears the previous result and any activity/camera state.
 
-States:
+### Context panel
 
-- **Default:** transparent/surface background, `line` border, `ink` label.
-- **Hover:** subtle `#F5F6F2` background; no lift or shadow.
-- **Selected good window:** `move-soft` background and `move` selection rule.
-- **Selected meeting soon:** `hold-soft` background and `hold` selection rule.
-- **Selected low need:** `low-soft` background and `ink-subtle` selection rule.
-- **Focus-visible:** `3px` `focus` outline with `2px` offset.
-- **Evaluating:** selector remains visible but is temporarily disabled until the result commits; preserve its visual dimensions.
+Header:
 
-Selecting a scenario immediately updates context and returns the decision region to `IDLE`. It must not automatically evaluate because the explicit reveal is useful during the pitch.
+- `Right now`
+- `Work context at {time}`
+- live dot plus `Context ready`
 
-### 5.3 Work context
+Context-source row:
 
-Heading: `Work context`
-Time line: `14:03 · Today` (value follows scenario data)
+- Calendar source: `Demo data`
+- Camera source: `Off`, `Starting`, `Active`, or `Unavailable` where the source row is present in the implemented composition.
 
-Show three metrics:
+Metrics:
 
-1. `57 min` / `Sitting`
-2. `12 min` / `To Design Review`
-3. `78 min` / `Since last movement`
+- `{n} min` / `You've been sitting`
+- `in {n} min` / `Next meeting` / meeting title
+- `{n} min` / `Since last movement`
 
-For meeting-soon, the second metric is `2 min / To Design Review`. For low need, it is `30 min / To Team Sync`.
+Numbers are the evidence. Do not add rings, trend charts, or raw decision scores.
 
-Do not use donut charts or decorative icons. The numbers are the evidence. Use thin dividers or a tidy metric grid.
+### Decision surface
 
-### 5.4 Decision balance
+Shared order:
 
-Show both factors in every evaluated state:
+1. State label.
+2. Decision result.
+3. Movement need and interruption cost.
+4. Activity, only for `MOVE NOW`.
+5. Reason.
+6. Action, only when relevant.
 
-```text
-Movement need       HIGH   ■ ■ ■
-Interruption cost   LOW    ■ □ □
-```
+`MOVE NOW` uses `decision-go`; `NOT NOW` uses `decision-hold`. Both share dimensions, typography, rules, and padding.
 
-- Each rail has three equal rectangular segments, `20 × 6px` desktop and `18 × 6px` mobile.
-- Include the text level; segments are redundant visual reinforcement.
-- Use the exact label `Interruption cost`, not `Opportunity`, because the contrast is central to the pitch.
-- In `IDLE`, render neutral placeholders with labels and `—` values. Do not predict the result.
-- In `EVALUATING`, keep the labels and use a subtle left-to-right fill lasting no more than 220 ms.
-
-Canonical factor states:
+## 8. State specification
 
-| Scenario | Movement need | Interruption cost |
-|---|---|---|
-| Good time to move | `HIGH` | `LOW` |
-| Meeting starts soon | `HIGH` | `HIGH` |
-| Low movement need | `LOW` | value returned by engine, expected `LOW` |
-
-### 5.5 Decision region
+### Idle
 
-This is the visual focal point and follows the application state machine.
+- Surface: `desk-dark`.
+- Status: small live lime mark.
+- Copy: `Context is ready`.
+- Question: `Is now a good time to move?`
+- Action: `Ask WorkPulse`.
+- No predicted factor levels.
 
-#### `IDLE`
+### `MOVE NOW`
 
-- Eyebrow: `Ready to evaluate`
-- Lead: `Should WorkPulse interrupt right now?`
-- Supporting copy: `Weigh movement need against the cost of interrupting your work.`
-- Primary button: `Evaluate this moment`
-- No secondary action.
-
-#### `EVALUATING`
-
-- Status text: `Checking this moment…`
-- Keep the context visible and stable.
-- Disable duplicate evaluation.
-- Show a 180–260 ms transition; do not simulate a slow AI response.
-- The status is announced politely to assistive technology.
-
-#### `RECOMMENDED` / `MOVE NOW`
-
-- Solid `move` decision field with white text, or a white decision field with a strong `move` left edge if full color harms layout. Prefer the solid field for the pitch viewport.
-- Eyebrow: `Decision`
-- Main label: `MOVE NOW`
-- Lead: `You have a good window.`
-- Activity line: `10 squats · about 1 minute`
-- Primary action: `Start activity`
-- Secondary action: `Not now`
-- Explanation label: `Why this decision`
-- Explanation: `You’ve been sitting for 57 minutes and have a 12-minute window before your next meeting.`
-
-Do not use exclamation marks. The voice is confident, not breathless.
-
-#### `NOT_NOW` — meeting hard gate
-
-- Solid `hold` decision field with white text, equal in size to `MOVE NOW`.
-- Eyebrow: `Decision`
-- Main label: `NOT NOW`
-- Lead: `Protect the next commitment.`
-- Supporting line: `Design Review starts in 2 minutes.`
-- No `Start` or dismissal action.
-- Primary neutral action: `Check another scenario`
-- Explanation label: `Why this decision`
-- Explanation: `You need movement, but your next meeting starts in 2 minutes. I’ll check again afterwards.`
-
-Avoid clocks, alerts, red color, or warning language. This is a correct protective decision.
-
-#### `NOT_NOW` — low movement need
-
-- Light `low-soft` field with `ink` text and a strong neutral edge.
-- Main label: `NOT NOW`
-- Lead: `No interruption needed.`
-- Supporting line: `You moved recently.`
-- Action: `Check another scenario`
-- Explanation: `Your movement need is still low. WorkPulse will check again later.`
-
-#### `NOT_NOW` — cooldown
-
-- Use the `hold-soft` family, not an error state.
-- Main label: `NOT NOW`
-- Lead: `Your choice is being respected.`
-- Explanation: `You recently declined an activity, so WorkPulse is respecting your 15-minute cooldown.`
-- If a reliable remaining-time value exists, append `Ready again in {n} min`; otherwise do not invent a countdown.
-- Action: `Check another scenario`.
-
-### 5.6 Activity session
-
-Starting an activity replaces the recommendation actions within the same decision region. Do not navigate to a new page or modal.
-
-#### `ACTIVE`
-
-- Eyebrow: `Activity in progress`
-- Heading: `10 squats`
-- Duration: `About 1 minute`
-- Instruction: `Complete ten controlled squats at a comfortable pace.`
-- Primary action: `Complete activity`
-- Secondary action: `Stop for now`
-- Optional simple elapsed indicator is allowed only if implemented reliably; it cannot block completion.
-- Do not use camera language in P0.
-
-`Stop for now` records `skipped` only if the implementation already supports that outcome in the flow; otherwise return to the recommendation without persistence. Do not relabel it `Not now`, which is reserved for dismissal before starting.
-
-#### `COMPLETED`
-
-- Use `move-soft` background and a simple check mark if available.
-- Heading: `Movement recorded`
-- Copy: `10 squats completed. Nice work—back to your day.`
-- Primary action: `Evaluate another moment`
-- The new completed history row appears at the same time.
-- Confirmation remains visible until the user takes the next action; do not auto-dismiss it during a pitch.
-
-#### `DISMISSED`
-
-- Heading: `Noted—no reminders for 15 minutes.`
-- Copy: `WorkPulse will respect your cooldown and check again later.`
-- Primary action: `Continue`
-- The dismissed history row appears immediately.
-- No guilt copy, streak loss, or attempt to persuade the user back into the activity.
-
-### 5.7 Intervention history
-
-Heading: `Today`
-Supporting label: `Stored only in this browser`
-
-#### Empty
-
-- `No interventions yet.`
-- `Completed or dismissed activities will appear here.`
-- Keep empty history compact; it should not look like missing content.
-
-#### Populated row
-
-Example completed row:
-
-```text
-14:04   10 squats                          COMPLETED
-        Good time to move · 57 min sitting
-```
-
-Example dismissed row:
-
-```text
-14:06   10 squats                          DISMISSED
-        Good time to move · 57 min sitting
-```
-
-- Reverse chronological order.
-- Outcome is uppercase text with an adjacent icon or shape; never color alone.
-- `COMPLETED` uses `move`; `DISMISSED` uses neutral `ink-subtle`, not danger red.
-- Show at most five rows before a `Show all` disclosure on desktop and three on mobile.
-- `Clear history` is a small text action in the history heading. `Reset demo` remains the preferred pitch recovery action.
-
-## 6. Interaction specification
-
-### Primary flow
-
-1. Initial load selects `Good time to move` and shows `IDLE`.
-2. `Evaluate this moment` triggers `EVALUATING`, then commits the deterministic result.
-3. A `MOVE NOW` result offers `Start activity` and `Not now`.
-4. `Start activity` changes the decision region to `ACTIVE` in place.
-5. `Complete activity` persists a completed record and changes the region to `COMPLETED`.
-6. Selecting `Meeting starts soon` updates the context and returns the region to `IDLE`.
-7. Evaluating reveals the equally prominent meeting-gate `NOT NOW` state.
-
-### Scenario changes
-
-- Scenario selection always resets transient UI (`EVALUATING`, `ACTIVE`, success acknowledgement) to `IDLE`.
-- It does not clear history.
-- If an activity is active, changing scenario requires one lightweight inline confirmation: `Leave this activity? Progress isn’t saved.` with `Leave activity` and `Keep going`. Do not use a browser alert.
-
-### Motion
-
-- State change: 180–220 ms opacity plus a maximum 8 px vertical shift.
-- Decision field color change: 160 ms.
-- Scenario selection background: 120 ms.
-- No spring/bounce motion, confetti, counters rolling through intermediate values, or staggered reveals.
-- Respect `prefers-reduced-motion`; replace transforms with an immediate change or a brief opacity transition under 100 ms.
-
-### Feedback
-
-- Buttons show hover, pressed, focus-visible, and disabled states.
-- Disabled evaluation uses 50% visual emphasis but retains readable text.
-- Persistence failure, if detected, shows: `History couldn’t be saved in this browser. The current demo still works.` The core decision remains usable.
-- Invalid local data must fall back to empty history without exposing a technical error.
-
-## 7. Control states
-
-### Primary button
-
-- Background `move`, text `white`, minimum height `48px`, horizontal padding `20px`.
-- Hover: darken to `#085C44`.
-- Pressed: darken to `#064D39`, translate at most `1px` vertically.
-- Focus-visible: `3px focus` outline, `2px` offset.
-- Disabled: `#9CB7AB` background with `#FFFFFF`; cursor and semantics disabled.
-
-In the `hold` field, a neutral action may use white background with `hold` text so the page does not imply movement is the next action.
-
-### Secondary button
-
-- Transparent or `surface` background, `1px line-strong` border, `ink` text.
-- Hover: `#F0F2EE`.
-- Pressed: `#E6EAE6`.
-- Same focus treatment and target size as the primary button.
-
-### Text action
-
-- Underlined on hover and focus; underline offset `3px`.
-- Minimum 44 px interactive height through padding, even when visually compact.
-- Destructive actions use `danger` text plus explicit copy, never an icon alone.
-
-## 8. Accessibility requirements
-
-Target WCAG 2.2 AA for the P0 surface.
-
-- Use semantic landmarks: `header`, `main`, and a labelled history `section`.
-- Use one page-level `h1`; recommendation, activity, and history headings follow a logical hierarchy even as states change.
-- Scenario selector uses native radio inputs or an ARIA-complete tab pattern. Arrow-key behavior must match the chosen pattern.
-- All actions are native buttons. Do not attach click behavior to generic containers.
-- Maintain at least 4.5:1 contrast for body/control text and 3:1 for large display text, component borders, and focus indicators.
-- Decision changes use a persistent `aria-live="polite"` region. Announce one concise result: `Decision: Move now. Movement need high. Interruption cost low.` or its `Not now` equivalent.
-- `EVALUATING` sets the relevant region to busy and prevents duplicate submissions.
-- Move keyboard focus to the decision heading after evaluation and to the activity heading after `Start activity`; do not move focus for passive history updates.
-- Visible focus must never be clipped by rounded containers or overflow.
-- Every icon has text or an accessible label. Decorative rail segments are hidden from assistive technology because the text level is authoritative.
-- Do not use color, position, or animation as the sole status cue.
-- At 200% zoom and 320 CSS px effective width, content reflows without two-dimensional scrolling.
-- Support browser text enlargement without clipping buttons or forcing the decision labels to overlap.
-- Provide at least 44 × 44 px pointer targets and adequate spacing between adjacent controls.
-- Respect `prefers-reduced-motion` and `prefers-contrast` where available.
-- Keep language plain and non-judgmental. Never frame dismissal as failure.
-
-## 9. Content specification
-
-### Fixed product copy
-
-- Wordmark: `WORKPULSE`
-- Tagline: `Move more. Interrupt less.`
-- One-line explanation, used only where space allows: `An AI coworker that finds the least disruptive moment to get you moving.`
-- Privacy line: `Demo data stays in this browser.`
-
-### Good-window screen
-
-- Decision: `MOVE NOW`
-- Lead: `You have a good window.`
-- Activity: `10 squats · about 1 minute`
-- Reason: `You’ve been sitting for 57 minutes and have a 12-minute window before your next meeting.`
-- Actions: `Start activity`, `Not now`
-
-### Meeting-soon screen
-
-- Decision: `NOT NOW`
-- Lead: `Protect the next commitment.`
-- Context line: `Design Review starts in 2 minutes.`
-- Reason: `You need movement, but your next meeting starts in 2 minutes. I’ll check again afterwards.`
-- Action: `Check another scenario`
-
-### Low-need screen
-
-- Decision: `NOT NOW`
-- Lead: `No interruption needed.`
-- Context line: `You moved 25 minutes ago.`
-- Reason: `Your movement need is still low. WorkPulse will check again later.`
-- Action: `Check another scenario`
-
-### Voice rules
-
-- Calm, direct, and specific.
-- Use contractions naturally.
-- Avoid “should,” “failed,” “overdue,” “burn,” “optimize yourself,” and medical language.
-- Name the decisive context rather than praising the algorithm.
-- Prefer `activity` or the actual movement name over `workout`.
-- Use sentence case everywhere except the product wordmark, decision label, factor level, and history outcome.
-
-## 10. Pitch-ready screen sequence
-
-The live demo should be rehearsed against these exact frames. Each frame must also work as a still screenshot fallback.
-
-### Frame 1 — Establish the question (0:35)
-
-- Selected scenario: `Good time to move`.
-- State: `IDLE`.
-- Visible evidence: `57 min sitting`, `12 min to Design Review`, `78 min since last movement`.
-- Focal copy: `Should WorkPulse interrupt right now?`
-- Presenter action: select `Evaluate this moment`.
-
-### Frame 2 — Reveal `MOVE NOW` (0:42)
-
-- State: `RECOMMENDED`.
-- Focal field: green `MOVE NOW`.
-- Factors: `Movement need HIGH`; `Interruption cost LOW`.
-- Visible reason and `10 squats · about 1 minute`.
-- Presenter line: explain that the window is useful and low-cost.
-
-### Frame 3 — Make it actionable (0:55)
-
+- State label: `WINDOW OPEN`.
+- Display: `MOVE NOW`.
+- Movement need: `HIGH`.
+- Interruption cost: `LOW`.
+- Activity label: `Smallest useful move`.
+- Activity: `Neck reset`.
+- Duration: `About 45 seconds`.
+- Reason: `You've been sitting for 57 minutes and have a 12-minute window before your next meeting.`
+- Action: `Start activity`.
+
+### `NOT NOW`
+
+- State label: `HOLD THIS MOMENT`.
+- Display: `NOT NOW`.
+- Movement need: `HIGH`.
+- Interruption cost: `HIGH`.
+- Reason: `You need movement, but your next meeting starts in 2 minutes. I'll check again afterwards.`
+- No activity, start, warning icon, retry pressure, or red treatment.
+
+### Activity consent
+
+- Eyebrow: `Camera-guided activity`.
+- Heading: `Neck reset`.
+- Progress: `0 / 4`.
+- Lead: `Follow four gentle neck movements`.
+- Privacy: `Your image is processed on this device. WorkPulse does not record, save, or upload video. The camera switches off after the movement check.`
+- Safety: `Use a comfortable range. Stop if you feel pain or dizziness.`
+- Primary action: `Enable camera`.
+- Secondary action: `Complete without camera`.
+- Quiet exit: `Stop activity`.
+
+Camera must not start when `Start activity` is pressed. `Start activity` enters consent; `Enable camera` requests permission.
+
+### Camera loading
+
+- Preserve the final camera-stage dimensions to avoid layout shift.
+- Copy: `Starting the camera and pose model…`
+- Use a restrained in-place loader, not a generic full-page spinner.
+- Manual fallback and stop remain reachable if loading fails or takes too long.
+
+### Camera active
+
+- Mirrored live preview.
+- Lime upper-body pose trace.
+- Persistent `Camera active` indicator.
+- Large progress `{n} / 4`.
+- One instruction at a time:
+  - `Face the camera and hold a comfortable neutral position.`
+  - `Slowly turn your head to either side.`
+  - `Now turn through center to the other side.`
+  - `Return to center, then lower your chin gently.`
+  - `Return through center and lift your gaze slightly.`
+  - `Return to a comfortable neutral position.`
+- Tracking recovery: `Keep your face and both shoulders visible.`
+- Stop action remains available.
+
+Do not show confidence percentages, raw landmarks, diagnostic angles, or a recording-style red dot.
+
+### Camera denied
+
+- Heading: `Camera permission is off`.
+- Copy explains that browser settings can be changed and no video was captured.
+- Actions: `Try again`, `Complete without camera`.
+- Keep safety copy and stop action.
+
+### Camera unavailable
+
+- Heading: `No camera is available`.
+- Copy: `WorkPulse couldn't find an available camera on this device.`
+- Primary path: `Complete without camera`.
+- Optional retry is secondary.
+
+### Camera or model error
+
+- Heading: `Camera guidance couldn't start`.
+- Copy: `Check your connection or camera access, then try again.`
+- Actions: `Try again`, `Complete without camera`.
+- Avoid stack traces, provider names, or blame.
+
+### Completed manually
+
+- Surface: `desk-dark` or completed variant of the signal desk.
+- Label: `Activity complete`.
+- Heading: `Nice work. Back to your day.`
+- Supporting copy: `Completed without camera verification.`
+- Action: `Run again`.
+
+### Completed with verification
+
+- Label: `Movement verified`.
+- Heading: `Nice work. Neck reset verified.`
+- Supporting copy: `Four movements confirmed on this device. No video was recorded. Camera is off.`
+- Action: `Run again`.
+
+Completion remains visible until the user acts. Do not auto-dismiss it during the pitch.
+
+## 9. Interaction and motion
+
+- Scenario selection clears result and activity state immediately.
+- Decision reveal: 160–220 ms opacity and at most 8 px movement.
+- Button hover/press: 160 ms ease-out, maximum 1 px lift/press.
+- Camera progress changes without bounce, confetti, or score celebration.
+- Preserve dimensions across consent/loading/active/recovery where practical.
+- With `prefers-reduced-motion`, remove translation and decorative pulse; keep immediate state changes or sub-100 ms opacity.
+- Never simulate slow AI thinking; the decision is deterministic and immediate.
+
+## 10. Accessibility requirements
+
+Target WCAG 2.2 AA.
+
+- Use semantic landmarks and one page-level `h1`.
+- Scenario radios/select retain native keyboard behaviour and labels.
+- All actions use native buttons.
+- Result region announces `Decision: Move now. Movement need high. Interruption cost low.` or the corresponding hold state.
+- Camera status changes use polite live announcements; permission errors use an alert only when immediate attention is required.
+- Move focus to the decision heading after evaluation, activity heading after start, and recovery heading after a camera error.
+- Do not move focus for ordinary pose-progress updates.
+- Video preview has a useful accessible label; decorative overlay is hidden from assistive technology.
+- Focus outline remains visible and unclipped across every surface.
+- Minimum target size: `44 × 44px`.
+- Body/control contrast: at least 4.5:1; large text and component boundaries: at least 3:1.
+- 200% zoom and 320 CSS px effective width reflow without two-dimensional scrolling.
+- Decision, camera, completion, and error states never rely on colour alone.
+
+## 11. Pitch-ready sequence
+
+### Frame 1 — The question
+
+- Good scenario selected.
+- Context: `57 / 12 / 78`.
+- Idle state: `Is now a good time to move?`
+- Presenter selects `Ask WorkPulse`.
+
+### Frame 2 — `MOVE NOW`
+
+- Green decision surface.
+- High need, low cost.
+- Neck reset, about 45 seconds.
+- Reason visible.
 - Presenter selects `Start activity`.
-- State: `ACTIVE`.
-- Show `10 squats`, one-sentence instruction, and `Complete activity`.
-- No timer dependency; the presenter may immediately complete during the hackathon pitch.
 
-### Frame 4 — Prove memory (1:03)
+### Frame 3 — Permission and trust
 
-- State: `COMPLETED`.
-- Confirmation: `Movement recorded`.
-- History shows a new `COMPLETED` row.
-- Presenter points to the record, then selects `Meeting starts soon`.
+- Consent state, camera still off.
+- Presenter points to on-device processing and manual fallback.
+- For a reliable live pitch, manual completion is the default; camera is the optional wow path.
 
-### Frame 5 — Set up the contrast (1:09)
+### Frame 4 — Optional verification
 
-- Selected scenario: `Meeting starts soon`.
-- State: `IDLE`.
-- Evidence changes to `72 min sitting`, `2 min to Design Review`, `90 min since last movement`.
-- Presenter selects `Evaluate this moment`.
+- Enable camera only when venue conditions and permission are confirmed.
+- Show active indicator, pose trace, and progress.
+- Complete verified or switch to manual fallback without derailing the story.
 
-### Frame 6 — Reveal `NOT NOW` (1:14)
+### Frame 5 — Completion
 
-- State: meeting-gate `NOT_NOW`.
-- Focal field: deep-slate `NOT NOW`, equal in prominence to Frame 2.
-- Factors: `Movement need HIGH`; `Interruption cost HIGH`.
-- Reason names the meeting in 2 minutes.
-- Presenter line: **“That’s the difference between a reminder and an agent.”**
+- Confirm manual or verified completion.
+- Camera-off statement is visible after verified completion.
+- Select `Meeting starts soon`.
 
-### Frame 7 — Close on trust (1:22 onward)
+### Frame 6 — `NOT NOW`
 
-- Remain on `NOT NOW`; do not navigate to an architecture or feature slide.
-- The visible browser-local privacy line and history support the close.
-- Closing product line: `Move more. Interrupt less.`
+- Context: `72 / 2 / 90`.
+- Evaluate.
+- Brown decision surface with high need and high interruption cost.
+- Presenter line: `That's the difference between a reminder and an agent.`
 
-### Screenshot set
+### Required capture set
 
-Capture before submission:
+1. Desktop `MOVE NOW`, current neck-reset copy.
+2. Desktop `NOT NOW`.
+3. Mobile `NOT NOW` at 390 × 844.
+4. Activity consent.
+5. Camera active with no identifiable capture retained in the repository unless explicitly approved.
+6. Verified completion confirming camera off.
 
-1. Desktop `MOVE NOW` at 1440 × 900.
-2. Desktop meeting-gate `NOT NOW` at 1440 × 900.
-3. Mobile `MOVE NOW` at 390 × 844.
-4. Desktop completed state with one history record.
+The existing desktop review capture contains stale `10 squats` copy and must not be treated as final submission evidence after the neck-reset change.
 
-The first screenshot is the primary submission image; the second is the essential contrast image.
+## 12. Component mapping
 
-## 11. Implementation mapping
-
-The existing component boundaries map cleanly to this design:
-
-| Component | Design responsibility |
+| Code component | Design responsibility |
 |---|---|
-| `ScenarioSelector` | labelled single-selection demo control and its states |
-| `WorkContextCard` | current time, three context metrics, and meeting label |
-| `DecisionCard` | factor rails, all decision states, reason, and recommendation actions |
-| `ActivityCard` | recommended activity summary inside `MOVE NOW` |
-| `ActivitySession` | active, completed, and stopped activity states |
-| `InterventionHistory` | empty/populated history, clear action, browser-local note |
+| `WorkPulseApp` | scenario and product-state orchestration |
+| `ScenarioSelector` | radio/select variants and responsive state reset |
+| `WorkContextCard` | provenance, context readiness, and three metrics |
+| `DecisionCard` | equal-authority move/hold state surfaces |
+| `ActivitySession` | consent, loading, active camera, recovery, manual fallback, safety |
+| `icons.tsx` | product-owned vector marks and state icons |
 
-Implementation must consume domain outputs as provided. Visual labels may translate `MOVE_NOW` to `MOVE NOW`, but the UI must not recalculate, override, or infer decision logic.
+The UI consumes domain outputs. Design layers do not recalculate the decision or infer medical meaning from camera landmarks.
 
-## 12. Acceptance checklist for the implemented UI
+## 13. Anti-patterns
 
-- A first-time judge can identify the current scenario, three context facts, two decision factors, and decision within 20 seconds.
-- `MOVE NOW` and meeting-gate `NOT NOW` are equal in scale and craft, not primary versus fallback.
-- The good-window and meeting-soon states are distinguishable without color.
-- The scenario selector is visible but does not compete with the decision.
-- `NOT NOW` never shows `Start activity`.
-- Completing or dismissing produces an immediate visible history record.
-- A reload preserves history; reset returns to the known initial state in one action.
-- The complete primary flow fits and remains usable at 360 px width.
-- The desktop pitch path does not require scrolling before the activity/history section.
-- Keyboard navigation, visible focus, live announcements, 200% zoom, reduced motion, and contrast all pass manual review.
-- No P1/P2 feature or remote dependency can block the P0 demo.
+- No generic dashboard card grid.
+- No rings, raw score, calorie counts, streaks, badges, or gamification.
+- No AI chat, assistant avatar, sparkles, or simulated thinking.
+- No gradients on components, glassmorphism, neon glow, or purple AI palette.
+- No red error treatment for `NOT NOW`.
+- No automatic camera start, hidden preview, microphone request, or recording metaphor.
+- No medical posture score, pain diagnosis, or “correct posture” certainty.
+- No stock wellness imagery or decorative yoga illustrations.
+- No expansion screens inside the current pitch path.
+
+## 14. Design roadmap
+
+### P0+ workday boundary
+
+Add a compact settings surface for start time, end time, working days, and time zone. Outside-hours results reuse the hold structure with copy such as `Workday complete` rather than creating a new alert system.
+
+### P0+ activity fit
+
+Add explicit controls for `Can stand`, `Can leave desk`, available minutes, meeting participation, equipment, and exclusions. Selection remains downstream of `MOVE NOW`. Reuse the activity surface; do not create a browseable exercise marketplace.
+
+### P0+ outcome memory
+
+Add dismissal, 15-minute cooldown, third low-need scenario, and a compact browser-local history. History remains evidence, not analytics.
+
+### P1 daily routines
+
+Move from independent prompts to one chronological `Today` timeline containing workday boundaries, meals, therapy, and movement. Priority and due-window language must be visible. Medication items receive private-preview controls and exact user-entered instructions; nutrition is not scored.
+
+### P2 ambient assistance
+
+Posture, ergonomic check, daylight, environment, and wearable modules share one permissions pattern: source, purpose, current status, revoke action, data retained, and fallback. Camera-based posture never runs continuously by default.
+
+## 15. Current design acceptance checklist
+
+- Two scenarios only; all copy matches `WORKPULSE_SPEC.md` v1.4.
+- Good scenario offers `Neck reset`, not squats.
+- `MOVE NOW` and `NOT NOW` have equal structural and typographic authority.
+- Calendar provenance and camera status are explicit.
+- Camera starts only after a dedicated consent action.
+- Manual completion is available before and after camera failure.
+- Loading and active camera states do not cause destructive layout shift.
+- Verified completion states that no video was recorded and camera is off.
+- The full flow is keyboard usable with visible focus.
+- Mobile works from 360 px without horizontal overflow.
+- Reduced motion is respected.
+- No history, cooldown, meal, therapy, or workday settings appear in the current MVP path.

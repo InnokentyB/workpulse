@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-25T10:18:39Z",
+  "title": "Design System: WorkPulse",
+  "extensions": {
+    "colorMeta": {
+      "ink": { "role": "neutral", "displayName": "Deep Ink", "tonalRamp": ["oklch(15% 0.025 155)", "oklch(26% 0.025 155)", "oklch(38% 0.025 155)", "oklch(50% 0.025 155)", "oklch(62% 0.022 155)", "oklch(74% 0.018 155)", "oklch(86% 0.012 155)", "oklch(95% 0.006 155)"] },
+      "ink-soft": { "role": "neutral", "displayName": "Soft Ink", "tonalRamp": ["oklch(15% 0.022 155)", "oklch(26% 0.022 155)", "oklch(38% 0.022 155)", "oklch(50% 0.020 155)", "oklch(62% 0.018 155)", "oklch(74% 0.014 155)", "oklch(86% 0.010 155)", "oklch(95% 0.005 155)"] },
+      "paper": { "role": "neutral", "displayName": "Warm Paper", "tonalRamp": ["oklch(15% 0.018 92)", "oklch(26% 0.018 92)", "oklch(38% 0.017 92)", "oklch(50% 0.016 92)", "oklch(62% 0.014 92)", "oklch(74% 0.012 92)", "oklch(86% 0.010 92)", "oklch(95% 0.008 92)"] },
+      "paper-raised": { "role": "neutral", "displayName": "Raised Paper", "tonalRamp": ["oklch(15% 0.014 92)", "oklch(26% 0.014 92)", "oklch(38% 0.013 92)", "oklch(50% 0.012 92)", "oklch(62% 0.011 92)", "oklch(74% 0.010 92)", "oklch(86% 0.008 92)", "oklch(95% 0.006 92)"] },
+      "rule": { "role": "neutral", "displayName": "Ruled Line", "tonalRamp": ["oklch(15% 0.010 100)", "oklch(26% 0.010 100)", "oklch(38% 0.009 100)", "oklch(50% 0.008 100)", "oklch(62% 0.007 100)", "oklch(74% 0.006 100)", "oklch(86% 0.005 100)", "oklch(95% 0.003 100)"] },
+      "signal": { "role": "primary", "displayName": "Ink Green", "tonalRamp": ["oklch(15% 0.070 160)", "oklch(26% 0.090 160)", "oklch(38% 0.110 160)", "oklch(50% 0.120 160)", "oklch(62% 0.110 160)", "oklch(74% 0.090 160)", "oklch(86% 0.060 160)", "oklch(95% 0.025 160)"] },
+      "signal-bright": { "role": "primary", "displayName": "Signal Lime", "tonalRamp": ["oklch(15% 0.110 125)", "oklch(26% 0.140 125)", "oklch(38% 0.170 125)", "oklch(50% 0.190 125)", "oklch(62% 0.190 125)", "oklch(74% 0.180 125)", "oklch(86% 0.145 125)", "oklch(95% 0.060 125)"] },
+      "signal-soft": { "role": "primary", "displayName": "Signal Mist", "tonalRamp": ["oklch(15% 0.045 125)", "oklch(26% 0.055 125)", "oklch(38% 0.065 125)", "oklch(50% 0.070 125)", "oklch(62% 0.065 125)", "oklch(74% 0.055 125)", "oklch(86% 0.040 125)", "oklch(95% 0.018 125)"] },
+      "hold": { "role": "secondary", "displayName": "Hold Brown", "tonalRamp": ["oklch(15% 0.065 48)", "oklch(26% 0.085 48)", "oklch(38% 0.105 48)", "oklch(50% 0.120 48)", "oklch(62% 0.110 48)", "oklch(74% 0.090 48)", "oklch(86% 0.060 48)", "oklch(95% 0.025 48)"] },
+      "hold-bright": { "role": "secondary", "displayName": "Hold Amber", "tonalRamp": ["oklch(15% 0.075 67)", "oklch(26% 0.095 67)", "oklch(38% 0.115 67)", "oklch(50% 0.130 67)", "oklch(62% 0.130 67)", "oklch(74% 0.115 67)", "oklch(86% 0.080 67)", "oklch(95% 0.035 67)"] },
+      "focus": { "role": "tertiary", "displayName": "Focus Blue", "tonalRamp": ["oklch(15% 0.090 255)", "oklch(26% 0.120 255)", "oklch(38% 0.150 255)", "oklch(50% 0.170 255)", "oklch(62% 0.155 255)", "oklch(74% 0.120 255)", "oklch(86% 0.075 255)", "oklch(95% 0.030 255)"] },
+      "desk-dark": { "role": "neutral", "displayName": "Desk Dark", "tonalRamp": ["oklch(15% 0.025 155)", "oklch(26% 0.030 155)", "oklch(38% 0.032 155)", "oklch(50% 0.030 155)", "oklch(62% 0.026 155)", "oklch(74% 0.020 155)", "oklch(86% 0.012 155)", "oklch(95% 0.006 155)"] },
+      "decision-go": { "role": "primary", "displayName": "Decision Green", "tonalRamp": ["oklch(15% 0.050 160)", "oklch(26% 0.065 160)", "oklch(38% 0.080 160)", "oklch(50% 0.090 160)", "oklch(62% 0.080 160)", "oklch(74% 0.065 160)", "oklch(86% 0.040 160)", "oklch(95% 0.018 160)"] },
+      "decision-hold": { "role": "secondary", "displayName": "Decision Brown", "tonalRamp": ["oklch(15% 0.040 55)", "oklch(26% 0.052 55)", "oklch(38% 0.064 55)", "oklch(50% 0.070 55)", "oklch(62% 0.064 55)", "oklch(74% 0.052 55)", "oklch(86% 0.032 55)", "oklch(95% 0.014 55)"] },
+      "inverse-text": { "role": "neutral", "displayName": "Inverse Text", "tonalRamp": ["oklch(15% 0.010 100)", "oklch(26% 0.010 100)", "oklch(38% 0.009 100)", "oklch(50% 0.008 100)", "oklch(62% 0.007 100)", "oklch(74% 0.006 100)", "oklch(86% 0.005 100)", "oklch(95% 0.003 100)"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Decision Display", "purpose": "Resolved MOVE NOW and NOT NOW state only." },
+      "headline": { "displayName": "Product Headline", "purpose": "The opening product premise." },
+      "title": { "displayName": "Signal Title", "purpose": "Questions, activity titles, and state transitions." },
+      "body": { "displayName": "Explanatory Body", "purpose": "Premise, reasons, and activity instructions." },
+      "label": { "displayName": "Measured Label", "purpose": "System status, legends, units, and metadata." }
+    },
+    "shadows": [
+      { "name": "primary-action-hover", "value": "0 8px 22px rgba(3, 20, 12, .28)", "purpose": "One-pixel hover lift for the primary action on a decision surface." },
+      { "name": "evaluate-action-hover", "value": "0 8px 20px rgba(0, 0, 0, .17)", "purpose": "Hover lift for the pre-decision action." },
+      { "name": "live-signal-halo", "value": "0 0 0 4px var(--signal-soft)", "purpose": "Readiness halo around the live context dot." }
+    ],
+    "motion": [
+      { "name": "state-transition", "value": "160ms ease-out", "purpose": "Button, scenario-row, color, shadow, and transform feedback." },
+      { "name": "activity-pulse", "value": "1.25s cubic-bezier(.22, 1, .36, 1) infinite alternate", "purpose": "Three asynchronous bars that mark an activity in progress." },
+      { "name": "reduced-motion", "value": ".01ms, 1 iteration", "purpose": "Collapses animation and transition under prefers-reduced-motion." }
+    ],
+    "breakpoints": [
+      { "name": "compact", "value": "640px" },
+      { "name": "stacked", "value": "920px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one constructive action on a decision, ready, or active surface.",
+      "html": "<button class=\"ds-button-primary\" type=\"button\">Start activity <svg aria-hidden=\"true\" viewBox=\"0 0 20 20\"><path d=\"M4 10h12m-4.5-4.5L16 10l-4.5 4.5\" fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.8\"/></svg></button>",
+      "css": ".ds-button-primary { align-items: center; background: var(--signal-bright, #b8f36b); border: 0; border-radius: 10px; color: var(--ink, #16231d); cursor: pointer; display: inline-flex; font-family: Geist, Arial, sans-serif; font-size: .87rem; font-weight: 670; gap: 10px; justify-content: center; min-height: 48px; padding: 12px 18px; transition: background-color 160ms ease-out, box-shadow 160ms ease-out, transform 160ms ease-out; } .ds-button-primary svg { height: 19px; width: 19px; } .ds-button-primary:hover { background: #c7fb84; box-shadow: 0 8px 22px rgba(3,20,12,.28); transform: translateY(-1px); } .ds-button-primary:focus-visible { outline: 3px solid var(--focus, #205fca); outline-offset: 3px; } .ds-button-primary:active { transform: translateY(0); }"
+    },
+    {
+      "name": "Quiet Action",
+      "kind": "button",
+      "refersTo": "button-quiet",
+      "description": "A reversible or defer action that remains subordinate on a dark surface.",
+      "html": "<div class=\"ds-quiet-canvas\"><button class=\"ds-button-quiet\" type=\"button\">Not now</button></div>",
+      "css": ".ds-quiet-canvas { background: var(--decision-go, #183e2f); padding: 20px; } .ds-button-quiet { background: transparent; border: 1px solid currentColor; border-radius: 10px; color: var(--inverse-text, #f8f8f1); cursor: pointer; font-family: Geist, Arial, sans-serif; font-size: .87rem; font-weight: 670; min-height: 48px; padding: 12px 18px; transition: background-color 160ms ease-out, transform 160ms ease-out; } .ds-button-quiet:hover { background: rgba(255,255,255,.1); transform: translateY(-1px); } .ds-button-quiet:focus-visible { outline: 3px solid var(--focus, #205fca); outline-offset: 3px; } .ds-button-quiet:active { transform: translateY(0); }"
+    },
+    {
+      "name": "Scenario Option",
+      "kind": "input",
+      "description": "A full-row desktop radio choice with ruled structure and supporting context.",
+      "html": "<label class=\"ds-scenario-option\"><input checked name=\"ds-scenario\" type=\"radio\"><span class=\"ds-scenario-title\">Good movement window</span><span class=\"ds-scenario-description\">Long sitting stretch, clear calendar</span></label>",
+      "css": ".ds-scenario-option { background: var(--paper-raised, #fbfaf5); border-bottom: 1px solid var(--rule, #d8d5ca); border-top: 1px solid var(--rule, #d8d5ca); color: var(--ink, #16231d); cursor: pointer; display: grid; font-family: Geist, Arial, sans-serif; gap: 4px; padding: 17px 8px 17px 29px; position: relative; transition: background-color 160ms ease-out; } .ds-scenario-option:hover { background: rgba(255,255,255,.42); } .ds-scenario-option input { accent-color: var(--signal, #15684a); height: 15px; left: 5px; margin: 0; position: absolute; top: 20px; width: 15px; } .ds-scenario-option input:focus-visible { outline: 3px solid var(--focus, #205fca); outline-offset: 3px; } .ds-scenario-title { font-size: .92rem; font-weight: 670; } .ds-scenario-description { color: var(--ink-soft, #526159); font-size: .76rem; line-height: 1.5; }"
+    },
+    {
+      "name": "Mobile Scenario Select",
+      "kind": "input",
+      "description": "The compact scenario control used below 640px to keep context and action close.",
+      "html": "<select class=\"ds-scenario-select\" aria-label=\"Choose the workday context\"><option>Good movement window</option><option>Meeting too close</option><option>Cooldown active</option></select>",
+      "css": ".ds-scenario-select { appearance: none; background-color: var(--paper-raised, #fbfaf5); border: 1px solid var(--rule, #d8d5ca); border-radius: 10px; color: var(--ink, #16231d); display: block; font-family: Geist, Arial, sans-serif; font-size: .9rem; font-weight: 650; min-height: 50px; padding: 10px 46px 10px 14px; width: 100%; } .ds-scenario-select:focus-visible { outline: 3px solid var(--focus, #205fca); outline-offset: 3px; }"
+    },
+    {
+      "name": "Work Context Panel",
+      "kind": "card",
+      "refersTo": "context-panel",
+      "description": "The raised-paper top half of the signal desk, presenting three measured context facts.",
+      "html": "<section class=\"ds-context-panel\"><header><div><h2>Right now</h2><p>Work context at 14:20</p></div><span class=\"ds-live-status\"><i></i>Context ready</span></header><dl><div><dt>You’ve been sitting</dt><dd>72 <small>min</small></dd></div><div><dt>Next meeting</dt><dd>Clear</dd></div><div><dt>Since last movement</dt><dd>72 <small>min</small></dd></div></dl></section>",
+      "css": ".ds-context-panel { background: var(--paper-raised, #fbfaf5); border: 1px solid var(--rule, #d8d5ca); border-radius: 14px 14px 0 0; color: var(--ink, #16231d); font-family: Geist, Arial, sans-serif; padding: 26px 30px 28px; } .ds-context-panel header { align-items: start; display: flex; justify-content: space-between; } .ds-context-panel h2 { font-size: 1rem; margin: 0 0 4px; } .ds-context-panel p, .ds-context-panel dt, .ds-context-panel small { color: var(--ink-soft, #526159); font-size: .72rem; margin: 0; } .ds-live-status { align-items: center; color: var(--signal, #15684a); display: inline-flex; font-size: .72rem; font-weight: 630; gap: 7px; } .ds-live-status i { background: var(--signal, #15684a); border-radius: 50%; box-shadow: 0 0 0 4px var(--signal-soft, #dff1cc); height: 7px; width: 7px; } .ds-context-panel dl { display: grid; grid-template-columns: repeat(3,1fr); margin: 28px 0 0; } .ds-context-panel dl>div { border-left: 1px solid var(--rule, #d8d5ca); min-height: 92px; padding: 2px 22px; } .ds-context-panel dl>div:first-child { border-left: 0; padding-left: 0; } .ds-context-panel dt { margin-bottom: 10px; } .ds-context-panel dd { font-size: 2.5rem; font-variant-numeric: tabular-nums; font-weight: 640; letter-spacing: -.04em; line-height: .95; margin: 0; }"
+    },
+    {
+      "name": "GO Decision Surface",
+      "kind": "custom",
+      "refersTo": "decision-go",
+      "description": "The signature resolved GO surface with explicit state, measured signals, reason, and action.",
+      "html": "<section class=\"ds-decision ds-decision-go\"><div class=\"ds-decision-topline\"><span>Window open</span></div><h2>Move now</h2><div class=\"ds-decision-signals\"><span>Movement need <strong>HIGH</strong></span><span>Interruption cost <strong>LOW</strong></span></div><p class=\"ds-decision-reason\">You’ve been sitting long enough, and there is room before the next meeting.</p><button class=\"ds-decision-action\">Start activity</button></section>",
+      "css": ".ds-decision { border-radius: 0 0 14px 14px; color: var(--inverse-text, #f8f8f1); font-family: Geist, Arial, sans-serif; padding: 40px; } .ds-decision-go { background: var(--decision-go, #183e2f); } .ds-decision-topline { border-bottom: 1px solid rgba(255,255,255,.19); display: flex; font-size: .69rem; font-weight: 670; justify-content: space-between; letter-spacing: .08em; padding-bottom: 18px; text-transform: uppercase; } .ds-decision h2 { font-size: clamp(3rem,8vw,5rem); font-weight: 600; letter-spacing: -.04em; line-height: .9; margin: 36px 0 32px; text-transform: uppercase; } .ds-decision-signals { border-bottom: 1px solid rgba(255,255,255,.19); border-top: 1px solid rgba(255,255,255,.19); display: grid; grid-template-columns: 1fr 1fr; } .ds-decision-signals span { display: flex; font-size: .76rem; justify-content: space-between; padding: 18px 20px 18px 0; } .ds-decision-signals span+span { border-left: 1px solid rgba(255,255,255,.19); padding-left: 20px; } .ds-decision-signals strong { color: var(--signal-bright, #b8f36b); font-size: .79rem; letter-spacing: .07em; } .ds-decision-reason { font-size: 1rem; line-height: 1.56; margin: 32px 0; max-width: 60ch; } .ds-decision-action { background: var(--signal-bright, #b8f36b); border: 0; border-radius: 10px; color: var(--ink, #16231d); cursor: pointer; font-weight: 670; min-height: 48px; padding: 12px 18px; transition: box-shadow 160ms ease-out, transform 160ms ease-out; } .ds-decision-action:hover { box-shadow: 0 8px 22px rgba(3,20,12,.28); transform: translateY(-1px); } .ds-decision-action:focus-visible { outline: 3px solid var(--focus, #205fca); outline-offset: 3px; }"
+    },
+    {
+      "name": "HOLD Decision Surface",
+      "kind": "custom",
+      "refersTo": "decision-hold",
+      "description": "The equal-authority HOLD surface that explains why interruption is not useful now.",
+      "html": "<section class=\"ds-hold\"><div class=\"ds-hold-topline\"><span>Hold this moment</span></div><h2>Not now</h2><div class=\"ds-hold-signals\"><span>Movement need <strong>HIGH</strong></span><span>Interruption cost <strong>HIGH</strong></span></div><small>Why this decision</small><p>Your next meeting is too close. Keep working; WorkPulse will wait for a better window.</p></section>",
+      "css": ".ds-hold { background: var(--decision-hold, #493125); border-radius: 0 0 14px 14px; color: var(--inverse-text, #f8f8f1); font-family: Geist, Arial, sans-serif; padding: 40px; } .ds-hold-topline { border-bottom: 1px solid rgba(255,255,255,.19); color: #ecd6c6; display: flex; font-size: .69rem; font-weight: 670; justify-content: space-between; letter-spacing: .08em; padding-bottom: 18px; text-transform: uppercase; } .ds-hold h2 { font-size: clamp(3rem,8vw,5rem); font-weight: 600; letter-spacing: -.04em; line-height: .9; margin: 36px 0 32px; text-transform: uppercase; } .ds-hold-signals { border-bottom: 1px solid rgba(255,255,255,.19); border-top: 1px solid rgba(255,255,255,.19); display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 32px; } .ds-hold-signals span { color: #ecd6c6; display: flex; font-size: .76rem; justify-content: space-between; padding: 18px 20px 18px 0; } .ds-hold-signals span+span { border-left: 1px solid rgba(255,255,255,.19); padding-left: 20px; } .ds-hold-signals strong { color: var(--hold-bright, #f2b56d); font-size: .79rem; letter-spacing: .07em; } .ds-hold small { color: #ecd6c6; font-size: .7rem; } .ds-hold p { font-size: 1rem; line-height: 1.56; margin: 10px 0 0; max-width: 60ch; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Workday Signal Desk",
+    "overview": "WorkPulse feels like a calm instrument built into the workday: warm paper surrounds a compact desk of measured context, ruled divisions, and one decisive signal surface. It is purposeful rather than clinical, editorial rather than dashboard-like, and confident enough to recommend either movement or restraint without turning either outcome into a judgment.\n\nThe interface progresses from context to question to reason to action. Its strongest visual contrast is reserved for the decision stage: ink-green means a useful movement window, warm brown means hold, and electric lime marks the next constructive action. Dense status typography and tabular numerals make the product feel precise, while generous breathing room and plain language keep that precision humane.",
+    "keyCharacteristics": [
+      "Warm paper canvas with restrained radial lime atmosphere.",
+      "Ruled dividers and compact status labels organize information without dashboard chrome.",
+      "Large, explicit decision typography makes GO or HOLD readable without relying on color.",
+      "Ink-green and warm-brown state surfaces share one structure, so neither outcome feels secondary.",
+      "Lime is a scarce action and live-signal cue, not a decorative brand wash."
+    ],
+    "rules": [
+      { "name": "The Scarce Lime Rule", "body": "Reserve bright lime for the next useful action, a live signal, or a resolved low-cost cue; never flood the paper canvas with it.", "section": "colors" },
+      { "name": "The Equal Outcomes Rule", "body": "GO and HOLD use the same structural hierarchy and typographic force. Color changes the state character, not its importance.", "section": "colors" },
+      { "name": "The Decision Speaks Largest Rule", "body": "The resolved state is always the strongest type on the screen; supporting levels and reasons remain legible but never compete with it.", "section": "typography" },
+      { "name": "The Measured Numeral Rule", "body": "Context values use tabular numerals so changing data does not disturb the visual rhythm.", "section": "typography" },
+      { "name": "The Flat Desk Rule", "body": "Surfaces stay flat at rest; use rules and tonal contrast for structure, and reserve shadow for interaction feedback.", "section": "elevation" },
+      { "name": "The Joined Instrument Rule", "body": "Context and decision surfaces must read as one stacked device: round the exposed outer corners, not the shared seam.", "section": "shapes" }
+    ],
+    "dos": [
+      "Do keep the decision as the largest and highest-contrast message after evaluation.",
+      "Do use one-pixel ruled dividers, tonal layers, and joined panels to structure the desk.",
+      "Do preserve text labels for MOVE NOW and NOT NOW so state never depends on green or brown alone.",
+      "Do keep scenario controls visible but secondary, collapsing them to a select on narrow screens.",
+      "Do respect reduced-motion preference for the activity pulse animation."
+    ],
+    "donts": [
+      "Don't turn WorkPulse into a generic reminder dashboard with equal-weight cards, charts, or persistent notification chrome.",
+      "Don't use signal lime as a large decorative field or on multiple competing actions.",
+      "Don't make HOLD look like an error, warning, or failed outcome; it is a successful decision with equal authority.",
+      "Don't introduce soft floating cards or ambient shadows at rest; the system is ruled and flat.",
+      "Don't add ornamental typefaces, gradients on components, or color-only state communication."
+    ]
+  }
+}

@@ -1,12 +1,10 @@
 import { selectActivity } from "./activity-selector";
 import type {
   DecisionResult,
-  InterventionRecord,
   Level,
   WorkContext,
 } from "./types";
 
-const COOLDOWN_MINUTES = 15;
 const MINIMUM_SEDENTARY_MINUTES = 40;
 const MEETING_GATE_MINUTES = 5;
 const MOVE_NOW_THRESHOLD = 0.65;
@@ -21,26 +19,8 @@ function toLevel(value: number): Level {
   return "LOW";
 }
 
-function wasRecentlyDismissed(
-  history: InterventionRecord[],
-  now: Date,
-): boolean {
-  const latestDismissal = history
-    .filter((record) => record.outcome === "dismissed")
-    .sort((left, right) => right.createdAt.localeCompare(left.createdAt))[0];
-
-  if (!latestDismissal) return false;
-
-  const elapsedMinutes =
-    (now.getTime() - new Date(latestDismissal.createdAt).getTime()) / 60_000;
-
-  return elapsedMinutes >= 0 && elapsedMinutes < COOLDOWN_MINUTES;
-}
-
 export function evaluateIntervention(
   context: WorkContext,
-  history: InterventionRecord[] = [],
-  now: Date = new Date(),
 ): DecisionResult {
   const movementScore = clamp(
     (context.sedentaryMinutes / 75) * 0.7 +
@@ -71,16 +51,6 @@ export function evaluateIntervention(
     };
   }
 
-  if (wasRecentlyDismissed(history, now)) {
-    return {
-      decision: "NOT_NOW",
-      movementNeed,
-      interruptionCost,
-      score,
-      reason: "You recently declined an activity, so WorkPulse is respecting your cooldown.",
-    };
-  }
-
   if (context.sedentaryMinutes < MINIMUM_SEDENTARY_MINUTES) {
     return {
       decision: "NOT_NOW",
@@ -103,7 +73,7 @@ export function evaluateIntervention(
       interruptionCost,
       score,
       reason: `You've been sitting for ${context.sedentaryMinutes} minutes and have ${windowDescription}.`,
-      activity: selectActivity(history),
+      activity: selectActivity(),
     };
   }
 
