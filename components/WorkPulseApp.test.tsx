@@ -86,7 +86,7 @@ describe("WorkPulseApp", () => {
     expect(screen.queryByText(/nice work/i)).toBeNull();
   });
 
-  it("offers and records the second screen-guided activity", async () => {
+  it("offers camera verification for the second activity", async () => {
     render(<WorkPulseApp />);
     await screen.findByText("No completed activities yet.");
 
@@ -105,13 +105,13 @@ describe("WorkPulseApp", () => {
     );
 
     expect(screen.getByRole("heading", { name: "Shoulder rolls" })).toBeDefined();
-    expect(
-      screen.getAllByText(/three slow shoulder circles forward/i),
-    ).toHaveLength(2);
-    fireEvent.click(screen.getByRole("button", { name: /complete activity/i }));
+    expect(screen.getByLabelText("0 of 6 shoulder rolls")).toBeDefined();
+    expect(screen.getByText(/complete six slow shoulder rolls/i)).toBeDefined();
+    expect(screen.getByRole("button", { name: /enable camera/i })).toBeDefined();
+    fireEvent.click(screen.getByRole("button", { name: /finish without camera/i }));
 
     expect(screen.getByText(/shoulder rolls complete/i)).toBeDefined();
-    expect(screen.getByText("Completed with on-screen guidance")).toBeDefined();
+    expect(screen.getByText("Completed manually without camera verification")).toBeDefined();
     expect(screen.getByText("exercise")).toBeDefined();
     expect(screen.getByText("Just now")).toBeDefined();
   });

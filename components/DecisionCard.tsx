@@ -77,7 +77,7 @@ export function DecisionCard({
                       <strong>{activity.name}</strong>
                     </span>
                     <small>
-                      About {activity.durationSeconds} sec · {activity.guide === "camera-neck" ? "Camera optional" : "Screen guided"}
+                      About {activity.durationSeconds} sec · {activity.guide.startsWith("camera-") ? "Camera optional" : "Screen guided"}
                     </small>
                   </span>
                 </label>

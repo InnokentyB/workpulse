@@ -6,6 +6,7 @@ import { ActivitySession } from "@/components/ActivitySession";
 const originalMediaDevices = navigator.mediaDevices;
 const originalMatchMedia = window.matchMedia;
 const originalInnerHeight = window.innerHeight;
+const originalVisualViewport = window.visualViewport;
 const originalScrollIntoView = HTMLElement.prototype.scrollIntoView;
 const scrollIntoView = vi.fn();
 const activity = {
@@ -45,6 +46,10 @@ afterEach(() => {
   Object.defineProperty(window, "innerHeight", {
     configurable: true,
     value: originalInnerHeight,
+  });
+  Object.defineProperty(window, "visualViewport", {
+    configurable: true,
+    value: originalVisualViewport,
   });
 });
 
@@ -109,13 +114,13 @@ describe("ActivitySession", () => {
     });
   });
 
-  it("completes a screen-guided shoulder activity without camera access", () => {
+  it("offers camera verification for shoulder rolls", () => {
     const onComplete = vi.fn();
-    const { container } = render(
+    render(
       <ActivitySession
         activity={{
           durationSeconds: 60,
-          guide: "guided-steps",
+          guide: "camera-shoulders",
           id: "shoulder-rolls",
           instructions: "Make three slow circles forward, then three backward.",
           movementCount: 6,
@@ -127,13 +132,40 @@ describe("ActivitySession", () => {
     );
 
     expect(screen.getByRole("heading", { name: "Shoulder rolls" })).toBeDefined();
-    expect(container.querySelector('[data-icon="shoulder-rolls"]')).not.toBeNull();
-    expect(screen.getByText(/no camera needed/i)).toBeDefined();
+    expect(screen.getByLabelText("0 of 6 shoulder rolls")).toBeDefined();
+    expect(screen.getByText(/complete six slow shoulder rolls/i)).toBeDefined();
+    expect(screen.getByRole("button", { name: /enable camera/i })).toBeDefined();
+    fireEvent.click(screen.getByRole("button", { name: /finish without camera/i }));
+
+    expect(onComplete).toHaveBeenCalledWith({
+      mode: "manual",
+      movements: 0,
+      verified: false,
+    });
+  });
+
+  it("keeps a screen-guided fallback available for configured activities", () => {
+    const onComplete = vi.fn();
+    render(
+      <ActivitySession
+        activity={{
+          durationSeconds: 30,
+          guide: "guided-steps",
+          id: "desk-stretch",
+          instructions: "Follow the steps on screen.",
+          movementCount: 2,
+          name: "Desk stretch",
+          steps: ["Settle", "Stretch"],
+        }}
+        onComplete={onComplete}
+      />,
+    );
+
     fireEvent.click(screen.getByRole("button", { name: /complete activity/i }));
 
     expect(onComplete).toHaveBeenCalledWith({
       mode: "guided",
-      movements: 6,
+      movements: 2,
       verified: false,
     });
   });
@@ -188,6 +220,55 @@ describe("ActivitySession", () => {
       container.querySelector(".camera-stage") as HTMLDivElement,
       "getBoundingClientRect",
     ).mockReturnValue({ height: 600 } as DOMRect);
+
+    fireEvent.click(screen.getByRole("button", { name: /enable camera/i }));
+
+    expect(scrollIntoView).toHaveBeenLastCalledWith({
+      behavior: "smooth",
+      block: "start",
+    });
+
+    scrollIntoView.mockClear();
+    window.dispatchEvent(new Event("resize"));
+    expect(scrollIntoView).toHaveBeenLastCalledWith({
+      behavior: "auto",
+      block: "start",
+    });
+  });
+
+  it("uses the visual viewport height when browser chrome reduces the workspace", () => {
+    const visualViewport = Object.assign(new EventTarget(), {
+      height: 400,
+      offsetLeft: 0,
+      offsetTop: 0,
+      onresize: null,
+      onscroll: null,
+      pageLeft: 0,
+      pageTop: 0,
+      scale: 1,
+      width: 900,
+    });
+    Object.defineProperty(window, "visualViewport", {
+      configurable: true,
+      value: visualViewport,
+    });
+    Object.defineProperty(navigator, "mediaDevices", {
+      configurable: true,
+      value: {
+        getUserMedia: vi.fn().mockReturnValue(new Promise(() => undefined)),
+      },
+    });
+
+    const { container } = render(
+      <ActivitySession
+        activity={activity}
+        onComplete={vi.fn()}
+      />,
+    );
+    vi.spyOn(
+      container.querySelector(".camera-stage") as HTMLDivElement,
+      "getBoundingClientRect",
+    ).mockReturnValue({ height: 500 } as DOMRect);
 
     fireEvent.click(screen.getByRole("button", { name: /enable camera/i }));
 

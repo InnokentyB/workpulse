@@ -23,6 +23,12 @@ import {
   type NeckMotionState,
   type PoseLandmark,
 } from "@/lib/neck-motion-tracker";
+import {
+  INITIAL_SHOULDER_MOTION_STATE,
+  TARGET_SHOULDER_ROLLS,
+  updateShoulderMotion,
+  type ShoulderMotionState,
+} from "@/lib/shoulder-motion-tracker";
 import type { Activity } from "@/lib/types";
 
 const WASM_ROOT =
@@ -90,7 +96,7 @@ function cameraMessage(status: CameraStatus): string {
   return "WorkPulse could not start pose detection. Check your connection and try again.";
 }
 
-function trackingMessage(motion: NeckMotionState): string {
+function neckTrackingMessage(motion: NeckMotionState): string {
   if (motion.tracking === "out-of-frame") {
     return "Keep your face and both shoulders visible.";
   }
@@ -112,6 +118,56 @@ function trackingMessage(motion: NeckMotionState): string {
       return "Movement check complete.";
   }
 }
+
+function shoulderTrackingMessage(motion: ShoulderMotionState): string {
+  if (motion.tracking === "out-of-frame") {
+    return "Keep both shoulders visible in the frame.";
+  }
+
+  switch (motion.stage) {
+    case "calibrating":
+      return "Sit tall and let your shoulders relax.";
+    case "lift":
+      return "Lift both shoulders toward your ears to begin the next roll.";
+    case "lower":
+      return "Circle your shoulders back and lower them gently.";
+    case "complete":
+      return "Shoulder roll check complete.";
+  }
+}
+
+type CameraMotionState = {
+  movements: number;
+  stage: string;
+  tracking: "out-of-frame" | "ready";
+};
+
+type CameraMotionGuide<State extends CameraMotionState> = {
+  consentTitle: string;
+  initialState: State;
+  progressLabel: string;
+  targetMovements: number;
+  trackingMessage: (motion: State) => string;
+  updateMotion: (state: State, landmarks: PoseLandmark[]) => State;
+};
+
+const NECK_GUIDE: CameraMotionGuide<NeckMotionState> = {
+  consentTitle: "Follow four gentle neck movements",
+  initialState: INITIAL_NECK_MOTION_STATE,
+  progressLabel: "neck movements",
+  targetMovements: TARGET_NECK_MOVEMENTS,
+  trackingMessage: neckTrackingMessage,
+  updateMotion: updateNeckMotion,
+};
+
+const SHOULDER_GUIDE: CameraMotionGuide<ShoulderMotionState> = {
+  consentTitle: "Complete six slow shoulder rolls",
+  initialState: INITIAL_SHOULDER_MOTION_STATE,
+  progressLabel: "shoulder rolls",
+  targetMovements: TARGET_SHOULDER_ROLLS,
+  trackingMessage: shoulderTrackingMessage,
+  updateMotion: updateShoulderMotion,
+};
 
 function drawPose(
   canvas: HTMLCanvasElement,
@@ -161,12 +217,13 @@ function drawPose(
   }
 }
 
-function CameraNeckSession({
+function CameraPoseSession<State extends CameraMotionState>({
   activity,
+  guide,
   onComplete,
-}: ActivitySessionProps) {
+}: ActivitySessionProps & { guide: CameraMotionGuide<State> }) {
   const [status, setStatus] = useState<CameraStatus>("idle");
-  const [motion, setMotion] = useState(INITIAL_NECK_MOTION_STATE);
+  const [motion, setMotion] = useState(guide.initialState);
   const sessionRef = useWorkingAreaFocus<HTMLElement>();
   const cameraStageRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -177,7 +234,7 @@ function CameraNeckSession({
   const runDetectionRef = useRef<(timestamp: number) => void>(() => undefined);
   const cameraRequestRef = useRef(0);
   const lastInferenceRef = useRef(0);
-  const motionRef = useRef(INITIAL_NECK_MOTION_STATE);
+  const motionRef = useRef(guide.initialState);
 
   const stopCamera = useCallback(() => {
     cameraRequestRef.current += 1;
@@ -226,16 +283,23 @@ function CameraNeckSession({
           const landmarks = result.landmarks[0];
           drawPose(canvas, video, landmarks);
 
-          const nextMotion = updateNeckMotion(
-            motionRef.current,
+          const previousMotion = motionRef.current;
+          const nextMotion = guide.updateMotion(
+            previousMotion,
             (landmarks ?? []) as PoseLandmark[],
           );
           motionRef.current = nextMotion;
-          setMotion(nextMotion);
+          if (
+            nextMotion.stage !== previousMotion.stage ||
+            nextMotion.movements !== previousMotion.movements ||
+            nextMotion.tracking !== previousMotion.tracking
+          ) {
+            setMotion(nextMotion);
+          }
           lastInferenceRef.current = timestamp;
 
           if (nextMotion.stage === "complete") {
-            finish(true, TARGET_NECK_MOVEMENTS);
+            finish(true, guide.targetMovements);
             return;
           }
         } catch {
@@ -249,7 +313,7 @@ function CameraNeckSession({
         runDetectionRef.current(nextTimestamp),
       );
     },
-    [finish, stopCamera],
+    [finish, guide, stopCamera],
   );
 
   useEffect(() => {
@@ -260,8 +324,8 @@ function CameraNeckSession({
     const requestId = cameraRequestRef.current + 1;
     cameraRequestRef.current = requestId;
     setStatus("loading");
-    setMotion(INITIAL_NECK_MOTION_STATE);
-    motionRef.current = INITIAL_NECK_MOTION_STATE;
+    setMotion(guide.initialState);
+    motionRef.current = guide.initialState;
 
     if (!navigator.mediaDevices?.getUserMedia) {
       setStatus("unavailable");
@@ -327,22 +391,32 @@ function CameraNeckSession({
         setStatus("error");
       }
     }
-  }, [stopCamera]);
+  }, [guide, stopCamera]);
 
   useEffect(() => stopCamera, [stopCamera]);
 
-  useEffect(() => {
-    if (status !== "loading") return;
+  const positionCameraStage = useCallback((behavior: ScrollBehavior) => {
     const cameraStage = cameraStageRef.current;
+    const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
     const block =
-      cameraStage && cameraStage.getBoundingClientRect().height > window.innerHeight - 48
+      cameraStage && cameraStage.getBoundingClientRect().height > viewportHeight - 48
         ? "start"
         : "center";
-    cameraStage?.scrollIntoView?.({
-      behavior: preferredScrollBehavior(),
-      block,
-    });
-  }, [status]);
+    cameraStage?.scrollIntoView?.({ behavior, block });
+  }, []);
+
+  useEffect(() => {
+    if (status !== "loading" && status !== "active") return;
+    positionCameraStage(preferredScrollBehavior());
+
+    const reposition = () => positionCameraStage("auto");
+    window.addEventListener("resize", reposition);
+    window.visualViewport?.addEventListener("resize", reposition);
+    return () => {
+      window.removeEventListener("resize", reposition);
+      window.visualViewport?.removeEventListener("resize", reposition);
+    };
+  }, [positionCameraStage, status]);
 
   const showCamera = status === "loading" || status === "active";
   const showError =
@@ -350,7 +424,6 @@ function CameraNeckSession({
 
   return (
     <section
-      aria-live="polite"
       className="activity-session activity-session--camera"
       ref={sessionRef}
       tabIndex={-1}
@@ -362,10 +435,10 @@ function CameraNeckSession({
         </div>
         <div
           className="movement-progress"
-          aria-label={`${motion.movements} of ${TARGET_NECK_MOVEMENTS} neck movements`}
+          aria-label={`${motion.movements} of ${guide.targetMovements} ${guide.progressLabel}`}
         >
           <strong>{motion.movements}</strong>
-          <span>/ {TARGET_NECK_MOVEMENTS}</span>
+          <span>/ {guide.targetMovements}</span>
         </div>
       </div>
 
@@ -389,7 +462,7 @@ function CameraNeckSession({
         <div className="camera-consent">
           <CameraIcon />
           <div>
-            <h3>Follow four gentle neck movements</h3>
+            <h3>{guide.consentTitle}</h3>
             <p>
               Your image is processed on this device. WorkPulse does not record,
               save, or upload video. The camera switches off after the movement check.
@@ -399,7 +472,9 @@ function CameraNeckSession({
       ) : null}
 
       {status === "active" ? (
-        <p className="tracking-message">{trackingMessage(motion)}</p>
+        <p aria-atomic="true" className="tracking-message" role="status">
+          {guide.trackingMessage(motion)}
+        </p>
       ) : null}
 
       <p className="activity-safety-note">
@@ -535,5 +610,9 @@ export function ActivitySession(props: ActivitySessionProps) {
     return <GuidedStepsSession {...props} />;
   }
 
-  return <CameraNeckSession {...props} />;
+  if (props.activity.guide === "camera-shoulders") {
+    return <CameraPoseSession {...props} guide={SHOULDER_GUIDE} />;
+  }
+
+  return <CameraPoseSession {...props} guide={NECK_GUIDE} />;
 }

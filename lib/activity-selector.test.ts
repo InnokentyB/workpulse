@@ -14,13 +14,14 @@ describe("selectActivity", () => {
     });
   });
 
-  it("provides a second guided shoulder activity", () => {
+  it("provides a second camera-verified shoulder activity", () => {
     expect(ACTIVITIES).toHaveLength(2);
     expect(selectActivity("shoulder-rolls")).toMatchObject({
       id: "shoulder-rolls",
       name: "Shoulder rolls",
       durationSeconds: 60,
-      guide: "guided-steps",
+      guide: "camera-shoulders",
+      movementCount: 6,
     });
   });
 

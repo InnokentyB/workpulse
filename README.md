@@ -16,8 +16,9 @@ is different. It includes deterministic `MOVE NOW` / `NOT NOW` decisions,
 clear explanations, two selectable activities, and a minimal `Start → Done` loop.
 The context panel labels the calendar input as demo data. During the movement
 activity, the user can explicitly enable the browser camera and let an on-device
-pose model guide a four-movement neck reset. A second shoulder-roll activity uses
-screen guidance and does not request camera access. Video is never recorded,
+pose model guide a four-movement neck reset. The shoulder-roll activity can use
+the same optional camera flow to check six lift-and-return cycles on-device, with
+manual completion available for either activity. Video is never recorded,
 stored, or uploaded, and the camera stops when verification completes. Completed
 activities are recorded in a local, browser-only history with time, duration,
 verification mode, and movement count; the history also summarizes today's count

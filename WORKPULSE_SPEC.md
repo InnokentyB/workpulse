@@ -202,10 +202,11 @@ The UI summarizes this as four guided movements after neutral calibration. Full 
 
 ### 8.2 Shoulder rolls
 
-The second activity is a camera-free shoulder reset lasting approximately 60 seconds.
-The user makes three slow shoulder circles forward and then three backward, within
-a comfortable range. The interface shows the sequence as short numbered steps and
-records completion as screen-guided rather than camera-verified.
+The second activity is a shoulder reset lasting approximately 60 seconds. The user
+makes three slow shoulder circles forward and then three backward, within a
+comfortable range. With explicit consent, on-device pose detection calibrates a
+relaxed shoulder position and counts six lift-and-return cycles. The same manual
+fallback remains available when camera access is unavailable or unwanted.
 
 ## 9. Camera and privacy contract
 
@@ -337,8 +338,10 @@ Required automated checks:
 - the five-minute meeting boundary returns `NOT_NOW`;
 - the UI switches between scenarios without stale state;
 - `Start → manual completion → Run again` works;
-- face and both shoulders are required before calibration or verification;
-- side-to-side, down, up, and neutral stages advance only in order;
+- face and both shoulders are required for neck calibration or verification;
+- face and both shoulders are required for shoulder-roll calibration or verification;
+- neck side-to-side, down, up, and neutral stages advance only in order;
+- a shoulder roll advances only after both shoulders rise relative to the face and return to the calibrated relaxed position;
 - denied camera permission produces a recoverable state;
 - camera and motion state reset when the session ends.
 
@@ -357,7 +360,7 @@ The MVP is done when a viewer can:
 1. compare both scenarios;
 2. understand why the decisions differ;
 3. choose and start either activity only from `MOVE_NOW`;
-4. complete shoulder rolls with screen guidance, or complete the neck reset manually or with four on-device guided movements;
+4. complete either activity manually or with on-device movement verification;
 5. see that the camera is off after the session;
 6. repeat the demo reliably on desktop and mobile;
 7. run the decision demo if camera verification is unavailable.

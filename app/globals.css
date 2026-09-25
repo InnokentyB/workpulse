@@ -329,6 +329,7 @@ button { color: inherit; }
   padding: clamp(30px, 5vw, 58px);
   scroll-margin-top: 24px;
 }
+.activity-session--camera { overflow-anchor: none; }
 .activity-session__heading { align-items: end; display: flex; gap: 28px; justify-content: space-between; }
 .activity-session__heading p { color: #c7d8cf; font-size: .73rem; margin: 0 0 9px; }
 .activity-session__heading h2 { font-size: clamp(2.6rem, 6vw, 5.2rem); font-weight: 580; letter-spacing: -.04em; line-height: .98; margin: 0; }

@@ -8,12 +8,13 @@ export const ACTIVITIES: readonly Activity[] = [
     guide: "camera-neck",
     instructions:
       "Slowly turn side to side, lower your chin, and lift your gaze within a comfortable range.",
+    movementCount: 4,
   },
   {
     id: "shoulder-rolls",
     name: "Shoulder rolls",
     durationSeconds: 60,
-    guide: "guided-steps",
+    guide: "camera-shoulders",
     instructions:
       "Make three slow shoulder circles forward, then three backward. Stay within a comfortable range.",
     movementCount: 6,

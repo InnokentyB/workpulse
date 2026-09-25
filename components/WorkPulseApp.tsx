@@ -163,7 +163,7 @@ export function WorkPulseApp() {
                 </h2>
                 <span>
                   {completion?.verified
-                    ? "Four movements confirmed on this device. No video was recorded. Camera is off."
+                    ? `${completion.movements} movements confirmed on this device. No video was recorded. Camera is off.`
                     : completion?.mode === "guided"
                       ? "Completed with on-screen guidance. No camera was used."
                       : "Completed without camera verification."}
