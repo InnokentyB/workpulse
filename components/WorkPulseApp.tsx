@@ -6,6 +6,7 @@ import {
   ActivitySession,
   type ActivityCompletion,
 } from "@/components/ActivitySession";
+import { ActivityPreferencesPanel } from "@/components/ActivityPreferencesPanel";
 import { ActivityHistory } from "@/components/ActivityHistory";
 import { DecisionCard } from "@/components/DecisionCard";
 import { ArrowIcon, CheckIcon } from "@/components/icons";
@@ -14,11 +15,22 @@ import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { WorkContextCard } from "@/components/WorkContextCard";
 import { demoScenarios } from "@/data/demo-scenarios";
 import {
+  DEFAULT_ACTIVITY_PREFERENCES,
+  loadActivityPreferences,
+  saveActivityPreferences,
+  type ActivityPreferences,
+} from "@/lib/activity-preferences";
+import {
   loadActivityHistory,
   recordActivityCompletion,
   type ActivityHistoryEntry,
 } from "@/lib/activity-history";
-import { ACTIVITIES, selectActivity } from "@/lib/activity-selector";
+import {
+  ACTIVITIES,
+  describeActivityFit,
+  selectActivity,
+  selectActivityForContext,
+} from "@/lib/activity-selector";
 import { evaluateIntervention } from "@/lib/decision-engine";
 import type { DecisionResult, WorkPulseState } from "@/lib/types";
 
@@ -30,11 +42,19 @@ export function WorkPulseApp() {
   const [result, setResult] = useState<DecisionResult | null>(null);
   const [completion, setCompletion] = useState<ActivityCompletion | null>(null);
   const [history, setHistory] = useState<ActivityHistoryEntry[]>([]);
+  const [preferences, setPreferences] = useState<ActivityPreferences>({
+    ...DEFAULT_ACTIVITY_PREFERENCES,
+  });
+  const [availableActivities, setAvailableActivities] =
+    useState<readonly (typeof ACTIVITIES)[number][]>(ACTIVITIES);
 
   useEffect(() => {
     let active = true;
     void Promise.resolve().then(() => {
-      if (active) setHistory(loadActivityHistory(window.localStorage));
+      if (active) {
+        setHistory(loadActivityHistory(window.localStorage));
+        setPreferences(loadActivityPreferences(window.localStorage));
+      }
     });
     return () => {
       active = false;
@@ -54,13 +74,44 @@ export function WorkPulseApp() {
     setCompletion(null);
   }
 
+  function updatePreferences(nextPreferences: ActivityPreferences) {
+    setPreferences(nextPreferences);
+    saveActivityPreferences(window.localStorage, nextPreferences);
+    setState("IDLE");
+    setResult(null);
+    setCompletion(null);
+  }
+
+  function availableSeconds() {
+    return scenario.context.minutesToNextMeeting === null
+      ? null
+      : scenario.context.minutesToNextMeeting * 60;
+  }
+
   function evaluate() {
     const nextResult = evaluateIntervention(scenario.context);
     const lastActivityId = history.at(-1)?.activityId;
     if (nextResult.activity) {
-      nextResult.activity = selectActivity(
-        lastActivityId === "neck-reset" ? "shoulder-rolls" : "neck-reset",
-      );
+      const selection = selectActivityForContext({
+        ...preferences,
+        availableSeconds: availableSeconds(),
+        lastActivityId,
+      });
+      if (!selection) {
+        setAvailableActivities([]);
+        setResult({
+          ...nextResult,
+          decision: "NOT_NOW",
+          reason:
+            "Movement would help, but no activity fits the options you selected. Adjust what works right now or try later.",
+          activity: undefined,
+        });
+        setState("NOT_NOW");
+        return;
+      }
+      nextResult.activity = selection.activity;
+      nextResult.activityReason = selection.reason;
+      setAvailableActivities(selection.eligibleActivities);
     }
     setResult(nextResult);
     setState(nextResult.decision === "MOVE_NOW" ? "RECOMMENDED" : "NOT_NOW");
@@ -93,6 +144,10 @@ export function WorkPulseApp() {
             scenarios={demoScenarios}
             selectedId={selectedId}
           />
+          <ActivityPreferencesPanel
+            onChange={updatePreferences}
+            preferences={preferences}
+          />
           <div className="privacy-note">
             <span aria-hidden="true">Demo</span>
             <p>Two fixed contexts. No calendar connection or setup required.</p>
@@ -117,14 +172,22 @@ export function WorkPulseApp() {
 
           {isResultVisible && result ? (
             <DecisionCard
-              activities={ACTIVITIES}
-              onActivitySelect={(activityId) =>
+              activities={availableActivities}
+              onActivitySelect={(activityId) => {
+                const activity = selectActivity(activityId);
                 setResult((current) =>
                   current
-                    ? { ...current, activity: selectActivity(activityId) }
+                    ? {
+                        ...current,
+                        activity,
+                        activityReason: describeActivityFit(
+                          activity,
+                          availableSeconds(),
+                        ),
+                      }
                     : current,
-                )
-              }
+                );
+              }}
               onStart={() => setState("ACTIVE")}
               result={result}
             />

@@ -370,7 +370,10 @@ The MVP is done when a viewer can:
 ### Current MVP — implemented slice
 
 - Two-scenario decision contrast.
-- Selectable neck reset and shoulder-roll activities.
+- Six-activity starter library with deterministic fit by time, workspace
+  constraints, camera availability, exclusions, and the last completed activity.
+- Neck reset and shoulder rolls retain optional camera verification; other
+  activities use screen guidance.
 - Optional local camera verification with manual fallback.
 - Local completion history; no accounts or external services.
 

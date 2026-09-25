@@ -18,6 +18,12 @@ export type Activity = {
   guide: "camera-neck" | "camera-shoulders" | "guided-steps";
   movementCount?: number;
   steps?: readonly string[];
+  requirements?: {
+    camera?: boolean;
+    explicitChoice?: boolean;
+    leaveDesk?: boolean;
+    stand?: boolean;
+  };
 };
 
 export type DecisionResult = {
@@ -27,6 +33,7 @@ export type DecisionResult = {
   score: number;
   reason: string;
   activity?: Activity;
+  activityReason?: string;
 };
 
 export type DemoScenario = {

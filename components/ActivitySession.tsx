@@ -14,8 +14,8 @@ import type {
 import {
   CameraIcon,
   CheckIcon,
-  ShoulderRollsIcon,
 } from "@/components/icons";
+import { ActivityIcon } from "@/components/ActivityIcon";
 import {
   INITIAL_NECK_MOTION_STATE,
   TARGET_NECK_MOVEMENTS,
@@ -30,6 +30,7 @@ import {
   type ShoulderMotionState,
 } from "@/lib/shoulder-motion-tracker";
 import type { Activity } from "@/lib/types";
+import { formatActivityDuration } from "@/lib/activity-selector";
 
 const WASM_ROOT =
   "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.0.1/wasm";
@@ -558,7 +559,7 @@ function GuidedStepsSession({
       <div className="activity-session__heading">
         <div className="guided-title">
           <span className="guided-title__icon">
-            <ShoulderRollsIcon />
+            <ActivityIcon activity={activity} />
           </span>
           <div>
             <p>Screen-guided activity · no camera needed</p>
@@ -566,8 +567,7 @@ function GuidedStepsSession({
           </div>
         </div>
         <div className="guided-duration">
-          <strong>{activity.durationSeconds}</strong>
-          <span>sec</span>
+          <strong>{formatActivityDuration(activity.durationSeconds)}</strong>
         </div>
       </div>
 

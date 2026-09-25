@@ -136,6 +136,23 @@ button { color: inherit; }
   text-transform: uppercase;
 }
 .privacy-note p { color: var(--ink-soft); font-size: .73rem; line-height: 1.5; margin: 1px 0 0; }
+.fit-settings { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 24px; }
+.fit-settings__heading { display: grid; gap: 4px; }
+.fit-settings__heading h2 { font-size: .78rem; letter-spacing: .02em; margin: 0; }
+.fit-settings__heading span { color: var(--ink-soft); font-size: .64rem; }
+.fit-settings__toggles { display: grid; gap: 2px; margin-top: 14px; }
+.fit-settings__toggles label, .fit-settings__exclusions label {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  font-size: .75rem;
+  gap: 9px;
+  min-height: 34px;
+}
+.fit-settings input { accent-color: var(--signal); height: 15px; margin: 0; width: 15px; }
+.fit-settings__exclusions { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 12px; }
+.fit-settings__exclusions summary { color: var(--ink-soft); cursor: pointer; font-size: .7rem; font-weight: 650; }
+.fit-settings__exclusions > div { display: grid; margin-top: 9px; }
 .demo-stage { min-width: 0; }
 
 .context-panel {
@@ -317,6 +334,9 @@ button { color: inherit; }
 .activity-preview__icon svg { height: 42px; width: 42px; }
 .activity-preview h3 { font-size: 1rem; font-weight: 650; letter-spacing: -.015em; margin: 0; }
 .activity-preview p { color: #d5e2da; font-size: 1rem; line-height: 1.55; margin: 7px 0 0; max-width: 62ch; }
+.activity-fit-reason { border-top: 1px solid rgba(255, 255, 255, .19); margin-top: 24px; padding-top: 20px; }
+.activity-fit-reason span { color: var(--signal-bright); font-size: .68rem; font-weight: 680; letter-spacing: .06em; text-transform: uppercase; }
+.activity-fit-reason p { color: #d5e2da; font-size: .82rem; line-height: 1.55; margin: 8px 0 0; }
 .decision-reason { margin-top: 38px; max-width: 68ch; }
 .decision-reason p { font-size: 1.05rem; line-height: 1.56; margin: 0; }
 .decision-actions { display: flex; gap: 12px; margin-top: 40px; }

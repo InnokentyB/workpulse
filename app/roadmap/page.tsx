@@ -33,13 +33,13 @@ const nearTermFeatures = [
     title: "Activities that fit the moment",
     detail:
       "Choose by available time and whether the person can stand, leave the desk, or briefly look away from the screen.",
-    signal: "Smallest useful action",
+    signal: "Now in prototype",
   },
   {
     title: "A practical starter library",
     detail:
       "Add seated neck and shoulder movement, an eye-distance break, standing mobility, and a five-minute walk.",
-    signal: "Seated · standing · eyes · walking",
+    signal: "Six local activities",
   },
   {
     title: "Preferences and exclusions",

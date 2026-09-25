@@ -1,9 +1,7 @@
-import {
-  ArrowIcon,
-  NeckResetIcon,
-  ShoulderRollsIcon,
-} from "@/components/icons";
+import { ActivityIcon } from "@/components/ActivityIcon";
+import { ArrowIcon } from "@/components/icons";
 import type { Activity, DecisionResult } from "@/lib/types";
+import { formatActivityDuration } from "@/lib/activity-selector";
 
 type DecisionCardProps = {
   activities?: readonly Activity[];
@@ -18,14 +16,6 @@ function Signal({ label, value }: { label: string; value: string }) {
       <span>{label}</span>
       <strong data-level={value}>{value}</strong>
     </div>
-  );
-}
-
-function ActivityIcon({ activity }: { activity: Activity }) {
-  return activity.id === "shoulder-rolls" ? (
-    <ShoulderRollsIcon />
-  ) : (
-    <NeckResetIcon />
   );
 }
 
@@ -77,7 +67,7 @@ export function DecisionCard({
                       <strong>{activity.name}</strong>
                     </span>
                     <small>
-                      About {activity.durationSeconds} sec · {activity.guide.startsWith("camera-") ? "Camera optional" : "Screen guided"}
+                      About {formatActivityDuration(activity.durationSeconds)} · {activity.guide.startsWith("camera-") ? "Camera optional" : "Screen guided"}
                     </small>
                   </span>
                 </label>
@@ -86,7 +76,9 @@ export function DecisionCard({
           ) : (
             <>
               <h3>{result.activity?.name}</h3>
-              <span>About {result.activity?.durationSeconds} seconds</span>
+              <span>
+                About {result.activity ? formatActivityDuration(result.activity.durationSeconds) : ""}
+              </span>
             </>
           )}
           {result.activity ? (
@@ -98,6 +90,12 @@ export function DecisionCard({
                 <h3>How to do {result.activity.name.toLowerCase()}</h3>
                 <p>{result.activity.instructions}</p>
               </div>
+            </div>
+          ) : null}
+          {result.activityReason ? (
+            <div className="activity-fit-reason">
+              <span>Why this movement</span>
+              <p>{result.activityReason}</p>
             </div>
           ) : null}
         </div>

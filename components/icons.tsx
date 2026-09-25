@@ -182,3 +182,43 @@ export function NeckResetIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+export function EyeCareIcon({ className }: IconProps) {
+  return (
+    <svg aria-hidden="true" className={className} data-icon="eye-care-break" fill="none" viewBox="0 0 48 48">
+      <path d="M5 24s7-10 19-10 19 10 19 10-7 10-19 10S5 24 5 24Z" stroke="currentColor" strokeWidth="2.2" />
+      <circle cx="24" cy="24" r="5" stroke="currentColor" strokeWidth="2.2" />
+      <path d="M36 10l6-5m-3 10 6-1" stroke="currentColor" strokeLinecap="round" strokeWidth="2.2" />
+    </svg>
+  );
+}
+
+export function WallPushIcon({ className }: IconProps) {
+  return (
+    <svg aria-hidden="true" className={className} data-icon="wall-push-ups" fill="none" viewBox="0 0 48 48">
+      <path d="M41 5v38M13 15l14 7 7-1M27 22l-5 9-10 10M22 31l10 10" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" />
+      <circle cx="11" cy="11" r="4" stroke="currentColor" strokeWidth="2.2" />
+      <path d="M34 17v8" stroke="currentColor" strokeLinecap="round" strokeWidth="2.2" />
+    </svg>
+  );
+}
+
+export function WalkIcon({ className }: IconProps) {
+  return (
+    <svg aria-hidden="true" className={className} data-icon="purposeful-walk" fill="none" viewBox="0 0 48 48">
+      <circle cx="28" cy="8" r="4" stroke="currentColor" strokeWidth="2.2" />
+      <path d="m25 16-5 9 7 5 4-8m-4 8-4 12m4-12 9 10M20 25l-8 5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" />
+      <path d="M5 42h8m23 0h7" stroke="currentColor" strokeLinecap="round" strokeWidth="2.2" />
+    </svg>
+  );
+}
+
+export function QuietResetIcon({ className }: IconProps) {
+  return (
+    <svg aria-hidden="true" className={className} data-icon="quiet-reset" fill="none" viewBox="0 0 48 48">
+      <circle cx="24" cy="11" r="4.5" stroke="currentColor" strokeWidth="2.2" />
+      <path d="M24 17v12m0-6-8 7m8-7 8 7M16 30l-5 11m21-11 5 11M15 41h18" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" />
+      <path d="M8 12c2-2 4-2 6 0m20 0c2-2 4-2 6 0" stroke="currentColor" strokeLinecap="round" strokeWidth="2.2" />
+    </svg>
+  );
+}

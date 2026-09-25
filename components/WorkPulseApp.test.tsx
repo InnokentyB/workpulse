@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { WorkPulseApp } from "@/components/WorkPulseApp";
@@ -29,6 +29,46 @@ describe("WorkPulseApp", () => {
     expect(screen.getByText(/about 45 sec/i)).toBeDefined();
     expect(screen.getByRole("button", { name: /start neck reset/i })).toBeDefined();
     expect(screen.getByRole("heading", { name: /how to do neck reset/i })).toBeDefined();
+  });
+
+  it("recommends an activity that fits current workspace options", () => {
+    render(<WorkPulseApp />);
+
+    fireEvent.click(screen.getByRole("checkbox", { name: /i can stand/i }));
+    fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
+
+    expect(
+      screen.getByRole("button", { name: /start wall push-ups/i }),
+    ).toBeDefined();
+    expect(
+      screen.getByText(/standing movement is possible/i),
+    ).toBeDefined();
+  });
+
+  it("uses a screen-guided option when camera is unavailable", () => {
+    render(<WorkPulseApp />);
+
+    fireEvent.click(screen.getByRole("checkbox", { name: /camera is okay/i }));
+    fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
+
+    expect(
+      screen.getByRole("button", { name: /start eye care break/i }),
+    ).toBeDefined();
+    expect(screen.queryByRole("radio", { name: /neck reset/i })).toBeNull();
+  });
+
+  it("persists workspace preferences on this device", async () => {
+    const firstRender = render(<WorkPulseApp />);
+    fireEvent.click(screen.getByRole("checkbox", { name: /i can stand/i }));
+    firstRender.unmount();
+
+    render(<WorkPulseApp />);
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole("checkbox", { name: /i can stand/i }),
+      ).toHaveProperty("checked", true),
+    );
   });
 
   it("supports the compact selector and clears the previous decision", () => {
