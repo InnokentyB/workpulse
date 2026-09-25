@@ -1,102 +1,150 @@
-# WorkPulse — MVP Specification
+# WorkPulse — Canonical Product & Engineering Specification
 
 **Version:** 1.4
 **Date:** 25 September 2026
+**Track:** Workplace Wellbeing
 **Tagline:** Move more. Interrupt less.
 
-This document is the complete product and engineering contract for the current MVP. Anything not listed under “In scope” is not part of this slice.
+This document is the single source of truth for the current WorkPulse MVP and its governed next stages. Sections marked **Current MVP** describe the implemented slice. Later stages are requirements and roadmap, not hidden MVP scope.
 
-## 1. Goal
+## 1. Product goal
 
-Prove that a movement intervention should depend on both movement need and interruption cost—not on a fixed timer.
+WorkPulse proves that movement need alone is not enough to justify an interruption. A useful workplace-wellbeing agent must balance the need to move against the cost of interrupting the current work moment.
 
-The demo must make one contrast obvious:
+The core demonstration compares two superficially similar situations:
 
 - after 57 sedentary minutes with 12 minutes before a meeting, WorkPulse says `MOVE NOW`;
 - after 72 sedentary minutes with only 2 minutes before a meeting, WorkPulse says `NOT NOW`.
 
-The second decision is not an error or fallback. It is the core evidence that WorkPulse understands context.
+The second decision is not an error or fallback. It is the clearest evidence that WorkPulse understands context rather than firing a fixed timer.
 
-## 2. User
+## 2. Primary user and need
 
-Alex is a remote product manager who spends most of the day at a laptop and ignores generic “time to stand” reminders because they often arrive at bad moments.
+Alex is a remote product manager who spends most of the day at a laptop and ignores generic movement reminders because they arrive at inconvenient moments.
 
-Alex needs a clear recommendation that fits the workday without setup, guilt, or another system to manage.
+Alex needs:
 
-## 3. MVP hypothesis
+- almost no setup;
+- a recommendation that fits the real workday;
+- a small activity that can start immediately;
+- freedom to decline without guilt or repeated nagging;
+- a clear reason for every intervention;
+- explicit control over any camera or sensitive data.
 
-> A viewer will understand the value of contextual movement decisions when two situations with similarly high movement need produce different recommendations because the interruption cost is different.
+Primary job:
 
-## 4. In scope
+> When I am absorbed in desk work, help me move at an appropriate moment without making me manage reminders or disrupting an important commitment.
+
+## 3. Product principles
+
+1. **Do not interrupt unless useful.** A correct decision not to act is valuable.
+2. **Context beats schedules.** Movement need, opportunity, and interruption cost determine the decision.
+3. **Choose the smallest useful intervention.** The activity fits the available moment and user constraints.
+4. **Explain every decision.** The user sees the decisive context in plain language.
+5. **Deterministic where reliability matters.** Hard gates and the core decision do not depend on an LLM.
+6. **Verify without surveillance.** Camera use is explicit, temporary, local, and optional.
+7. **Protect the whole working day.** Future movement logic must not silently encourage work through meals, rest, or the planned end of work.
+8. **The user remains in control.** Dismissal, exclusions, permissions, and private routines remain user-owned.
+
+## 4. Current MVP contract
+
+### 4.1 In scope
 
 - One responsive web page.
-- Four fixed demo scenarios covering three activity selections and the meeting gate.
+- Exactly two fixed demo scenarios.
 - Visible sedentary time, time to the next meeting, and time since the last movement.
 - Visible context provenance: calendar information is labelled as demo data and camera status is explicit.
 - A deterministic decision engine with hard gates and scoring.
-- Equal-weight `MOVE NOW` and `NOT NOW` presentation.
+- Equal-authority `MOVE NOW` and `NOT NOW` presentation.
 - Visible movement-need and interruption-cost levels.
 - A plain-language explanation for every decision.
-- A deterministic activity catalog: 45-second neck reset, 90-second shoulder reset, and three-minute full-body reset.
-- Activity selection based on time since the last movement and the usable window before the next meeting.
-- A validated build-time workout configuration with editor-readable JSON Schema.
-- Optional on-device guidance for four neck movements during the activity.
-- Guided timer sessions with visible steps, pause/resume, automatic completion, and a manual fallback.
-- Keyboard accessibility, visible focus, and a usable 360px mobile layout.
-- Focused automated tests for the two decisions and the activity loop.
+- One fixed activity for `MOVE NOW`: a neck reset in about 45 seconds.
+- Optional on-device guidance for four gentle neck movements.
+- Explicit camera consent, loading, active, denied, unavailable, and error states.
+- Manual completion fallback that does not require camera access.
+- Camera shutdown after completion, cancellation, or component exit.
+- Keyboard accessibility, visible focus, reduced-motion support, and a usable 360 px layout.
+- Automated tests for both decisions, the interaction loop, and neck-motion tracking.
 
-## 5. Explicit non-goals
+### 4.2 Current MVP non-goals
 
-- A third low-movement-need demo scenario.
-- Dismissal, cooldown, history, or `localStorage`.
-- Preference learning or personalized activity generation.
+- A third low-movement-need scenario.
+- Dismissal, cooldown, history, or `localStorage` persistence.
+- Multiple activities or preference learning.
 - Continuous or background camera observation.
 - Video recording, storage, upload, playback, or microphone access.
 - Real calendar data, background scheduling, or notifications.
-- Authentication, a database, cross-device sync, or analytics.
+- Authentication, a database, analytics, or cross-device sync.
 - LLM-generated decisions, explanations, or activities.
-- Medical guidance or health-outcome claims.
+- Medication, meal, posture, sleep, or environment routines.
+- Medical diagnosis, treatment, or guaranteed health claims.
 
-Public deployment and a backup recording are launch tasks, not product functionality in this repository.
+Public deployment, backup screenshots, and a backup recording are launch deliverables, not runtime dependencies.
 
-## 6. Canonical scenarios
+## 5. Canonical scenarios
 
 | Scenario | Sitting | Next meeting | Last movement | Expected decision |
 |---|---:|---:|---:|---|
-| Good window | 57 min | 12 min | 78 min ago | `MOVE NOW` |
-| Shoulder window | 72 min | 7 min | 100 min ago | `MOVE NOW` |
-| Full reset window | 95 min | 8 min | 130 min ago | `MOVE NOW` |
-| Meeting soon | 72 min | 2 min | 90 min ago | `NOT NOW` |
+| Good time to move | 57 min | 12 min | 78 min ago | `MOVE NOW` |
+| Meeting starts soon | 72 min | 2 min | 90 min ago | `NOT NOW` |
 
-### Good window result
+### 5.1 Good window result
 
 - Decision: `MOVE NOW`
 - Movement need: `HIGH`
 - Interruption cost: `LOW`
 - Activity: `Neck reset`, about 45 seconds
-- Explanation names both the sedentary time and the 12-minute window.
+- Explanation: `You've been sitting for 57 minutes and have a 12-minute window before your next meeting.`
+- Action: `Start activity`
 
-### Meeting-soon result
+### 5.2 Meeting-soon result
 
 - Decision: `NOT NOW`
 - Movement need: `HIGH`
 - Interruption cost: `HIGH`
-- No activity and no start action
-- Explanation says the next meeting starts in 2 minutes.
+- Explanation: `You need movement, but your next meeting starts in 2 minutes. I'll check again afterwards.`
+- No activity and no start action.
 
-## 7. Decision engine
+The meeting hard gate always wins. WorkPulse does not fill the remaining two minutes with a seated exercise because restraint is the proof of the product.
 
-Hard gates run before the score and always win:
+## 6. Current MVP state machine
+
+```text
+IDLE
+  │ Ask WorkPulse
+  ▼
+MOVE_NOW ── Start activity ──► ACTIVITY_CONSENT
+  │                              ├─ Enable camera ─► LOADING ─► ACTIVE
+  │                              │                    ├─ verified sequence ─► COMPLETED_VERIFIED
+  │                              │                    ├─ denied/unavailable/error ─► RECOVERY
+  │                              │                    └─ stop ─► IDLE
+  │                              └─ Complete without camera ─► COMPLETED_MANUAL
+  │
+  └─ Run again / change scenario ─► IDLE
+
+NOT_NOW ── change scenario / run again ─► IDLE
+```
+
+Rules:
+
+- Selecting another scenario clears the previous result and activity state.
+- The activity never begins camera processing before explicit user action.
+- Manual completion remains available if the camera is declined, missing, or unreliable.
+- Partially completed camera activity does not persist across reloads.
+- Camera tracks stop whenever the activity ends or the component unmounts.
+
+## 7. Decision model
+
+### 7.1 Hard gate
 
 ```text
 IF next meeting <= 5 minutes
 THEN NOT_NOW
-
-IF sedentary time < 40 minutes
-THEN NOT_NOW
 ```
 
-Scoring:
+Later stages may add cooldown, outside-hours, and routine gates. They cannot override or weaken the current meeting gate.
+
+### 7.2 Scoring
 
 ```text
 movementNeed = clamp(
@@ -116,96 +164,171 @@ score >= 0.65 → MOVE_NOW
 score < 0.65  → NOT_NOW
 ```
 
-Invariants:
+### 7.3 Invariants
 
-- Every result has a non-empty reason.
-- `MOVE_NOW` always includes the deterministic best-fit activity and an activity-selection explanation.
-- If no configured activity fits the protected window, the result is `NOT_NOW`.
-- `NOT_NOW` never includes an activity or start action.
+- Every result includes a non-empty reason.
+- `MOVE_NOW` includes the fixed MVP activity.
+- `NOT_NOW` includes no activity and no start action.
 - The same context always produces the same result.
 - Domain logic does not import React or browser APIs.
+- Camera logic cannot change the `MOVE_NOW` / `NOT_NOW` decision.
 
-## 8. Interaction
+## 8. Neck-reset activity
+
+The current activity is a gentle neck reset lasting approximately 45 seconds.
+
+Instruction:
+
+> Slowly turn side to side, lower your chin, and lift your gaze within a comfortable range.
+
+Safety copy:
+
+> Use a comfortable range. Stop if you feel pain or dizziness.
+
+The verified sequence is:
+
+1. Establish a comfortable neutral pose.
+2. Turn gently to either side.
+3. Return through centre and turn to the opposite side.
+4. Return through centre and lower the chin gently.
+5. Return through centre and lift the gaze slightly.
+6. Return to neutral to complete verification.
+
+The UI summarizes this as four guided movements after neutral calibration. Full neck circles, deep extension, forceful movement, pain diagnosis, and therapeutic claims are prohibited.
+
+## 9. Camera and privacy contract
+
+- Camera activation requires a dedicated user action.
+- The browser requests video only and never microphone access.
+- Pose landmarks are calculated on the user's device.
+- Raw frames, video, and landmark streams are not recorded, stored, uploaded, or played back.
+- A live camera indicator remains visible while the stream is active.
+- The camera switches off automatically after success, cancellation, error, or navigation away from the activity.
+- Permission denial and unavailable-camera states explain recovery and preserve manual completion.
+- Current movement progress exists only in memory and is discarded on reload.
+- Optional camera verification is evidence of completion, not a medical assessment.
+
+## 10. Current architecture
 
 ```text
-Select scenario
-      ↓
-Ask WorkPulse
-      ↓
-MOVE NOW ── Start ── Activity ── Done ── Run again
-      or
-NOT NOW ── explanation only
-```
-
-Selecting another scenario clears the previous result before the next evaluation. No state persists across reloads.
-
-## 9. Acceptance criteria
-
-1. Good window displays `57 / 12 / 78` and deterministically returns `MOVE NOW`, `HIGH` need, `LOW` cost, a reason, and the neck reset.
-2. Meeting soon displays `72 / 2 / 90` and deterministically returns `NOT NOW`, `HIGH` need, `HIGH` cost, and a meeting-gate reason.
-3. The `72 / 7 / 100` context selects the 90-second shoulder reset and explains why it fits.
-4. The `95 / 8 / 130` context selects the three-minute full-body reset and explains why it fits.
-5. `NOT NOW` shows no activity and no start action.
-6. Switching between scenarios never leaves stale values or controls.
-7. `Start → Enable camera → Complete four guided neck movements → Run again` works without persistence.
-8. Timed activities show their sequence, advance by elapsed time, support pause/resume, and complete at zero.
-9. Completing any activity sets the in-memory time since last movement to zero for the next decision.
-10. Both decisions remain understandable without relying on color.
-11. The core flow works at 360px and on a presentation-size desktop.
-12. The decision demo works without external services; camera verification loads the pose model on demand.
-13. Calendar context is visibly identified as demo data.
-14. Camera access is requested only after an explicit user action and never requests microphone access.
-15. Camera frames are processed locally and are never recorded, stored, or uploaded.
-16. The camera activity calibrates a neutral pose, then verifies one turn to either side, a turn to the opposite side, chin down, a gentle gaze up, and a return to neutral in that order.
-17. The camera stops automatically after the verified sequence and whenever the session ends.
-18. Permission denial and unavailable-camera states explain how to recover and retain a manual fallback.
-19. Guidance avoids full neck circles and deep extension, asks for a comfortable range, and tells the user to stop for pain or dizziness.
-20. Tests, lint, and the production build pass.
-
-## 10. Architecture
-
-```text
-Fixed scenarios
-      ↓
-Pure decision engine
-      ↓
-Best-fit activity selector
-      ↓
+Fixed demo scenarios
+        ↓
+Pure deterministic decision engine
+        ↓
 Responsive React UI
-      ↓
+        ↓ MOVE_NOW only, user starts activity
 Permissioned browser camera
-      ↓
-On-device pose landmarks
-      ↓
-In-memory movement progress only
+        ↓
+On-device MediaPipe pose landmarks
+        ↓
+In-memory movement progress and completion
 ```
 
 Stack:
 
-- Next.js App Router
-- React
-- strict TypeScript
-- Tailwind CSS plus project CSS
-- Vitest and Testing Library
+- Next.js App Router;
+- React;
+- strict TypeScript;
+- Tailwind CSS plus project CSS;
+- Vitest and Testing Library;
+- MediaPipe Tasks Vision, loaded on demand.
 
-There is no backend, authentication layer, database, real calendar integration, video storage, or AI service. Browser-native camera access feeds MediaPipe Pose Landmarker during the neck reset. Timer progress, neutral-position calibration, and movement progress exist only in React state and are discarded on reload.
+There is no backend, authentication, database, real calendar integration, video storage, or AI service in the current MVP.
 
-## 11. Test contract
+## 11. Current functional requirements
+
+### FR-01 — Select a fixed scenario
+
+The user can select either canonical scenario. Changing selection replaces all visible context and clears the prior decision.
+
+**Acceptance:** switching `A → B → A` never leaves stale values, controls, or camera state.
+
+### FR-02 — Evaluate the moment
+
+The system applies the meeting gate before scoring and returns a deterministic result.
+
+**Acceptance:** both canonical scenarios match section 5.
+
+### FR-03 — Explain the decision
+
+The UI shows the decision, movement need, interruption cost, and plain-language reason.
+
+**Acceptance:** a viewer can explain the contrast without reading source code or relying on colour.
+
+### FR-04 — Offer the neck reset only for `MOVE_NOW`
+
+`MOVE_NOW` includes `Neck reset`, approximate duration, explanation, and `Start activity`.
+
+**Acceptance:** `NOT_NOW` contains no activity and no start action.
+
+### FR-05 — Complete manually
+
+The activity can be completed without camera verification.
+
+**Acceptance:** manual completion reaches a clear success state and reports that no camera verification was used.
+
+### FR-06 — Verify locally with camera
+
+After explicit consent, the product loads the pose model, shows a mirrored preview and overlay, advances through the guided sequence, and completes after the required movements.
+
+**Acceptance:** success reports four verified movements, confirms that no video was recorded, and confirms that the camera is off.
+
+### FR-07 — Recover from camera failure
+
+Denied permission, missing camera, model failure, and tracking loss produce actionable, non-technical guidance.
+
+**Acceptance:** the user can retry or complete manually; the decision demo remains usable.
+
+## 12. Current non-functional requirements
+
+### Reliability
+
+- Both canonical decisions are deterministic and repeatable.
+- The core decision demo works without camera or external services.
+- Camera/model failure never blocks manual completion or the `NOT_NOW` demonstration.
+
+### Performance
+
+- Decision evaluation feels immediate and targets under 100 ms.
+- MediaPipe loads only after the user chooses camera verification.
+- Initial page load remains suitable for a live demo on shared Wi-Fi.
+
+### Accessibility
+
+- Controls are keyboard accessible and use semantic elements.
+- Focus states are visible on paper, green, brown, and lime surfaces.
+- Decision and camera states are communicated through text, not colour alone.
+- The interface reflows from 360 px without horizontal scrolling.
+- Reduced-motion preference disables decorative motion.
+
+### Safety and claims
+
+- Copy frames the activity as a workplace-wellbeing suggestion, not medical advice.
+- The UI tells the user to use a comfortable range and stop for pain or dizziness.
+- No diagnosis, treatment, prevention, or guaranteed outcome is implied.
+
+### Security and privacy
+
+- No secrets are placed in client code.
+- Camera access is user initiated and video-only.
+- Raw camera media is never persisted or transmitted.
+- Third-party model assets are a runtime dependency only for optional verification.
+
+## 13. Current test contract
 
 Required automated checks:
 
-- canonical good window returns `MOVE NOW` with the neck reset;
-- medium and long windows return the shoulder and full-body resets respectively;
-- meeting-soon hard gate returns `NOT NOW` without an activity;
-- the five-minute meeting boundary returns `NOT NOW`;
-- UI switches between all scenarios without stale state;
-- minimal `Start → Done → Run again` flow works.
-- face and shoulder visibility is required before calibration or verification;
-- the side-to-side, down, up, and neutral sequence advances only in order;
-- camera permission denial produces a recoverable state.
-- timed sessions advance, pause, resume, and complete deterministically.
+- good window returns `MOVE_NOW`, high need, low cost, reason, and neck reset;
+- meeting-soon gate returns `NOT_NOW`, high need, high cost, and no activity;
+- the five-minute meeting boundary returns `NOT_NOW`;
+- the UI switches between scenarios without stale state;
+- `Start → manual completion → Run again` works;
+- face and both shoulders are required before calibration or verification;
+- side-to-side, down, up, and neutral stages advance only in order;
+- denied camera permission produces a recoverable state;
+- camera and motion state reset when the session ends.
 
-Required verification commands:
+Verification commands:
 
 ```bash
 npm test
@@ -213,6 +336,177 @@ npm run lint
 npm run build
 ```
 
-## 12. Definition of done
+## 14. Current definition of done
 
-The MVP is done when a viewer can compare the four scenarios, understand why the decisions and selected activity durations differ, complete either a camera-guided neck reset or a timer-guided longer reset, and repeat the demo reliably on desktop and mobile.
+The MVP is done when a viewer can:
+
+1. compare both scenarios;
+2. understand why the decisions differ;
+3. start the neck reset only from `MOVE_NOW`;
+4. complete manually or optionally verify four guided movements on-device;
+5. see that the camera is off after the session;
+6. repeat the demo reliably on desktop and mobile;
+7. run the decision demo if camera verification is unavailable.
+
+## 15. Governed roadmap
+
+### Current MVP — implemented slice
+
+- Two-scenario decision contrast.
+- Fixed neck reset.
+- Optional local camera verification with manual fallback.
+- No persistence, accounts, or external services.
+
+### P0+ — only after current MVP passes its acceptance contract
+
+Choose one coherent slice at a time:
+
+1. **Workday boundary:** local start/end settings plus an outside-hours `NOT_NOW` reason.
+2. **Activity fit:** explicit available duration, ability to stand, ability to leave the desk, meeting participation, exclusions, and a four-activity library.
+3. **Outcome memory:** dismissal, cooldown, local history, and the third low-need scenario from the earlier prototype plan.
+
+P0+ may not weaken the meeting gate, camera privacy contract, manual fallback, or repeatable pitch path.
+
+### P1 — personal routines and adaptation
+
+- Preference-aware activity selection from local outcomes.
+- User-defined meal and long-break windows without nutrition scoring.
+- User-defined medication or therapy reminders after privacy, reliability, and safety gates.
+- Private notification controls, export, and deletion.
+- Real calendar participation context where available.
+- Optional validated LLM wording or activity personalization; deterministic decisions remain authoritative.
+
+### P2 — ambient assistance
+
+- Optional posture checks with explicit camera activation.
+- Guided ergonomic workspace self-assessment.
+- User-controlled daylight and evening-screen routines.
+- Temperature, humidity, and CO2 sensor integrations where supported.
+- Wearable, walking-pad, and standing-desk integrations.
+
+### P3 — coordinated personal wellbeing platform
+
+- Background scheduling.
+- Cross-device synchronization of explicitly selected data.
+- Richer behavioural learning.
+- Safe coordination across work, movement, meals, therapy, light, and environment.
+
+## 16. Post-MVP activity context
+
+These types describe future inputs and are not required by the current MVP:
+
+```ts
+type ActivityContext = {
+  availableMinutes: number;
+  canStand: boolean;
+  canLeaveDesk: boolean;
+  interactionMode: "NONE" | "AUDIO_ONLY" | "INTERACTIVE" | "PRESENTING" | "UNKNOWN";
+  equipment: Array<"WALKING_PAD" | "STANDING_DESK">;
+  excludedActivityIds: string[];
+};
+
+type WorkdaySettings = {
+  startTime: string;
+  endTime: string;
+  workingDays: number[];
+  timeZone: string;
+};
+```
+
+Rules:
+
+- Outside configured work hours, ordinary movement recommendations return `NOT_NOW` with an outside-hours reason.
+- Existing meeting and safety gates remain authoritative.
+- `canStand = false` excludes standing activities.
+- Walking requires enough time plus explicit ability to leave the desk or enabled equipment.
+- `INTERACTIVE`, `PRESENTING`, or unknown participation never grants walking permission automatically.
+
+## 17. Extended activity library
+
+| Activity | Minimum window | Context |
+|---|---:|---|
+| Neck and shoulder reset | 1 minute | Seated; can briefly pause |
+| Eye-distance break | 1 minute | Can look away from the screen |
+| Squats or standing mobility | 1–3 minutes | Can stand; activity not excluded |
+| Short walk | 5 minutes | Can leave the desk or walking pad enabled |
+
+Preparation time, clothing, outdoor weather, and return buffers remain later discovery topics.
+
+## 18. Meal and long-break contract
+
+Meal support protects a user-defined routine and calendar window. It does not require food logging. Initial actions are `Ate` or `Completed`, `Later`, and `Skip today`.
+
+- No calorie judgement or good/bad food labels.
+- No nutrition prescription or guaranteed prevention of snacking.
+- Fasting, shift work, caregiving, eating disorders, and cultural differences require discovery before broad release.
+- Meal prompts normally defer to an active higher-priority therapy item or imminent meeting.
+
+## 19. Medication and therapy contract
+
+Medication and ongoing-therapy reminders reproduce user-entered or professionally supplied instructions; WorkPulse does not create medical instructions.
+
+- Never invent or change a dose.
+- Never recommend compensating for a missed dose.
+- Never silently infer a relationship to meals.
+- Keep notification previews private by default.
+- Reliable delivery semantics, acknowledgement history, appropriate encryption, export, deletion, and revocation are release gates.
+- Employer access is prohibited by default.
+
+Actions are `Taken` or `Completed`, `Remind me later`, and `Skip today`.
+
+## 20. Prompt arbitration
+
+Future reminders must be coordinated rather than emitted independently. Default priority:
+
+1. user-defined medication or prescribed therapy;
+2. workday ending and rest boundaries;
+3. meal or long-break windows;
+4. contextual movement;
+5. posture, eyes, light, and environmental adjustments.
+
+A lower-priority prompt may not obscure or repeatedly compete with a higher-priority due item.
+
+## 21. Ambient-module contract
+
+Posture, ergonomics, daylight, evening-screen routines, room temperature, humidity, CO2, wearables, walking pads, and standing desks remain exploratory.
+
+- Every sensor and integration is separately opt-in and revocable.
+- Prefer derived signals over raw sensitive input.
+- Camera state remains visible while active.
+- Environmental recommendations must not claim unsupported oxygen measurement.
+- Advice must consider whether the user controls the room.
+- Pain input excludes unsuitable activity but does not produce diagnosis.
+
+## 22. Data ownership
+
+The user owns work schedules, movement outcomes, meal routines, therapy schedules, camera-derived completion, wearable signals, and environmental data.
+
+Before cloud synchronization, sensitive routine data requires purpose limitation, private notification previews, explicit consent, appropriate encryption, revocation, export, and deletion. Manager dashboards, employer monitoring, and hidden camera observation are outside the product direction.
+
+## 23. Principal risks and mitigations
+
+| Risk | Mitigation |
+|---|---|
+| Feature creep weakens the pitch | Current MVP acceptance gates every later stage |
+| Camera permission or model failure | Manual completion and camera-free decision demo |
+| Neck guidance implies medical treatment | Gentle range, stop guidance, no diagnosis or outcome claims |
+| Context appears fabricated | Label fixed calendar inputs as demo data |
+| Camera feels like surveillance | Explicit action, live indicator, local processing, automatic shutdown |
+| Later reminders create notification noise | Central prompt arbitration and user controls |
+| Medication scope implies clinical responsibility | Reproduce instructions only; safety and privacy release gates |
+| Sensitive data reaches an employer | User ownership and employer access prohibited by default |
+
+## 24. Design implications
+
+- `MOVE NOW` and `NOT NOW` require equal visual authority.
+- The current MVP needs dedicated states for idle, move, hold, camera consent, loading, active tracking, camera recovery, manual completion, and verified completion.
+- Context provenance and camera status remain visible and understandable.
+- The decision remains usable without camera, network model loading, or colour perception.
+- Future routine modules must join one coordinated daily timeline rather than become separate notification dashboards.
+- Settings, permissions, and sensitive routines require calm, explicit controls rather than invisible automation.
+
+## 25. Final product statement
+
+WorkPulse is not a fitness tracker, fixed timer, medical system, or chatbot with calendar access. It is a controlled workplace-wellbeing agent that balances movement need with interruption cost and sometimes chooses not to act.
+
+> A correct decision not to interrupt is as valuable as a decision to intervene.
