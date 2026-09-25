@@ -11,7 +11,11 @@ import type {
   PoseLandmarker as PoseLandmarkerInstance,
 } from "@mediapipe/tasks-vision";
 
-import { CameraIcon, CheckIcon } from "@/components/icons";
+import {
+  CameraIcon,
+  CheckIcon,
+  ShoulderRollsIcon,
+} from "@/components/icons";
 import {
   INITIAL_NECK_MOTION_STATE,
   TARGET_NECK_MOVEMENTS,
@@ -430,9 +434,14 @@ function GuidedStepsSession({
   return (
     <section aria-live="polite" className="activity-session activity-session--guided">
       <div className="activity-session__heading">
-        <div>
-          <p>Screen-guided activity · no camera needed</p>
-          <h2>{activity.name}</h2>
+        <div className="guided-title">
+          <span className="guided-title__icon">
+            <ShoulderRollsIcon />
+          </span>
+          <div>
+            <p>Screen-guided activity · no camera needed</p>
+            <h2>{activity.name}</h2>
+          </div>
         </div>
         <div className="guided-duration">
           <strong>{activity.durationSeconds}</strong>

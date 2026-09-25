@@ -43,7 +43,7 @@ describe("DecisionCard", () => {
 
   it("lets the user choose between the two available activities", () => {
     const onActivitySelect = vi.fn();
-    render(
+    const { container } = render(
       <DecisionCard
         activities={ACTIVITIES}
         onActivitySelect={onActivitySelect}
@@ -56,6 +56,7 @@ describe("DecisionCard", () => {
       "checked",
       true,
     );
+    expect(container.querySelector('[data-icon="shoulder-rolls"]')).not.toBeNull();
     fireEvent.click(screen.getByRole("radio", { name: /shoulder rolls/i }));
     expect(onActivitySelect).toHaveBeenCalledWith("shoulder-rolls");
   });

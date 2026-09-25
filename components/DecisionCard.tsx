@@ -1,4 +1,4 @@
-import { ArrowIcon } from "@/components/icons";
+import { ArrowIcon, ShoulderRollsIcon } from "@/components/icons";
 import type { Activity, DecisionResult } from "@/lib/types";
 
 type DecisionCardProps = {
@@ -59,8 +59,13 @@ export function DecisionCard({
                     type="radio"
                     value={activity.id}
                   />
-                  <span>
-                    <strong>{activity.name}</strong>
+                  <span className="activity-picker__copy">
+                    <span className="activity-picker__name">
+                      {activity.id === "shoulder-rolls" ? (
+                        <ShoulderRollsIcon />
+                      ) : null}
+                      <strong>{activity.name}</strong>
+                    </span>
                     <small>
                       About {activity.durationSeconds} sec · {activity.guide === "camera-neck" ? "Camera optional" : "Screen guided"}
                     </small>

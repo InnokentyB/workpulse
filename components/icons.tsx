@@ -113,3 +113,37 @@ export function CameraIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+export function ShoulderRollsIcon({ className }: IconProps) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      data-icon="shoulder-rolls"
+      fill="none"
+      viewBox="0 0 48 48"
+    >
+      <circle cx="24" cy="10.5" r="4.5" stroke="currentColor" strokeWidth="2.2" />
+      <path
+        d="M20 18.5v5M28 18.5v5M10.5 37c1.6-8.4 6.1-12.5 13.5-12.5S35.9 28.6 37.5 37"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2.2"
+      />
+      <path
+        d="M16.2 23.8c-5.5-.8-9.5 2-10.2 7.1-.3 2.2.2 4.2 1.5 5.8M31.8 23.8c5.5-.8 9.5 2 10.2 7.1.3 2.2-.2 4.2-1.5 5.8"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="2.2"
+      />
+      <path
+        d="m4.2 33.7 3.3 3 2.8-3.5M43.8 33.7l-3.3 3-2.8-3.5"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2.2"
+      />
+    </svg>
+  );
+}

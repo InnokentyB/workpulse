@@ -59,7 +59,7 @@ describe("ActivitySession", () => {
 
   it("completes a screen-guided shoulder activity without camera access", () => {
     const onComplete = vi.fn();
-    render(
+    const { container } = render(
       <ActivitySession
         activity={{
           durationSeconds: 60,
@@ -75,6 +75,7 @@ describe("ActivitySession", () => {
     );
 
     expect(screen.getByRole("heading", { name: "Shoulder rolls" })).toBeDefined();
+    expect(container.querySelector('[data-icon="shoulder-rolls"]')).not.toBeNull();
     expect(screen.getByText(/no camera needed/i)).toBeDefined();
     fireEvent.click(screen.getByRole("button", { name: /complete activity/i }));
 
