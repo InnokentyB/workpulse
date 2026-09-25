@@ -2,11 +2,7 @@ import Link from "next/link";
 
 import { PulseMark } from "@/components/icons";
 
-export function SiteHeader({
-  current,
-}: {
-  current: "demo" | "roadmap" | "teams" | "account";
-}) {
+export function SiteHeader({ current }: { current: "demo" | "roadmap" | "teams" }) {
   return (
     <header className="site-header">
       <Link className="brand" href="/#top" aria-label="WorkPulse home">
@@ -30,12 +26,6 @@ export function SiteHeader({
           href="/for-teams"
         >
           For teams
-        </Link>
-        <Link
-          aria-current={current === "account" ? "page" : undefined}
-          href="/account"
-        >
-          Account
         </Link>
       </nav>
     </header>

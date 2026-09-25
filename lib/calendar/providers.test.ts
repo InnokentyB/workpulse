@@ -29,25 +29,15 @@ describe("calendar provider registry", () => {
   it("marks Google configured only when both server credentials exist", () => {
     expect(
       getCalendarProviders({
-        AUTH_SECRET: "auth-secret",
-        DATABASE_URL: "postgresql://localhost/workpulse",
-        CALENDAR_TOKEN_ENCRYPTION_KEY: Buffer.alloc(32).toString("base64"),
         GOOGLE_CALENDAR_CLIENT_ID: "client-id",
         GOOGLE_CALENDAR_CLIENT_SECRET: "client-secret",
-        GOOGLE_CALENDAR_REDIRECT_URI:
-          "http://localhost:3000/api/calendar/google/callback",
       })[0].status,
     ).toBe("configured");
 
     expect(
       getCalendarProviders({
-        AUTH_SECRET: "auth-secret",
-        DATABASE_URL: "postgresql://localhost/workpulse",
-        CALENDAR_TOKEN_ENCRYPTION_KEY: Buffer.alloc(32).toString("base64"),
         GOOGLE_CALENDAR_CLIENT_ID: "client-id",
         GOOGLE_CALENDAR_CLIENT_SECRET: undefined,
-        GOOGLE_CALENDAR_REDIRECT_URI:
-          "http://localhost:3000/api/calendar/google/callback",
       })[0].status,
     ).toBe("configuration-required");
   });

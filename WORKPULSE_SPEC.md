@@ -382,11 +382,10 @@ Choose one coherent slice at a time:
 
    Infrastructure status: the provider-neutral availability contract, provider
    registry, Google FreeBusy adapter, and calendar-to-WorkPulse context mapper
-   are implemented. Passwordless Google identity, separate calendar consent,
-   encrypted credential storage, disconnect, and account deletion are also
-   implemented behind deployment configuration. Live replacement of demo
-   context remains P0+ work. Microsoft, Apple, and generic CalDAV are
-   represented as planned adapters behind the same contract.
+   are implemented. Google OAuth endpoints, encrypted credential storage,
+   settings UI, and live replacement of demo context remain P0+ work. Microsoft,
+   Apple, and generic CalDAV are represented as planned adapters behind the same
+   contract.
 2. **Workday boundary:** local start/end settings plus an outside-hours `NOT_NOW` reason.
 3. **Activity fit:** explicit available duration, ability to stand, ability to leave the desk, meeting participation, exclusions, and a four-activity library.
 4. **Outcome memory:** dismissal, cooldown, and the third low-need scenario from the earlier prototype plan.

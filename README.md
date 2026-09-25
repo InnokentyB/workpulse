@@ -40,10 +40,8 @@ The first real-calendar infrastructure is provider-neutral and documented in
 [`CALENDAR_INTEGRATION.md`](./CALENDAR_INTEGRATION.md). Google Calendar is the
 primary adapter and reads free/busy data only; Microsoft, Apple, and generic
 CalDAV are registered as planned providers. Live connection still requires
-deployment credentials and a migrated PostgreSQL database. The `/account`
-route implements Google sign-in, separate calendar consent, encrypted token
-storage, connection removal, and account deletion; it remains in a clear setup
-state until those deployment settings are supplied.
+OAuth endpoints, server-side encrypted token storage, and deployment
+credentials.
 
 ## Run locally
 
@@ -65,21 +63,12 @@ npm test
 npm run build
 ```
 
-Account setup also requires the server variables in `.env.example` and the
-PostgreSQL migration:
-
-```bash
-npm run db:migrate
-```
-
 ## Project structure
 
 ```text
 app/                    Next.js App Router entry points, including /roadmap
 app/api/calendar/       Safe provider discovery endpoint
-app/account/            Account and calendar connection settings
 components/             Responsive product UI and interaction tests
-db/migrations/          PostgreSQL account and connection schema
 data/demo-scenarios.ts  Stable scenarios for the live demo
 lib/calendar/           Provider contracts, registry, Google adapter, context
 lib/types.ts            Domain contracts

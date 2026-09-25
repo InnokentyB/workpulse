@@ -599,53 +599,6 @@ footer p { font-size: .7rem; margin: 0; }
 .roadmap-guardrails h2 { font-size: clamp(1.55rem, 3vw, 2.4rem); }
 .roadmap-guardrails p { color: #385146; font-size: .82rem; line-height: 1.55; margin: 12px 0 0; max-width: 64ch; }
 
-.account-page { min-height: 100vh; }
-.account-hero { border-bottom: 1px solid var(--line); padding: 72px 0 58px; }
-.account-hero > p {
-  color: var(--signal);
-  font-size: .72rem;
-  font-weight: 700;
-  letter-spacing: .08em;
-  margin: 0 0 18px;
-  text-transform: uppercase;
-}
-.account-hero h1 {
-  font-size: clamp(3rem, 6vw, 6rem);
-  font-weight: 590;
-  letter-spacing: -.045em;
-  line-height: .94;
-  margin: 0;
-  max-width: 12ch;
-}
-.account-hero > span { color: var(--ink-soft); display: block; line-height: 1.65; margin-top: 28px; max-width: 52ch; }
-.account-notice { background: var(--signal-soft); border-left: 4px solid var(--signal); margin: 28px 0 0; padding: 14px 18px; }
-.account-notice--error { background: #f5dfd2; border-left-color: var(--hold); }
-.account-grid { display: grid; gap: 1px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 42px 0 84px; }
-.account-card {
-  align-items: start;
-  background: var(--paper-raised);
-  border: 1px solid var(--line);
-  display: grid;
-  gap: 30px;
-  grid-template-columns: minmax(220px, .75fr) minmax(260px, 1fr) auto;
-  margin: 42px 0 84px;
-  padding: 36px;
-}
-.account-grid .account-card { grid-template-columns: 1fr; margin: 0; min-height: 310px; }
-.account-card > div > p { color: var(--signal); font-size: .68rem; font-weight: 700; letter-spacing: .08em; margin: 0 0 10px; text-transform: uppercase; }
-.account-card h2 { font-size: clamp(1.45rem, 3vw, 2.25rem); font-weight: 590; letter-spacing: -.035em; line-height: 1.05; margin: 0; }
-.account-card > p { color: var(--ink-soft); font-size: .84rem; line-height: 1.65; margin: 0; max-width: 50ch; }
-.account-card form, .account-card > a, .account-card > .account-status { align-self: end; justify-self: start; }
-.account-status { border: 1px solid var(--line); border-radius: 999px; color: var(--ink-soft); font-size: .72rem; font-weight: 650; padding: 9px 12px; }
-.account-button { background: transparent; border: 1px solid var(--ink); }
-.account-button:hover { background: var(--ink); color: var(--paper-raised); }
-.account-card--danger { background: #f3e9df; }
-.account-button--danger { border-color: var(--hold); color: var(--hold); }
-.account-button--danger:hover { background: var(--hold); color: #fff; }
-.account-card form:has(.account-confirmation) { display: grid; gap: 14px; }
-.account-confirmation { align-items: start; color: var(--ink-soft); display: flex; font-size: .72rem; gap: 9px; line-height: 1.45; max-width: 34ch; }
-.account-confirmation input { accent-color: var(--hold); margin: 2px 0 0; }
-
 @media (max-width: 920px) {
   .app-shell { padding: 0 28px; }
   .intro { align-items: start; gap: 26px; grid-template-columns: 1fr; padding-top: 54px; }
@@ -740,12 +693,6 @@ footer p { font-size: .7rem; margin: 0; }
   .roadmap-explore { padding: 56px 0; }
   .roadmap-guardrails { align-items: stretch; flex-direction: column; }
   .roadmap-guardrails .button { width: 100%; }
-  .account-hero { padding: 46px 0 40px; }
-  .account-hero h1 { font-size: clamp(2.8rem, 13vw, 4rem); }
-  .account-grid { grid-template-columns: 1fr; margin: 28px 0 60px; }
-  .account-card, .account-grid .account-card { gap: 22px; grid-template-columns: 1fr; margin: 28px 0 60px; min-height: 0; padding: 26px; }
-  .account-grid .account-card { margin: 0; }
-  .account-card .button, .account-card > a { width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
