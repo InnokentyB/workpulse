@@ -1,4 +1,5 @@
 import { selectActivity } from "./activity-selector";
+import type { WorkoutSettings } from "./workout-settings";
 import type {
   DecisionResult,
   Level,
@@ -21,6 +22,10 @@ function toLevel(value: number): Level {
 
 export function evaluateIntervention(
   context: WorkContext,
+  options: {
+    settings?: WorkoutSettings;
+    excludedActivityIds?: readonly string[];
+  } = {},
 ): DecisionResult {
   const movementScore = clamp(
     (context.sedentaryMinutes / 75) * 0.7 +
@@ -66,7 +71,10 @@ export function evaluateIntervention(
       context.minutesToNextMeeting === null
         ? "no upcoming meeting"
         : `a ${context.minutesToNextMeeting}-minute window before your next meeting`;
-    const activity = selectActivity(context);
+    const activity = selectActivity(
+      { ...context, excludedActivityIds: options.excludedActivityIds },
+      options.settings,
+    );
 
     if (!activity) {
       return {

@@ -4,6 +4,7 @@ import type { DecisionResult } from "@/lib/types";
 type DecisionCardProps = {
   result: DecisionResult;
   onStart?: () => void;
+  onSkip?: () => void;
 };
 
 function Signal({ label, value }: { label: string; value: string }) {
@@ -28,6 +29,7 @@ function formatActivityDuration(totalSeconds: number): string {
 export function DecisionCard({
   result,
   onStart,
+  onSkip,
 }: DecisionCardProps) {
   const activity = result.decision === "MOVE_NOW" ? result.activity : undefined;
 
@@ -66,6 +68,11 @@ export function DecisionCard({
           <button className="button button--primary" onClick={onStart} type="button">
             Start activity <ArrowIcon />
           </button>
+          {onSkip ? (
+            <button className="button button--quiet" onClick={onSkip} type="button">
+              Skip for now
+            </button>
+          ) : null}
         </div>
       ) : null}
     </section>

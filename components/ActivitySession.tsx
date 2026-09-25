@@ -19,6 +19,7 @@ import {
 import { TimedActivitySession } from "@/components/TimedActivitySession";
 import {
   INITIAL_NECK_MOTION_STATE,
+  NECK_MOTION_THRESHOLDS,
   TARGET_NECK_MOVEMENTS,
   updateNeckMotion,
   type NeckMotionState,
@@ -52,6 +53,9 @@ type CameraStatus =
 type ActivitySessionProps = {
   activity: Activity;
   onComplete: (completion: ActivityCompletion) => void;
+  onEvent?: (
+    event: "camera_permission_denied" | "camera_start_failed" | "activity_skipped",
+  ) => void;
 };
 
 function cameraMessage(status: CameraStatus): string {
@@ -85,6 +89,88 @@ function trackingMessage(motion: NeckMotionState): string {
     case "complete":
       return "Movement check complete.";
   }
+}
+
+function stageLabel(motion: NeckMotionState): string {
+  switch (motion.stage) {
+    case "calibrating":
+      return "Calibrating neutral position";
+    case "first-side":
+      return "Turn to either side";
+    case "opposite-side":
+      return "Turn to the other side";
+    case "down":
+      return "Lower your chin";
+    case "up":
+      return "Lift your gaze slightly";
+    case "center":
+      return "Return to neutral";
+    case "complete":
+      return "Movement check complete";
+  }
+}
+
+function formatDelta(value: number | null): string {
+  if (value === null) return "—";
+  const percentage = Math.round(value * 100);
+  if (percentage > 0) return `+${percentage}%`;
+  if (percentage < 0) return `−${Math.abs(percentage)}%`;
+  return "0%";
+}
+
+export function CameraDiagnostics({
+  motion,
+  onRecalibrate,
+}: {
+  motion: NeckMotionState;
+  onRecalibrate: () => void;
+}) {
+  const shouldersVisible =
+    motion.visibility.leftShoulder && motion.visibility.rightShoulder;
+
+  return (
+    <section aria-label="Camera diagnostics" className="camera-diagnostics">
+      <div className="camera-diagnostics__heading">
+        <div>
+          <p>Camera check</p>
+          <strong>{stageLabel(motion)}</strong>
+        </div>
+        <button
+          className="button button--quiet camera-diagnostics__recalibrate"
+          onClick={onRecalibrate}
+          type="button"
+        >
+          Recalibrate
+        </button>
+      </div>
+
+      <div className="camera-diagnostics__visibility">
+        <span data-ready={motion.visibility.face}>
+          {motion.visibility.face ? "Face visible" : "Face not visible"}
+        </span>
+        <span data-ready={shouldersVisible}>
+          {shouldersVisible
+            ? "Both shoulders visible"
+            : "Bring both shoulders into frame"}
+        </span>
+      </div>
+
+      <dl className="camera-diagnostics__measurements">
+        <div>
+          <dt>Horizontal</dt>
+          <dd>{formatDelta(motion.horizontalDelta)}</dd>
+        </div>
+        <div>
+          <dt>Vertical</dt>
+          <dd>{formatDelta(motion.verticalDelta)}</dd>
+        </div>
+      </dl>
+
+      <p className="camera-diagnostics__thresholds">
+        Movement thresholds · Turn: {NECK_MOTION_THRESHOLDS.turn * 100}% · Chin: {NECK_MOTION_THRESHOLDS.down * 100}% · Gaze: {NECK_MOTION_THRESHOLDS.up * 100}%
+      </p>
+    </section>
+  );
 }
 
 function drawPose(
@@ -138,6 +224,7 @@ function drawPose(
 function CameraActivitySession({
   activity,
   onComplete,
+  onEvent,
 }: ActivitySessionProps) {
   const [status, setStatus] = useState<CameraStatus>("idle");
   const [motion, setMotion] = useState(INITIAL_NECK_MOTION_STATE);
@@ -213,6 +300,7 @@ function CameraActivitySession({
         } catch {
           stopCamera();
           setStatus("error");
+          onEvent?.("camera_start_failed");
           return;
         }
       }
@@ -221,7 +309,7 @@ function CameraActivitySession({
         runDetectionRef.current(nextTimestamp),
       );
     },
-    [finish, stopCamera],
+    [finish, onEvent, stopCamera],
   );
 
   useEffect(() => {
@@ -237,6 +325,7 @@ function CameraActivitySession({
 
     if (!navigator.mediaDevices?.getUserMedia) {
       setStatus("unavailable");
+      onEvent?.("camera_start_failed");
       return;
     }
 
@@ -290,22 +379,29 @@ function CameraActivitySession({
       stopCamera();
       if (error instanceof DOMException && error.name === "NotAllowedError") {
         setStatus("denied");
+        onEvent?.("camera_permission_denied");
       } else if (
         error instanceof DOMException &&
         (error.name === "NotFoundError" || error.name === "NotReadableError")
       ) {
         setStatus("unavailable");
+        onEvent?.("camera_start_failed");
       } else {
         setStatus("error");
+        onEvent?.("camera_start_failed");
       }
     }
-  }, [stopCamera]);
+  }, [onEvent, stopCamera]);
 
   useEffect(() => stopCamera, [stopCamera]);
 
   const showCamera = status === "loading" || status === "active";
   const showError =
     status === "denied" || status === "unavailable" || status === "error";
+  const recalibrate = useCallback(() => {
+    motionRef.current = INITIAL_NECK_MOTION_STATE;
+    setMotion(INITIAL_NECK_MOTION_STATE);
+  }, []);
 
   return (
     <section aria-live="polite" className="activity-session activity-session--camera">
@@ -359,7 +455,10 @@ function CameraActivitySession({
       ) : null}
 
       {status === "active" ? (
-        <p className="tracking-message">{trackingMessage(motion)}</p>
+        <>
+          <p className="tracking-message">{trackingMessage(motion)}</p>
+          <CameraDiagnostics motion={motion} onRecalibrate={recalibrate} />
+        </>
       ) : null}
 
       <p className="activity-safety-note">
@@ -406,6 +505,7 @@ function CameraActivitySession({
             onClick={() => {
               stopCamera();
               setStatus("idle");
+              onEvent?.("activity_skipped");
             }}
             type="button"
           >
@@ -428,7 +528,12 @@ function CameraActivitySession({
 
 export function ActivitySession(props: ActivitySessionProps) {
   if (props.activity.sessionType === "timer") {
-    return <TimedActivitySession {...props} />;
+    return (
+      <TimedActivitySession
+        activity={props.activity}
+        onComplete={props.onComplete}
+      />
+    );
   }
 
   return <CameraActivitySession {...props} />;

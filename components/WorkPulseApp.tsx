@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   ActivitySession,
@@ -10,12 +10,28 @@ import { ArrowIcon, CheckIcon, PulseMark } from "@/components/icons";
 import { ScenarioSelector } from "@/components/ScenarioSelector";
 import { WorkContextCard } from "@/components/WorkContextCard";
 import { demoScenarios } from "@/data/demo-scenarios";
+import {
+  loadActivityHistory,
+  minutesSinceLastCompletion,
+  recentActivityIds,
+  recordActivityCompletion,
+  type ActivityHistoryEntry,
+} from "@/lib/activity-history";
 import { evaluateIntervention } from "@/lib/decision-engine";
+import {
+  createProductEventTracker,
+  type ProductEventTracker,
+} from "@/lib/product-events";
+import {
+  loadRuntimeWorkoutSettings,
+  type RuntimeWorkoutSettings,
+} from "@/lib/runtime-workout-settings";
 import type {
   ActivityCompletion,
   DecisionResult,
   WorkPulseState,
 } from "@/lib/types";
+import { loadWorkoutSettings } from "@/lib/workout-settings";
 
 const INITIAL_SCENARIO_ID = "good-window";
 
@@ -24,8 +40,32 @@ export function WorkPulseApp() {
   const [state, setState] = useState<WorkPulseState>("IDLE");
   const [result, setResult] = useState<DecisionResult | null>(null);
   const [completion, setCompletion] = useState<ActivityCompletion | null>(null);
-  const [minutesSinceLastActivityOverride, setMinutesSinceLastActivityOverride] =
-    useState<number | null>(null);
+  const [history, setHistory] = useState<ActivityHistoryEntry[]>([]);
+  const [catalog, setCatalog] = useState<RuntimeWorkoutSettings>({
+    settings: loadWorkoutSettings(),
+    source: "bundled",
+  });
+  const trackerRef = useRef<ProductEventTracker | null>(null);
+
+  function tracker(): ProductEventTracker {
+    trackerRef.current ??= createProductEventTracker({ storage: window.localStorage });
+    return trackerRef.current;
+  }
+
+  useEffect(() => {
+    let active = true;
+    void Promise.resolve().then(() => {
+      if (active) setHistory(loadActivityHistory(window.localStorage));
+    });
+    void loadRuntimeWorkoutSettings({ storage: window.localStorage }).then(
+      (nextCatalog) => {
+        if (active) setCatalog(nextCatalog);
+      },
+    );
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const scenario = useMemo(
     () =>
@@ -33,13 +73,19 @@ export function WorkPulseApp() {
     [selectedId],
   );
   const activeContext = useMemo(
-    () => ({
-      ...scenario.context,
-      minutesSinceLastActivity:
-        minutesSinceLastActivityOverride ??
-        scenario.context.minutesSinceLastActivity,
-    }),
-    [minutesSinceLastActivityOverride, scenario.context],
+    () => {
+      const storedMinutes = minutesSinceLastCompletion(history);
+      return {
+        ...scenario.context,
+        minutesSinceLastActivity:
+          storedMinutes ?? scenario.context.minutesSinceLastActivity,
+      };
+    },
+    [history, scenario.context],
+  );
+  const excludedActivityIds = useMemo(
+    () => recentActivityIds(history, catalog.settings.repeatCooldownMinutes),
+    [catalog.settings.repeatCooldownMinutes, history],
   );
 
   function selectScenario(scenarioId: string) {
@@ -47,13 +93,25 @@ export function WorkPulseApp() {
     setState("IDLE");
     setResult(null);
     setCompletion(null);
-    setMinutesSinceLastActivityOverride(null);
   }
 
   function evaluate() {
-    const nextResult = evaluateIntervention(activeContext);
+    const nextResult = evaluateIntervention(activeContext, {
+      settings: catalog.settings,
+      excludedActivityIds,
+    });
     setResult(nextResult);
     setState(nextResult.decision === "MOVE_NOW" ? "RECOMMENDED" : "NOT_NOW");
+    if (nextResult.activity) {
+      tracker().track("recommendation_shown", {
+        activityId: nextResult.activity.id,
+        context: {
+          minutesToNextMeeting: activeContext.minutesToNextMeeting,
+          minutesSinceLastActivity: activeContext.minutesSinceLastActivity,
+          catalogVersion: catalog.settings.version,
+        },
+      });
+    }
   }
 
   function runAgain() {
@@ -90,8 +148,11 @@ export function WorkPulseApp() {
             selectedId={selectedId}
           />
           <div className="privacy-note">
-            <span aria-hidden="true">Demo</span>
-            <p>Four fixed contexts. No calendar connection or setup required.</p>
+            <span aria-hidden="true">Catalog</span>
+            <p>
+              Version {catalog.settings.version} · {catalog.source === "remote" ? "Live" : catalog.source === "cache" ? "Saved" : "Built in"}
+              {catalog.warning ? <small role="status">{catalog.warning}</small> : null}
+            </p>
           </div>
         </aside>
 
@@ -113,7 +174,23 @@ export function WorkPulseApp() {
 
           {isResultVisible && result ? (
             <DecisionCard
-              onStart={() => setState("ACTIVE")}
+              onSkip={() => {
+                if (result.activity) {
+                  tracker().track("activity_skipped", {
+                    activityId: result.activity.id,
+                    reason: "recommendation_dismissed",
+                  });
+                }
+                runAgain();
+              }}
+              onStart={() => {
+                if (result.activity) {
+                  tracker().track("activity_started", {
+                    activityId: result.activity.id,
+                  });
+                }
+                setState("ACTIVE");
+              }}
               result={result}
             />
           ) : null}
@@ -121,9 +198,31 @@ export function WorkPulseApp() {
           {state === "ACTIVE" && result?.activity ? (
             <ActivitySession
               activity={result.activity}
+              onEvent={(event) =>
+                tracker().track(event, { activityId: result.activity!.id })
+              }
               onComplete={(nextCompletion) => {
                 setCompletion(nextCompletion);
-                setMinutesSinceLastActivityOverride(0);
+                const nextHistory = recordActivityCompletion(
+                  window.localStorage,
+                  {
+                    activityId: result.activity!.id,
+                    completionMode: nextCompletion.mode,
+                  },
+                );
+                setHistory(nextHistory);
+                tracker().track(
+                  nextCompletion.mode === "manual"
+                    ? "activity_completed_manual"
+                    : "activity_completed",
+                  {
+                    activityId: result.activity!.id,
+                    context: {
+                      completedSteps: nextCompletion.completedSteps,
+                      verified: nextCompletion.verified,
+                    },
+                  },
+                );
                 setState("COMPLETED");
               }}
             />

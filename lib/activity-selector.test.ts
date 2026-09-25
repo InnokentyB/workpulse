@@ -61,8 +61,20 @@ describe("selectActivity", () => {
     ).toMatchObject({ id: "neck-reset" });
   });
 
+  it("avoids workouts completed inside the repeat cooldown", () => {
+    expect(
+      selectActivity({
+        minutesSinceLastActivity: 130,
+        minutesToNextMeeting: 8,
+        excludedActivityIds: ["full-body-reset"],
+      }),
+    ).toMatchObject({ id: "shoulder-reset" });
+  });
+
   it("selects from injected settings without code changes", () => {
     const customSettings = parseWorkoutSettings({
+      version: 1,
+      repeatCooldownMinutes: 120,
       transitionBufferSeconds: 0,
       workouts: [
         {
@@ -90,6 +102,8 @@ describe("selectActivity", () => {
 
   it("returns no activity when every configured workout exceeds the safe window", () => {
     const customSettings = parseWorkoutSettings({
+      version: 1,
+      repeatCooldownMinutes: 120,
       transitionBufferSeconds: 300,
       workouts: [
         {

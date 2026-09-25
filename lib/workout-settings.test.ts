@@ -7,6 +7,8 @@ import {
 
 function settings(overrides: Record<string, unknown> = {}) {
   return {
+    version: 1,
+    repeatCooldownMinutes: 120,
     transitionBufferSeconds: 300,
     workouts: [
       {
@@ -27,6 +29,8 @@ describe("workout settings", () => {
   it("loads the checked-in workout catalog", () => {
     const loaded = loadWorkoutSettings();
 
+    expect(loaded.version).toBe(1);
+    expect(loaded.repeatCooldownMinutes).toBe(120);
     expect(loaded.transitionBufferSeconds).toBe(300);
     expect(loaded.workouts.map(({ id }) => id)).toEqual([
       "neck-reset",
@@ -42,6 +46,91 @@ describe("workout settings", () => {
       sessionType: "timer",
       selection: { minimumMinutesSinceLastActivity: 0 },
     });
+  });
+
+  it("parses optional per-step visual guidance", () => {
+    const configured = settings({
+      workouts: [
+        {
+          ...settings().workouts[0],
+          guidance: {
+            position: "seated",
+            safetyWarning: "Stay within a comfortable range.",
+            steps: [
+              {
+                label: "Look ahead",
+                durationSeconds: 60,
+                visual: {
+                  kind: "image",
+                  src: "/guides/look-ahead.svg",
+                  alt: "A seated person looking straight ahead",
+                },
+              },
+            ],
+          },
+        },
+      ],
+    });
+
+    expect(parseWorkoutSettings(configured).workouts[0].guidance).toEqual({
+      position: "seated",
+      safetyWarning: "Stay within a comfortable range.",
+      steps: [
+        {
+          label: "Look ahead",
+          durationSeconds: 60,
+          visual: {
+            kind: "image",
+            src: "/guides/look-ahead.svg",
+            alt: "A seated person looking straight ahead",
+          },
+        },
+      ],
+    });
+  });
+
+  it("rejects guidance durations that do not match the workout", () => {
+    const configured = settings({
+      workouts: [
+        {
+          ...settings().workouts[0],
+          guidance: {
+            position: "either",
+            safetyWarning: "Move carefully.",
+            steps: [{ label: "Move", durationSeconds: 30 }],
+          },
+        },
+      ],
+    });
+
+    expect(() => parseWorkoutSettings(configured)).toThrow(/sum.*duration/i);
+  });
+
+  it("rejects unsafe visual URLs", () => {
+    const configured = settings({
+      workouts: [
+        {
+          ...settings().workouts[0],
+          guidance: {
+            position: "standing",
+            safetyWarning: "Move carefully.",
+            steps: [
+              {
+                label: "Move",
+                durationSeconds: 60,
+                visual: {
+                  kind: "image",
+                  src: "javascript:alert(1)",
+                  alt: "Movement guide",
+                },
+              },
+            ],
+          },
+        },
+      ],
+    });
+
+    expect(() => parseWorkoutSettings(configured)).toThrow(/visual.*src/i);
   });
 
   it("rejects duplicate workout ids", () => {

@@ -4,9 +4,15 @@
   "title": "WorkPulse workout settings",
   "type": "object",
   "additionalProperties": false,
-  "required": ["transitionBufferSeconds", "workouts"],
+  "required": ["version", "repeatCooldownMinutes", "transitionBufferSeconds", "workouts"],
   "properties": {
     "$schema": { "type": "string" },
+    "version": { "type": "integer", "minimum": 1 },
+    "repeatCooldownMinutes": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How long a completed workout is excluded from recommendations."
+    },
     "transitionBufferSeconds": {
       "type": "integer",
       "minimum": 0,
@@ -40,6 +46,38 @@
             "type": "array",
             "minItems": 1,
             "items": { "type": "string", "minLength": 1 }
+          },
+          "guidance": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["position", "safetyWarning", "steps"],
+            "properties": {
+              "position": { "enum": ["seated", "standing", "either"] },
+              "safetyWarning": { "type": "string", "minLength": 1 },
+              "steps": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["label", "durationSeconds"],
+                  "properties": {
+                    "label": { "type": "string", "minLength": 1 },
+                    "durationSeconds": { "type": "integer", "minimum": 1 },
+                    "visual": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["kind", "src", "alt"],
+                      "properties": {
+                        "kind": { "enum": ["image", "animation"] },
+                        "src": { "type": "string", "minLength": 1 },
+                        "alt": { "type": "string", "minLength": 1 }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "selection": {
             "type": "object",

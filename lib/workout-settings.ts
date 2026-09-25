@@ -1,5 +1,10 @@
 import rawWorkoutSettings from "@/data/workouts.json";
-import type { Activity } from "@/lib/types";
+import type {
+  Activity,
+  ActivityGuidance,
+  ActivityGuidanceStep,
+  ActivityVisual,
+} from "@/lib/types";
 
 export type WorkoutDefinition = Activity & {
   selection: {
@@ -8,6 +13,8 @@ export type WorkoutDefinition = Activity & {
 };
 
 export type WorkoutSettings = {
+  version: number;
+  repeatCooldownMinutes: number;
   transitionBufferSeconds: number;
   workouts: WorkoutDefinition[];
 };
@@ -41,6 +48,71 @@ function requirePositiveInteger(value: unknown, path: string): number {
   return number;
 }
 
+function parseVisual(value: unknown, path: string): ActivityVisual {
+  const visual = requireRecord(value, path);
+  if (visual.kind !== "image" && visual.kind !== "animation") {
+    throw new Error(`${path}.kind must be "image" or "animation".`);
+  }
+  const src = requireString(visual.src, `${path}.src`);
+  const isLocalPath = src.startsWith("/") && !src.startsWith("//");
+  if (!isLocalPath && !src.startsWith("https://")) {
+    throw new Error(`${path}.src must use a local path or HTTPS URL.`);
+  }
+
+  return {
+    kind: visual.kind,
+    src,
+    alt: requireString(visual.alt, `${path}.alt`),
+  };
+}
+
+function parseGuidance(
+  value: unknown,
+  path: string,
+  durationSeconds: number,
+): ActivityGuidance {
+  const guidance = requireRecord(value, path);
+  const position = guidance.position;
+  if (position !== "seated" && position !== "standing" && position !== "either") {
+    throw new Error(`${path}.position must be "seated", "standing", or "either".`);
+  }
+  if (!Array.isArray(guidance.steps) || guidance.steps.length === 0) {
+    throw new Error(`${path}.steps must contain at least one step.`);
+  }
+  const steps: ActivityGuidanceStep[] = guidance.steps.map((value, index) => {
+    const stepPath = `${path}.steps[${index}]`;
+    const step = requireRecord(value, stepPath);
+    return {
+      label: requireString(step.label, `${stepPath}.label`),
+      durationSeconds: requirePositiveInteger(
+        step.durationSeconds,
+        `${stepPath}.durationSeconds`,
+      ),
+      ...(step.visual === undefined
+        ? {}
+        : { visual: parseVisual(step.visual, `${stepPath}.visual`) }),
+    };
+  });
+  const guidanceDuration = steps.reduce(
+    (total, step) => total + step.durationSeconds,
+    0,
+  );
+  if (guidanceDuration !== durationSeconds) {
+    throw new Error(
+      `${path}.steps duration sum must equal durationSeconds (${durationSeconds}).`,
+    );
+  }
+
+  return {
+    position,
+    safetyWarning: requireString(
+      guidance.safetyWarning,
+      `${path}.safetyWarning`,
+    ),
+    steps,
+  };
+}
+
 function parseWorkout(value: unknown, index: number): WorkoutDefinition {
   const path = `workouts[${index}]`;
   const workout = requireRecord(value, path);
@@ -70,6 +142,15 @@ function parseWorkout(value: unknown, index: number): WorkoutDefinition {
     steps: workout.steps.map((step, stepIndex) =>
       requireString(step, `${path}.steps[${stepIndex}]`),
     ),
+    ...(workout.guidance === undefined
+      ? {}
+      : {
+          guidance: parseGuidance(
+            workout.guidance,
+            `${path}.guidance`,
+            durationSeconds,
+          ),
+        }),
     selection: {
       minimumMinutesSinceLastActivity: requireNonNegativeInteger(
         selection.minimumMinutesSinceLastActivity,
@@ -81,6 +162,11 @@ function parseWorkout(value: unknown, index: number): WorkoutDefinition {
 
 export function parseWorkoutSettings(value: unknown): WorkoutSettings {
   const settings = requireRecord(value, "workout settings");
+  const version = requirePositiveInteger(settings.version, "version");
+  const repeatCooldownMinutes = requireNonNegativeInteger(
+    settings.repeatCooldownMinutes,
+    "repeatCooldownMinutes",
+  );
   const transitionBufferSeconds = requireNonNegativeInteger(
     settings.transitionBufferSeconds,
     "transitionBufferSeconds",
@@ -109,7 +195,7 @@ export function parseWorkoutSettings(value: unknown): WorkoutSettings {
     );
   }
 
-  return { transitionBufferSeconds, workouts };
+  return { version, repeatCooldownMinutes, transitionBufferSeconds, workouts };
 }
 
 const checkedInSettings = parseWorkoutSettings(rawWorkoutSettings);

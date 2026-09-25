@@ -1,7 +1,13 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import { WorkPulseApp } from "@/components/WorkPulseApp";
+import { ACTIVITY_HISTORY_STORAGE_KEY } from "@/lib/activity-history";
+import { PRODUCT_EVENT_STORAGE_KEY } from "@/lib/product-events";
+
+beforeEach(() => {
+  window.localStorage.clear();
+});
 
 describe("WorkPulseApp", () => {
   it("starts with the canonical good-window context", () => {
@@ -106,5 +112,23 @@ describe("WorkPulseApp", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
     expect(screen.getByRole("heading", { name: /not now/i })).toBeDefined();
+
+    expect(window.localStorage.getItem(ACTIVITY_HISTORY_STORAGE_KEY)).toContain(
+      '"activityId":"neck-reset"',
+    );
+    expect(window.localStorage.getItem(PRODUCT_EVENT_STORAGE_KEY)).toContain(
+      '"name":"activity_completed_manual"',
+    );
+  });
+
+  it("records a skipped recommendation and returns to the ready state", () => {
+    render(<WorkPulseApp />);
+    fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
+    fireEvent.click(screen.getByRole("button", { name: /skip for now/i }));
+
+    expect(screen.getByRole("button", { name: /ask workpulse/i })).toBeDefined();
+    expect(window.localStorage.getItem(PRODUCT_EVENT_STORAGE_KEY)).toContain(
+      '"name":"activity_skipped"',
+    );
   });
 });

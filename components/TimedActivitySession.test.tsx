@@ -11,6 +11,23 @@ const activity: Activity = {
   instructions: "Move your shoulders slowly.",
   sessionType: "timer",
   steps: ["Roll backward", "Draw together", "Release"],
+  guidance: {
+    position: "seated",
+    safetyWarning: "Keep both feet on the floor.",
+    steps: [
+      { label: "Roll backward", durationSeconds: 1 },
+      { label: "Draw together", durationSeconds: 1 },
+      {
+        label: "Release",
+        durationSeconds: 1,
+        visual: {
+          kind: "animation",
+          src: "/guides/release.gif",
+          alt: "Shoulders releasing downward",
+        },
+      },
+    ],
+  },
 };
 
 afterEach(() => {
@@ -24,6 +41,8 @@ describe("TimedActivitySession", () => {
     expect(screen.getByRole("heading", { name: "Shoulder reset" })).toBeDefined();
     expect(screen.getByText("0:03")).toBeDefined();
     expect(screen.getByRole("list").children).toHaveLength(3);
+    expect(screen.getByText(/seated/i)).toBeDefined();
+    expect(screen.getByText("Keep both feet on the floor.")).toBeDefined();
     expect(screen.getByRole("button", { name: /start exercise/i })).toBeDefined();
   });
 
@@ -40,6 +59,7 @@ describe("TimedActivitySession", () => {
 
     await act(async () => vi.advanceTimersByTimeAsync(1_100));
     await act(async () => vi.advanceTimersByTimeAsync(1_100));
+    expect(screen.getByAltText("Shoulders releasing downward")).toBeDefined();
     expect(onComplete).toHaveBeenCalledWith({
       completedSteps: 3,
       mode: "timer",

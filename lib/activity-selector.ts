@@ -7,7 +7,7 @@ import type { Activity, WorkContext } from "./types";
 type ActivitySelectionContext = Pick<
   WorkContext,
   "minutesSinceLastActivity" | "minutesToNextMeeting"
->;
+> & { excludedActivityIds?: readonly string[] };
 
 const DEFAULT_SETTINGS = loadWorkoutSettings();
 
@@ -37,6 +37,7 @@ export function selectActivity(
   );
   const bestFit = byLongestDuration.find(
     (workout) =>
+      !context.excludedActivityIds?.includes(workout.id) &&
       context.minutesSinceLastActivity >=
         workout.selection.minimumMinutesSinceLastActivity &&
       workout.durationSeconds <= availableSeconds,

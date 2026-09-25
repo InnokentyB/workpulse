@@ -17,6 +17,25 @@ export type Activity = {
   instructions: string;
   sessionType: "camera-neck" | "timer";
   steps: string[];
+  guidance?: ActivityGuidance;
+};
+
+export type ActivityVisual = {
+  kind: "image" | "animation";
+  src: string;
+  alt: string;
+};
+
+export type ActivityGuidanceStep = {
+  label: string;
+  durationSeconds: number;
+  visual?: ActivityVisual;
+};
+
+export type ActivityGuidance = {
+  position: "seated" | "standing" | "either";
+  safetyWarning: string;
+  steps: ActivityGuidanceStep[];
 };
 
 export type ActivityCompletion = {

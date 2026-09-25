@@ -1,5 +1,7 @@
 {
   "$schema": "./workouts.schema.json",
+  "version": 1,
+  "repeatCooldownMinutes": 120,
   "transitionBufferSeconds": 300,
   "workouts": [
     {
@@ -14,6 +16,16 @@
         "Lower your chin",
         "Lift your gaze slightly"
       ],
+      "guidance": {
+        "position": "seated",
+        "safetyWarning": "Move slowly and stay within a comfortable range. Stop if you feel pain or dizziness.",
+        "steps": [
+          { "label": "Turn to one side", "durationSeconds": 10 },
+          { "label": "Turn to the other side", "durationSeconds": 10 },
+          { "label": "Lower your chin", "durationSeconds": 10 },
+          { "label": "Lift your gaze slightly", "durationSeconds": 15 }
+        ]
+      },
       "selection": {
         "minimumMinutesSinceLastActivity": 0
       }
@@ -29,6 +41,15 @@
         "Draw your shoulder blades gently together",
         "Let your arms hang and release"
       ],
+      "guidance": {
+        "position": "seated",
+        "safetyWarning": "Keep your breathing easy and stop if a movement is uncomfortable.",
+        "steps": [
+          { "label": "Roll your shoulders slowly backward", "durationSeconds": 30 },
+          { "label": "Draw your shoulder blades gently together", "durationSeconds": 30 },
+          { "label": "Let your arms hang and release", "durationSeconds": 30 }
+        ]
+      },
       "selection": {
         "minimumMinutesSinceLastActivity": 90
       }
@@ -45,6 +66,16 @@
         "Complete slow calf raises",
         "Shake out your arms and settle"
       ],
+      "guidance": {
+        "position": "standing",
+        "safetyWarning": "Use a stable stance and stop if you feel pain, dizziness, or loss of balance.",
+        "steps": [
+          { "label": "Stand tall and reach overhead", "durationSeconds": 45 },
+          { "label": "Bend gently to each side", "durationSeconds": 45 },
+          { "label": "Complete slow calf raises", "durationSeconds": 45 },
+          { "label": "Shake out your arms and settle", "durationSeconds": 45 }
+        ]
+      },
       "selection": {
         "minimumMinutesSinceLastActivity": 120
       }

@@ -3,7 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { CheckIcon } from "@/components/icons";
-import type { Activity, ActivityCompletion } from "@/lib/types";
+import type {
+  Activity,
+  ActivityCompletion,
+  ActivityGuidanceStep,
+} from "@/lib/types";
 
 type TimedActivitySessionProps = {
   activity: Activity;
@@ -27,18 +31,33 @@ export function TimedActivitySession({
     "ready",
   );
   const elapsedSeconds = activity.durationSeconds - remainingSeconds;
-  const stepDuration = activity.durationSeconds / activity.steps.length;
+  const guidedSteps = useMemo<ActivityGuidanceStep[]>(
+    () =>
+      activity.guidance?.steps ??
+      activity.steps.map((label) => ({
+        label,
+        durationSeconds: activity.durationSeconds / activity.steps.length,
+      })),
+    [activity.durationSeconds, activity.guidance?.steps, activity.steps],
+  );
+  const stepEndTimes = useMemo(
+    () =>
+      guidedSteps.reduce<number[]>((ends, step) => {
+        ends.push((ends.at(-1) ?? 0) + step.durationSeconds);
+        return ends;
+      }, []),
+    [guidedSteps],
+  );
   const currentStepIndex = Math.min(
-    Math.floor(elapsedSeconds / stepDuration),
-    activity.steps.length - 1,
+    stepEndTimes.findIndex((end) => elapsedSeconds < end) === -1
+      ? guidedSteps.length - 1
+      : stepEndTimes.findIndex((end) => elapsedSeconds < end),
+    guidedSteps.length - 1,
   );
-  const completedSteps = Math.min(
-    Math.floor(elapsedSeconds / stepDuration),
-    activity.steps.length,
-  );
+  const completedSteps = stepEndTimes.filter((end) => elapsedSeconds >= end).length;
   const currentStep = useMemo(
-    () => activity.steps[currentStepIndex],
-    [activity.steps, currentStepIndex],
+    () => guidedSteps[currentStepIndex],
+    [guidedSteps, currentStepIndex],
   );
 
   useEffect(() => {
@@ -46,7 +65,7 @@ export function TimedActivitySession({
 
     if (remainingSeconds === 0) {
       onComplete({
-        completedSteps: activity.steps.length,
+        completedSteps: guidedSteps.length,
         mode: "timer",
         verified: false,
       });
@@ -58,7 +77,7 @@ export function TimedActivitySession({
     }, 1_000);
 
     return () => window.clearTimeout(timer);
-  }, [activity.steps.length, onComplete, remainingSeconds, status]);
+  }, [guidedSteps.length, onComplete, remainingSeconds, status]);
 
   return (
     <section className="activity-session timed-session">
@@ -75,11 +94,19 @@ export function TimedActivitySession({
       {status === "ready" ? (
         <div className="timed-session__preview">
           <p>{activity.instructions}</p>
-          <ol data-step-count={activity.steps.length}>
-            {activity.steps.map((step, index) => (
-              <li key={step}>
+          {activity.guidance ? (
+            <span className="activity-position">
+              {activity.guidance.position === "either"
+                ? "Seated or standing"
+                : `${activity.guidance.position[0].toUpperCase()}${activity.guidance.position.slice(1)}`}
+            </span>
+          ) : null}
+          <ol data-step-count={guidedSteps.length}>
+            {guidedSteps.map((step, index) => (
+              <li key={`${step.label}-${index}`}>
                 <span>{index + 1}</span>
-                <strong>{step}</strong>
+                <strong>{step.label}</strong>
+                <small>{formatDuration(step.durationSeconds)}</small>
               </li>
             ))}
           </ol>
@@ -87,21 +114,30 @@ export function TimedActivitySession({
       ) : (
         <div aria-live="polite" className="timed-session__active">
           <p>Current movement</p>
-          <strong>{currentStep}</strong>
+          {currentStep.visual ? (
+            // eslint-disable-next-line @next/next/no-img-element -- runtime workout catalogs provide validated image URLs.
+            <img
+              alt={currentStep.visual.alt}
+              className="timed-session__visual"
+              src={currentStep.visual.src}
+            />
+          ) : null}
+          <strong>{currentStep.label}</strong>
           <span>
-            Step {Math.min(currentStepIndex + 1, activity.steps.length)} of {activity.steps.length}
+            Step {Math.min(currentStepIndex + 1, guidedSteps.length)} of {guidedSteps.length}
           </span>
         </div>
       )}
 
       <progress
-        aria-label={`${completedSteps} of ${activity.steps.length} steps complete`}
+        aria-label={`${completedSteps} of ${guidedSteps.length} steps complete`}
         max={activity.durationSeconds}
         value={elapsedSeconds}
       />
 
       <p className="activity-safety-note">
-        Move slowly and stay within a comfortable range. Stop if you feel pain or dizziness.
+        {activity.guidance?.safetyWarning ??
+          "Move slowly and stay within a comfortable range. Stop if you feel pain or dizziness."}
       </p>
 
       <div className="activity-session__actions">

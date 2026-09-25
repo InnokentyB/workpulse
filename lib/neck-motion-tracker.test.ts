@@ -30,9 +30,47 @@ function calibrated(): NeckMotionState {
 
 describe("updateNeckMotion", () => {
   it("requires the face and shoulders to be visible", () => {
-    expect(updateNeckMotion(INITIAL_NECK_MOTION_STATE, pose(0, 0, 0.2))).toEqual(
-      INITIAL_NECK_MOTION_STATE,
-    );
+    expect(
+      updateNeckMotion(INITIAL_NECK_MOTION_STATE, pose(0, 0, 0.2)),
+    ).toMatchObject({
+      tracking: "out-of-frame",
+      visibility: {
+        face: false,
+        leftShoulder: false,
+        rightShoulder: false,
+      },
+    });
+  });
+
+  it("reports landmark visibility and measured movement from the neutral baseline", () => {
+    const measured = updateNeckMotion(calibrated(), pose(0.04, -0.025));
+
+    expect(measured.visibility).toEqual({
+      face: true,
+      leftShoulder: true,
+      rightShoulder: true,
+    });
+    expect(measured.horizontalDelta).toBeCloseTo(0.08);
+    expect(measured.verticalDelta).toBeCloseTo(-0.05);
+  });
+
+  it("keeps the last measurement but reports which landmark left the frame", () => {
+    const measured = updateNeckMotion(calibrated(), pose(0.02));
+    const missingShoulder = pose();
+    missingShoulder[12] = { x: 0.75, y: 0.75, visibility: 0.2 };
+
+    const lost = updateNeckMotion(measured, missingShoulder);
+
+    expect(lost).toMatchObject({
+      tracking: "out-of-frame",
+      visibility: {
+        face: true,
+        leftShoulder: true,
+        rightShoulder: false,
+      },
+      horizontalDelta: measured.horizontalDelta,
+      verticalDelta: measured.verticalDelta,
+    });
   });
 
   it("calibrates a neutral position over eight visible frames", () => {
