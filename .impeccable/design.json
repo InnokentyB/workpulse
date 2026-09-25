@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-25T14:33:54Z",
+  "generatedAt": "2026-09-25T14:49:57Z",
   "title": "Design System: WorkPulse",
   "extensions": {
     "colorMeta": {
@@ -35,7 +35,8 @@
     "motion": [
       { "name": "state-transition", "value": "160ms ease-out", "purpose": "Button, scenario-row, color, shadow, and transform feedback." },
       { "name": "activity-pulse", "value": "1.25s cubic-bezier(.22, 1, .36, 1) infinite alternate", "purpose": "Three asynchronous bars that mark an activity in progress." },
-      { "name": "reduced-motion", "value": ".01ms, 1 iteration", "purpose": "Collapses animation and transition under prefers-reduced-motion." }
+      { "name": "viewport-guidance", "value": "focus with preventScroll; smooth or auto scroll; center if stage fits viewport minus 48px, otherwise start", "purpose": "Advance visual and assistive-technology context to a new activity session, then keep the camera startup stage visible without clipping." },
+      { "name": "reduced-motion", "value": ".01ms, 1 iteration", "purpose": "Collapses animation and transition and makes viewport guidance immediate under prefers-reduced-motion." }
     ],
     "breakpoints": [
       { "name": "compact", "value": "640px" },
@@ -142,7 +143,7 @@
       "Do use one-pixel ruled dividers, tonal layers, and joined panels to structure the desk.",
       "Do preserve text labels for MOVE NOW and NOT NOW so state never depends on green or brown alone.",
       "Do keep scenario controls visible but secondary, collapsing them to a select on narrow screens.",
-      "Do respect reduced-motion preference for the activity pulse animation.",
+      "Do respect reduced-motion preference for activity animation and viewport guidance; scrolling becomes immediate rather than smooth.",
       "Do keep history verification language explicit and its device-local explanation adjacent to the ledger.",
       "Do distinguish current, proposed, tentative, and exploratory roadmap content in text as well as styling."
     ],

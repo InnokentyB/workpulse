@@ -327,6 +327,7 @@ button { color: inherit; }
   color: #f8f8f1;
   min-height: 520px;
   padding: clamp(30px, 5vw, 58px);
+  scroll-margin-top: 24px;
 }
 .activity-session__heading { align-items: end; display: flex; gap: 28px; justify-content: space-between; }
 .activity-session__heading p { color: #c7d8cf; font-size: .73rem; margin: 0 0 9px; }
@@ -354,6 +355,7 @@ button { color: inherit; }
   margin-top: 32px;
   overflow: hidden;
   position: relative;
+  scroll-margin-block: 24px;
 }
 .camera-stage[data-visible="true"] { display: block; }
 .camera-stage video, .camera-stage canvas {

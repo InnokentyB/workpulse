@@ -59,6 +59,27 @@ type ActivitySessionProps = {
   onComplete: (completion: ActivityCompletion) => void;
 };
 
+function preferredScrollBehavior(): ScrollBehavior {
+  return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    ? "auto"
+    : "smooth";
+}
+
+function useWorkingAreaFocus<T extends HTMLElement>() {
+  const elementRef = useRef<T>(null);
+
+  useEffect(() => {
+    const element = elementRef.current;
+    element?.focus({ preventScroll: true });
+    element?.scrollIntoView?.({
+      behavior: preferredScrollBehavior(),
+      block: "start",
+    });
+  }, []);
+
+  return elementRef;
+}
+
 function cameraMessage(status: CameraStatus): string {
   if (status === "denied") {
     return "Camera permission was declined. Allow camera access in your browser settings and try again.";
@@ -146,6 +167,8 @@ function CameraNeckSession({
 }: ActivitySessionProps) {
   const [status, setStatus] = useState<CameraStatus>("idle");
   const [motion, setMotion] = useState(INITIAL_NECK_MOTION_STATE);
+  const sessionRef = useWorkingAreaFocus<HTMLElement>();
+  const cameraStageRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -308,12 +331,30 @@ function CameraNeckSession({
 
   useEffect(() => stopCamera, [stopCamera]);
 
+  useEffect(() => {
+    if (status !== "loading") return;
+    const cameraStage = cameraStageRef.current;
+    const block =
+      cameraStage && cameraStage.getBoundingClientRect().height > window.innerHeight - 48
+        ? "start"
+        : "center";
+    cameraStage?.scrollIntoView?.({
+      behavior: preferredScrollBehavior(),
+      block,
+    });
+  }, [status]);
+
   const showCamera = status === "loading" || status === "active";
   const showError =
     status === "denied" || status === "unavailable" || status === "error";
 
   return (
-    <section aria-live="polite" className="activity-session activity-session--camera">
+    <section
+      aria-live="polite"
+      className="activity-session activity-session--camera"
+      ref={sessionRef}
+      tabIndex={-1}
+    >
       <div className="activity-session__heading">
         <div>
           <p>Camera-guided activity</p>
@@ -328,7 +369,7 @@ function CameraNeckSession({
         </div>
       </div>
 
-      <div className="camera-stage" data-visible={showCamera}>
+      <div className="camera-stage" data-visible={showCamera} ref={cameraStageRef}>
         <video aria-label="Live camera preview" muted playsInline ref={videoRef} />
         <canvas aria-hidden="true" ref={canvasRef} />
         {status === "loading" ? (
@@ -430,9 +471,15 @@ function GuidedStepsSession({
   onComplete,
 }: ActivitySessionProps) {
   const steps = activity.steps ?? [activity.instructions];
+  const sessionRef = useWorkingAreaFocus<HTMLElement>();
 
   return (
-    <section aria-live="polite" className="activity-session activity-session--guided">
+    <section
+      aria-live="polite"
+      className="activity-session activity-session--guided"
+      ref={sessionRef}
+      tabIndex={-1}
+    >
       <div className="activity-session__heading">
         <div className="guided-title">
           <span className="guided-title__icon">

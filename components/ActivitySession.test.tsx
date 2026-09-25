@@ -1,9 +1,13 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ActivitySession } from "@/components/ActivitySession";
 
 const originalMediaDevices = navigator.mediaDevices;
+const originalMatchMedia = window.matchMedia;
+const originalInnerHeight = window.innerHeight;
+const originalScrollIntoView = HTMLElement.prototype.scrollIntoView;
+const scrollIntoView = vi.fn();
 const activity = {
   id: "neck-reset",
   name: "Neck reset",
@@ -13,10 +17,34 @@ const activity = {
   guide: "camera-neck" as const,
 };
 
+beforeEach(() => {
+  scrollIntoView.mockReset();
+  Object.defineProperty(window, "matchMedia", {
+    configurable: true,
+    value: vi.fn().mockReturnValue({ matches: false }),
+  });
+  Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+    configurable: true,
+    value: scrollIntoView,
+  });
+});
+
 afterEach(() => {
   Object.defineProperty(navigator, "mediaDevices", {
     configurable: true,
     value: originalMediaDevices,
+  });
+  Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+    configurable: true,
+    value: originalScrollIntoView,
+  });
+  Object.defineProperty(window, "matchMedia", {
+    configurable: true,
+    value: originalMatchMedia,
+  });
+  Object.defineProperty(window, "innerHeight", {
+    configurable: true,
+    value: originalInnerHeight,
   });
 });
 
@@ -30,11 +58,35 @@ describe("ActivitySession", () => {
       />,
     );
 
-    expect(screen.getByRole("heading", { name: "Neck reset" })).toBeDefined();
+    const heading = screen.getByRole("heading", { name: "Neck reset" });
+    expect(heading).toBeDefined();
+    expect(document.activeElement).toBe(heading.closest("section"));
     expect(screen.getByLabelText("0 of 4 neck movements")).toBeDefined();
     expect(screen.getByText(/does not record, save, or upload video/i)).toBeDefined();
     expect(screen.getByText(/stop if you feel pain or dizziness/i)).toBeDefined();
     expect(screen.getByRole("button", { name: /enable camera/i })).toBeDefined();
+    expect(scrollIntoView).toHaveBeenCalledWith({
+      behavior: "smooth",
+      block: "start",
+    });
+  });
+
+  it("moves immediately when reduced motion is preferred", () => {
+    vi.mocked(window.matchMedia).mockReturnValue({
+      matches: true,
+    } as MediaQueryList);
+
+    render(
+      <ActivitySession
+        activity={activity}
+        onComplete={vi.fn()}
+      />,
+    );
+
+    expect(scrollIntoView).toHaveBeenCalledWith({
+      behavior: "auto",
+      block: "start",
+    });
   });
 
   it("supports an explicit unverified fallback", () => {
@@ -106,7 +158,42 @@ describe("ActivitySession", () => {
     fireEvent.click(screen.getByRole("button", { name: /enable camera/i }));
 
     expect(await screen.findByRole("alert")).toBeDefined();
+    expect(scrollIntoView).toHaveBeenCalledWith({
+      behavior: "smooth",
+      block: "center",
+    });
     expect(screen.getByText(/allow camera access in your browser settings/i)).toBeDefined();
     expect(screen.getByRole("button", { name: /try camera again/i })).toBeDefined();
+  });
+
+  it("top-aligns a camera preview that is taller than the viewport", () => {
+    Object.defineProperty(window, "innerHeight", {
+      configurable: true,
+      value: 500,
+    });
+    Object.defineProperty(navigator, "mediaDevices", {
+      configurable: true,
+      value: {
+        getUserMedia: vi.fn().mockReturnValue(new Promise(() => undefined)),
+      },
+    });
+
+    const { container } = render(
+      <ActivitySession
+        activity={activity}
+        onComplete={vi.fn()}
+      />,
+    );
+    vi.spyOn(
+      container.querySelector(".camera-stage") as HTMLDivElement,
+      "getBoundingClientRect",
+    ).mockReturnValue({ height: 600 } as DOMRect);
+
+    fireEvent.click(screen.getByRole("button", { name: /enable camera/i }));
+
+    expect(scrollIntoView).toHaveBeenLastCalledWith({
+      behavior: "smooth",
+      block: "start",
+    });
   });
 });

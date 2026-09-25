@@ -235,7 +235,7 @@ The signature component begins with a small state label, follows with oversized 
 
 ### Activity Session Surfaces
 
-The activity state keeps the green decision surface and adapts to the selected guide. Neck reset begins with explicit camera consent; once permission is granted, a mirrored native video preview and lime upper-body pose trace make local detection visible. A large `0 / 4` movement indicator, one instruction at a time, persistent “no video recording” copy, and an always-available stop action keep the session legible and trustworthy. Permission denial and unavailable-camera states stay within the same surface and offer recovery plus a manual fallback. Shoulder rolls never request camera access: the same surface instead shows its outline pictogram at a larger scale inside a restrained circular frame, a prominent tabular duration, a short introduction, and numbered ruled steps, followed by one explicit completion action. The pictogram uses `currentColor`, stays unfilled, and changes scale through its container rather than through a separate asset.
+The activity state keeps the green decision surface and adapts to the selected guide. When either activity begins, move programmatic focus to the session without triggering a second scroll, then bring the session to the top of the viewport with 24px clearance so visual and assistive-technology context advance together. When camera loading begins, center the camera stage only when its height fits within the viewport minus 48px; otherwise align it to the top so the stage is not clipped. Use smooth scrolling by default and immediate scrolling when reduced motion is preferred. Neck reset begins with explicit camera consent; once permission is granted, a mirrored native video preview and lime upper-body pose trace make local detection visible. A large `0 / 4` movement indicator, one instruction at a time, persistent “no video recording” copy, and an always-available stop action keep the session legible and trustworthy. Permission denial and unavailable-camera states stay within the same surface and offer recovery plus a manual fallback. Shoulder rolls never request camera access: the same surface instead shows its outline pictogram at a larger scale inside a restrained circular frame, a prominent tabular duration, a short introduction, and numbered ruled steps, followed by one explicit completion action. The pictogram uses `currentColor`, stays unfilled, and changes scale through its container rather than through a separate asset.
 
 ### Work Context Metrics
 
@@ -257,7 +257,7 @@ The roadmap is a reading surface: a large editorial opening, a ruled three-phase
 - **Do** use one-pixel ruled dividers, tonal layers, and joined panels to structure the desk.
 - **Do** preserve text labels for MOVE NOW and NOT NOW so state never depends on green or brown alone.
 - **Do** keep scenario controls visible but secondary, collapsing them to a select on narrow screens.
-- **Do** respect reduced-motion preference for the activity pulse animation.
+- **Do** respect reduced-motion preference for activity animation and viewport guidance; scrolling becomes immediate rather than smooth.
 - **Do** keep history verification language explicit and its device-local explanation adjacent to the ledger.
 - **Do** distinguish current, proposed, tentative, and exploratory roadmap content in text as well as styling.
 
