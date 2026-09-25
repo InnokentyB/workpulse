@@ -167,15 +167,15 @@ The palette pairs quiet paper neutrals with grounded ink-green surfaces, a warm-
 
 **The Decision Speaks Largest Rule.** The resolved state is always the strongest type on the screen; supporting levels and reasons remain legible but never compete with it.
 
-**The Measured Numeral Rule.** Context values use tabular numerals so changing data does not disturb the visual rhythm.
+**The Measured Numeral Rule.** Context values, history counts, times, durations, and movement totals use tabular numerals so changing data does not disturb the visual rhythm.
 
 ## Layout
 
 The page sits in a centered 1440px shell with 48px desktop gutters. A compact header anchors the brand on the left while the tagline stays quiet in the center. The premise uses a wide-to-narrow editorial split, then the demo shifts to a 285px scenario rail beside one flexible decision stage with a 40px gutter.
 
-The context and decision areas read as one instrument: the raised paper context panel has only its top corners rounded, while the dark action or decision surface rounds only its bottom corners. Three context metrics divide the panel with one-pixel rules. History aligns beneath the decision stage rather than beneath the scenario rail.
+The context and decision areas read as one instrument: the raised paper context panel has only its top corners rounded, while the dark action or decision surface rounds only its bottom corners. Three context metrics divide the panel with one-pixel rules. The browser-local history section follows the demo in the same 285px/flexible-content grid; its title and privacy explanation occupy the left rail, while summary counts and completed-activity rows occupy the content column. The roadmap uses the same rail for a proposed P0.5 feature register, with the next phase and exploration separated by tonal surfaces and ruled rows.
 
-At 920px, the two-scenario rail becomes a two-column horizontal strip. At 640px, page gutters tighten to 18px, the scenario choices collapse into a single 50px select, the metrics become a two-column grid with the third metric spanning the next row, and actions stack to full width. The same context-to-decision reading order is preserved from a 360px viewport upward.
+At 920px, the two-scenario rail becomes a two-column horizontal strip; history and roadmap rails stack above their content. At 640px, page gutters tighten to 18px, the scenario choices collapse into a single 50px select, the metrics become a two-column grid with the third metric spanning the next row, and actions stack to full width. The header places its links beneath the brand, history rows become a date/time column beside an activity column with details underneath, and roadmap phase cells stack vertically. The same context-to-decision reading order is preserved from a 360px viewport upward.
 
 ## Elevation & Depth
 
@@ -227,7 +227,7 @@ The form language is measured and lightly softened. Joined context and decision 
 
 ### Navigation
 
-The compact header uses an inline pulse mark and bold product name on the left with a quiet tagline centered on desktop. The tagline disappears below 640px. Navigation does not become a menu because the MVP has one task.
+The compact header uses an inline pulse mark and bold product name on the left, a quiet tagline centered on desktop, and right-aligned pill links for Live demo, History, and What’s next. The current page receives an ink fill and inverse text; hover stays soft, and keyboard focus uses the shared blue outline. History links to the demo’s section anchor. Below 640px, the tagline disappears and the links sit visibly beneath the brand without a menu.
 
 ### Decision Surface
 
@@ -241,6 +241,14 @@ The activity state keeps the green decision surface and replaces the static inst
 
 Three metrics use large tight values, small muted units, and tabular numerals. Thin vertical rules separate them on desktop. On mobile, the first two remain side by side and the third spans a ruled second row, preserving all context in the first interaction viewport.
 
+### Activity History
+
+The browser-local ledger continues the paper-and-rule language beneath the demo. Its left rail names the section and explains that completed records stay on this device when browser storage is available. Three restrained, tabular summary numerals show completed, today, and camera-verified counts. The empty state leaves a clear ruled area and a plain invitation to finish an activity. Completed entries appear newest first as ruled rows with date and time, activity name, explicit camera or manual completion language, estimated duration, and movement count. On mobile, each row keeps time beside the activity and moves the two facts below the activity text.
+
+### Roadmap Register
+
+The roadmap is a reading surface: a large editorial opening, a ruled three-phase rail, then a feature register aligned to the 285px/content grid. The proposed P0.5 phase has the only dark rail cell, while the first feature row names the real calendar connection and its explicit permission requirement. A visible “proposed direction” note keeps the page from implying a release promise. Later and exploratory material recedes into a dark follow-on panel and quiet outlined pills.
+
 ## Do's and Don'ts
 
 ### Do:
@@ -250,6 +258,8 @@ Three metrics use large tight values, small muted units, and tabular numerals. T
 - **Do** preserve text labels for MOVE NOW and NOT NOW so state never depends on green or brown alone.
 - **Do** keep scenario controls visible but secondary, collapsing them to a select on narrow screens.
 - **Do** respect reduced-motion preference for the activity pulse animation.
+- **Do** keep history verification language explicit and its device-local explanation adjacent to the ledger.
+- **Do** distinguish current, proposed, tentative, and exploratory roadmap content in text as well as styling.
 
 ### Don't:
 

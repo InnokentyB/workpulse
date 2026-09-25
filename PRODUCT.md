@@ -29,9 +29,10 @@ The MVP is a responsive, single-page web demo for a laptop pitch and a 360px mob
 - Deterministically return `MOVE NOW` or `NOT NOW`, movement need, interruption cost, and a reason.
 - Attach one fixed activity—a neck reset in about 45 seconds—only to `MOVE NOW`.
 - Support optional on-device verification for four guided neck movements, plus a manual fallback.
+- Keep a browser-only history of completed activities with time, estimated duration, verification mode, and movement count when local storage is available.
 - Request camera access only during the activity and stop it immediately after completion or cancellation.
 - Never record, store, upload, or play back video, and never request microphone access.
-- Work without authentication, real calendar access, a database, local persistence, or an LLM service.
+- Work without authentication, real calendar access, a database, cross-device persistence, or an LLM service.
 - Frame activities as workplace-wellbeing suggestions, not medical advice.
 
 ## Brand Commitments

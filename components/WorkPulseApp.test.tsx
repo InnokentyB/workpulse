@@ -78,6 +78,7 @@ describe("WorkPulseApp", () => {
     expect(screen.getByRole("heading", { name: /your movement history/i })).toBeDefined();
     expect(screen.getByText("Completed manually without camera verification")).toBeDefined();
     expect(screen.getByText("45 sec")).toBeDefined();
+    expect(screen.getByText("Estimated")).toBeDefined();
 
     fireEvent.click(screen.getByRole("button", { name: /run again/i }));
     expect(screen.getByRole("button", { name: /ask workpulse/i })).toBeDefined();

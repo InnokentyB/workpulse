@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-25T10:18:39Z",
+  "generatedAt": "2026-09-25T14:13:07Z",
   "title": "Design System: WorkPulse",
   "extensions": {
     "colorMeta": {
@@ -96,6 +96,27 @@
       "description": "The equal-authority HOLD surface that explains why interruption is not useful now.",
       "html": "<section class=\"ds-hold\"><div class=\"ds-hold-topline\"><span>Hold this moment</span></div><h2>Not now</h2><div class=\"ds-hold-signals\"><span>Movement need <strong>HIGH</strong></span><span>Interruption cost <strong>HIGH</strong></span></div><small>Why this decision</small><p>Your next meeting is too close. Keep working; WorkPulse will wait for a better window.</p></section>",
       "css": ".ds-hold { background: var(--decision-hold, #493125); border-radius: 0 0 14px 14px; color: var(--inverse-text, #f8f8f1); font-family: Geist, Arial, sans-serif; padding: 40px; } .ds-hold-topline { border-bottom: 1px solid rgba(255,255,255,.19); color: #ecd6c6; display: flex; font-size: .69rem; font-weight: 670; justify-content: space-between; letter-spacing: .08em; padding-bottom: 18px; text-transform: uppercase; } .ds-hold h2 { font-size: clamp(3rem,8vw,5rem); font-weight: 600; letter-spacing: -.04em; line-height: .9; margin: 36px 0 32px; text-transform: uppercase; } .ds-hold-signals { border-bottom: 1px solid rgba(255,255,255,.19); border-top: 1px solid rgba(255,255,255,.19); display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 32px; } .ds-hold-signals span { color: #ecd6c6; display: flex; font-size: .76rem; justify-content: space-between; padding: 18px 20px 18px 0; } .ds-hold-signals span+span { border-left: 1px solid rgba(255,255,255,.19); padding-left: 20px; } .ds-hold-signals strong { color: var(--hold-bright, #f2b56d); font-size: .79rem; letter-spacing: .07em; } .ds-hold small { color: #ecd6c6; font-size: .7rem; } .ds-hold p { font-size: 1rem; line-height: 1.56; margin: 10px 0 0; max-width: 60ch; }"
+    },
+    {
+      "name": "Primary Navigation",
+      "kind": "nav",
+      "description": "Visible demo, history, and roadmap destinations with a filled current-page state.",
+      "html": "<nav class=\"ds-site-nav\" aria-label=\"Primary navigation\"><a href=\"#demo\" aria-current=\"page\">Live demo</a><a href=\"#history\">History</a><a href=\"#roadmap\">What's next</a></nav>",
+      "css": ".ds-site-nav { display: flex; flex-wrap: wrap; font-family: Geist, Arial, sans-serif; gap: 7px; } .ds-site-nav a { border-radius: 999px; color: var(--ink-soft, #526159); font-size: .73rem; font-weight: 650; padding: 8px 11px; text-decoration: none; } .ds-site-nav a:hover { background: rgba(255,255,255,.5); color: var(--ink, #16231d); } .ds-site-nav a[aria-current=page] { background: var(--ink, #16231d); color: var(--paper-raised, #fbfaf5); } .ds-site-nav a:focus-visible { outline: 3px solid var(--focus, #205fca); outline-offset: 3px; } @media (max-width: 640px) { .ds-site-nav { gap: 2px; } .ds-site-nav a { font-size: .68rem; padding-inline: 8px; } }"
+    },
+    {
+      "name": "Activity History",
+      "kind": "custom",
+      "description": "Browser-local completion ledger with restrained summary counts and ruled activity details.",
+      "html": "<section class=\"ds-history\"><header><h2>Your movement history.</h2><p>Completed activities stay on this device when browser storage is available.</p></header><div class=\"ds-history-content\"><dl class=\"ds-history-summary\"><div><dt>Completed</dt><dd>3</dd></div><div><dt>Today</dt><dd>1</dd></div><div><dt>Camera verified</dt><dd>2</dd></div></dl><ol><li><time><span>25 Sep</span><strong>10:24</strong></time><div><h3>Neck reset</h3><p>Completed with on-device camera verification</p></div><dl><div><dt>Estimated</dt><dd>45 sec</dd></div><div><dt>Movements</dt><dd>4</dd></div></dl></li></ol></div></section>",
+      "css": ".ds-history { border-top: 1px solid var(--line, #d8d5ca); color: var(--ink, #16231d); display: grid; font-family: Geist, Arial, sans-serif; gap: 40px; grid-template-columns: 285px minmax(0,1fr); padding-top: 34px; } .ds-history h2 { font-size: clamp(1.75rem,3.2vw,2.8rem); font-weight: 590; letter-spacing: -.035em; line-height: 1.04; margin: 0; } .ds-history header p { color: var(--ink-soft, #526159); font-size: .79rem; line-height: 1.6; margin: 19px 0 0; } .ds-history-content { min-width: 0; } .ds-history dl { margin: 0; } .ds-history-summary { border-bottom: 1px solid var(--line, #d8d5ca); display: grid; grid-template-columns: repeat(3,1fr); } .ds-history-summary>div { min-height: 98px; padding: 5px 20px 20px 0; } .ds-history-summary>div+div { border-left: 1px solid var(--line, #d8d5ca); padding-left: 20px; } .ds-history dt { color: var(--ink-soft, #526159); font-size: .68rem; } .ds-history-summary dd { font-size: 2.55rem; font-variant-numeric: tabular-nums; font-weight: 590; letter-spacing: -.04em; line-height: 1; margin: 17px 0 0; } .ds-history ol { list-style: none; margin: 0; padding: 0; } .ds-history li { align-items: center; border-bottom: 1px solid var(--line, #d8d5ca); display: grid; gap: 24px; grid-template-columns: 90px minmax(0,1fr) auto; min-height: 118px; padding: 20px 0; } .ds-history time { display: grid; font-variant-numeric: tabular-nums; gap: 5px; } .ds-history time span { color: var(--ink-soft, #526159); font-size: .68rem; text-transform: uppercase; } .ds-history time strong,.ds-history h3 { font-size: 1.05rem; font-weight: 650; } .ds-history h3 { letter-spacing: -.02em; margin: 0; } .ds-history li p { color: var(--ink-soft, #526159); font-size: .76rem; line-height: 1.5; margin: 7px 0 0; } .ds-history li>dl { display: flex; gap: 28px; min-width: 164px; } .ds-history li>dl div { display: grid; gap: 7px; } .ds-history li>dl dt { font-size: .65rem; } .ds-history li>dl dd { font-size: .78rem; font-variant-numeric: tabular-nums; font-weight: 650; margin: 0; } @media (max-width: 920px) { .ds-history { gap: 30px; grid-template-columns: 1fr; } } @media (max-width: 640px) { .ds-history-summary>div { min-height: 88px; padding-right: 12px; } .ds-history-summary>div+div { padding-left: 12px; } .ds-history-summary dd { font-size: 2.15rem; } .ds-history li { align-items: start; gap: 16px; grid-template-columns: 70px minmax(0,1fr); } .ds-history li>dl { grid-column: 2; min-width: 0; } }"
+    },
+    {
+      "name": "Roadmap Register",
+      "kind": "custom",
+      "description": "Reading-first proposed phase and feature rows, with the calendar connection first.",
+      "html": "<section class=\"ds-roadmap\"><div><p>Proposed direction, not a release promise.</p><h2>Useful for one real workday.</h2><small>Proposed next slice · P0.5</small></div><div class=\"ds-roadmap-register\"><article><div><h3>Real calendar connection</h3><p>With explicit permission, replace fixed demo context with upcoming events and free windows from the person's own calendar.</p></div><strong>First integration priority</strong></article><article><div><h3>Workday boundaries</h3><p>Let people define when work starts and when movement prompts should stay quiet.</p></div><strong>Protect time outside work</strong></article></div></section>",
+      "css": ".ds-roadmap { color: var(--ink, #16231d); display: grid; font-family: Geist, Arial, sans-serif; gap: 40px; grid-template-columns: 285px minmax(0,1fr); } .ds-roadmap>div>p { color: var(--hold, #9a4e27); font-size: .72rem; font-weight: 650; margin: 0 0 22px; } .ds-roadmap h2 { font-size: clamp(1.75rem,3.5vw,3rem); font-weight: 580; letter-spacing: -.035em; line-height: 1.04; margin: 0; } .ds-roadmap small { color: var(--signal, #15684a); display: block; font-size: .7rem; font-weight: 720; letter-spacing: .06em; margin-top: 15px; text-transform: uppercase; } .ds-roadmap-register { border-bottom: 1px solid var(--line, #d8d5ca); border-top: 1px solid var(--line, #d8d5ca); } .ds-roadmap article { display: grid; gap: 30px; grid-template-columns: minmax(0,1fr) 210px; padding: 25px 4px; } .ds-roadmap article+article { border-top: 1px solid var(--line, #d8d5ca); } .ds-roadmap h3 { font-size: 1.2rem; font-weight: 650; letter-spacing: -.02em; margin: 0; } .ds-roadmap article p { color: var(--ink-soft, #526159); font-size: .84rem; line-height: 1.6; margin: 8px 0 0; } .ds-roadmap article strong { color: var(--signal, #15684a); font-size: .72rem; font-weight: 680; line-height: 1.45; } @media (max-width: 920px) { .ds-roadmap { gap: 30px; grid-template-columns: 1fr; } } @media (max-width: 640px) { .ds-roadmap article { gap: 12px; grid-template-columns: 1fr; padding: 21px 0; } }"
     }
   ],
   "narrative": {
@@ -112,7 +133,7 @@
       { "name": "The Scarce Lime Rule", "body": "Reserve bright lime for the next useful action, a live signal, or a resolved low-cost cue; never flood the paper canvas with it.", "section": "colors" },
       { "name": "The Equal Outcomes Rule", "body": "GO and HOLD use the same structural hierarchy and typographic force. Color changes the state character, not its importance.", "section": "colors" },
       { "name": "The Decision Speaks Largest Rule", "body": "The resolved state is always the strongest type on the screen; supporting levels and reasons remain legible but never compete with it.", "section": "typography" },
-      { "name": "The Measured Numeral Rule", "body": "Context values use tabular numerals so changing data does not disturb the visual rhythm.", "section": "typography" },
+      { "name": "The Measured Numeral Rule", "body": "Context values, history counts, times, durations, and movement totals use tabular numerals so changing data does not disturb the visual rhythm.", "section": "typography" },
       { "name": "The Flat Desk Rule", "body": "Surfaces stay flat at rest; use rules and tonal contrast for structure, and reserve shadow for interaction feedback.", "section": "elevation" },
       { "name": "The Joined Instrument Rule", "body": "Context and decision surfaces must read as one stacked device: round the exposed outer corners, not the shared seam.", "section": "shapes" }
     ],
@@ -121,7 +142,9 @@
       "Do use one-pixel ruled dividers, tonal layers, and joined panels to structure the desk.",
       "Do preserve text labels for MOVE NOW and NOT NOW so state never depends on green or brown alone.",
       "Do keep scenario controls visible but secondary, collapsing them to a select on narrow screens.",
-      "Do respect reduced-motion preference for the activity pulse animation."
+      "Do respect reduced-motion preference for the activity pulse animation.",
+      "Do keep history verification language explicit and its device-local explanation adjacent to the ledger.",
+      "Do distinguish current, proposed, tentative, and exploratory roadmap content in text as well as styling."
     ],
     "donts": [
       "Don't turn WorkPulse into a generic reminder dashboard with equal-weight cards, charts, or persistent notification chrome.",

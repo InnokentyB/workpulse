@@ -36,8 +36,9 @@ export function ActivityHistory({ entries }: { entries: ActivityHistoryEntry[] }
       <header>
         <h2 id="history-heading">Your movement history.</h2>
         <p>
-          Completed activities stay on this device. WorkPulse does not send
-          this record to an employer or a remote service.
+          When browser storage is available, completed activities stay on this
+          device. WorkPulse does not send this record to an employer or a
+          remote service.
         </p>
       </header>
 
@@ -82,7 +83,7 @@ export function ActivityHistory({ entries }: { entries: ActivityHistoryEntry[] }
                   </div>
                   <dl>
                     <div>
-                      <dt>Duration</dt>
+                      <dt>Estimated</dt>
                       <dd>{entry.durationSeconds} sec</dd>
                     </div>
                     <div>
