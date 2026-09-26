@@ -17,6 +17,32 @@ describe("WorkPulseApp", () => {
     expect(screen.getByRole("button", { name: /ask workpulse/i })).toBeDefined();
   });
 
+  it("offers skippable setup once and lets the user edit it later", async () => {
+    render(<WorkPulseApp />);
+
+    expect(
+      await screen.findByRole("heading", {
+        name: /make each suggestion fit where you are/i,
+      }),
+    ).toBeDefined();
+    fireEvent.click(screen.getByRole("button", { name: /skip for now/i }));
+    expect(
+      screen.queryByRole("heading", {
+        name: /make each suggestion fit where you are/i,
+      }),
+    ).toBeNull();
+    expect(window.localStorage.getItem("workpulse.activity-preferences")).toContain(
+      '"onboardingStatus":"skipped"',
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /edit setup/i }));
+    expect(
+      screen.getByRole("heading", {
+        name: /make each suggestion fit where you are/i,
+      }),
+    ).toBeDefined();
+  });
+
   it("shows the complete recommendation for the good-window scenario", () => {
     render(<WorkPulseApp />);
 
@@ -152,10 +178,31 @@ describe("WorkPulseApp", () => {
     expect(screen.getByText("Completed manually without camera verification")).toBeDefined();
     expect(screen.getByText("45 sec")).toBeDefined();
     expect(screen.getByText("Estimated")).toBeDefined();
+    expect(
+      screen.getByRole("heading", { name: /how did neck reset feel/i }),
+    ).toBeDefined();
 
     fireEvent.click(screen.getByRole("button", { name: /run again/i }));
     expect(screen.getByRole("button", { name: /ask workpulse/i })).toBeDefined();
     expect(screen.queryByText(/nice work/i)).toBeNull();
+  });
+
+  it("saves optional activity feedback on this device", async () => {
+    render(<WorkPulseApp />);
+    await screen.findByText("No completed activities yet.");
+    fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
+    fireEvent.click(screen.getByRole("button", { name: /start neck reset/i }));
+    fireEvent.click(
+      screen.getByRole("button", { name: /finish without camera/i }),
+    );
+    fireEvent.click(screen.getByRole("radio", { name: /just right/i }));
+    fireEvent.click(screen.getByRole("radio", { name: /^yes$/i }));
+    fireEvent.click(screen.getByRole("button", { name: /save feedback/i }));
+
+    expect(window.localStorage.getItem("workpulse.activity-feedback")).toContain(
+      '"repeat":"yes"',
+    );
+    expect(screen.getByText(/thanks — this stays on this device/i)).toBeDefined();
   });
 
   it("offers camera verification for the second activity", async () => {

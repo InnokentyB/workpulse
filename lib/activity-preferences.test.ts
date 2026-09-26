@@ -3,7 +3,9 @@ import { describe, expect, it } from "vitest";
 import {
   ACTIVITY_PREFERENCES_STORAGE_KEY,
   DEFAULT_ACTIVITY_PREFERENCES,
+  applyOnboardingAnswers,
   loadActivityPreferences,
+  preferredActivityIds,
   saveActivityPreferences,
   type ActivityPreferencesStorage,
 } from "@/lib/activity-preferences";
@@ -27,6 +29,7 @@ describe("activity preferences", () => {
   it("persists workspace constraints and exclusions", () => {
     const storage = memoryStorage();
     const preferences = {
+      ...DEFAULT_ACTIVITY_PREFERENCES,
       cameraAllowed: false,
       canLeaveDesk: true,
       canStand: true,
@@ -35,6 +38,27 @@ describe("activity preferences", () => {
 
     saveActivityPreferences(storage, preferences);
     expect(loadActivityPreferences(storage)).toEqual(preferences);
+  });
+
+  it("maps onboarding answers into current workspace constraints", () => {
+    const next = applyOnboardingAnswers(DEFAULT_ACTIVITY_PREFERENCES, {
+      workplace: "office",
+      visibility: "on-video",
+      breakSpace: "outside",
+      hasDistantView: true,
+      preferredFormats: ["walk", "desk"],
+      avoidJumpsOrFloor: true,
+    });
+
+    expect(next.onboardingStatus).toBe("completed");
+    expect(next.canStand).toBe(false);
+    expect(next.canLeaveDesk).toBe(false);
+    expect(preferredActivityIds(next)).toEqual([
+      "purposeful-walk",
+      "eye-care-break",
+      "neck-reset",
+      "shoulder-rolls",
+    ]);
   });
 
   it("falls back safely for malformed or unknown settings", () => {

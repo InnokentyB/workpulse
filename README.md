@@ -68,6 +68,17 @@ npm test
 npm run build
 ```
 
+Pull requests run all three checks in CI. After deploying a preview or
+production build, run the read-only endpoint and security-header smoke test:
+
+```bash
+APP_BASE_URL=https://your-deployment.example npm run smoke
+```
+
+Environment variables and the complete release, manual browser verification,
+and rollback process are documented in
+[`RELEASE_RUNBOOK.md`](./RELEASE_RUNBOOK.md).
+
 ## Project structure
 
 ```text

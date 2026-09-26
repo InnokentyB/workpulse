@@ -40,6 +40,10 @@ export function SiteFooter() {
         A workplace wellbeing prototype. Activity suggestions are not medical
         advice.
       </p>
+      <nav aria-label="Legal">
+        <Link href="/privacy">Privacy</Link>
+        <Link href="/terms">Terms</Link>
+      </nav>
     </footer>
   );
 }

@@ -4,11 +4,13 @@ import type { ActivityPreferences } from "@/lib/activity-preferences";
 type ActivityPreferencesPanelProps = {
   preferences: ActivityPreferences;
   onChange: (preferences: ActivityPreferences) => void;
+  onEditSetup?: () => void;
 };
 
 export function ActivityPreferencesPanel({
   preferences,
   onChange,
+  onEditSetup,
 }: ActivityPreferencesPanelProps) {
   function update(
     changes: Partial<ActivityPreferences>,
@@ -27,8 +29,15 @@ export function ActivityPreferencesPanel({
   return (
     <section className="fit-settings" aria-labelledby="fit-settings-heading">
       <div className="fit-settings__heading">
-        <h2 id="fit-settings-heading">What works right now?</h2>
-        <span>Saved on this device</span>
+        <div>
+          <h2 id="fit-settings-heading">What works right now?</h2>
+          <span>Saved on this device</span>
+        </div>
+        {onEditSetup ? (
+          <button onClick={onEditSetup} type="button">
+            Edit setup
+          </button>
+        ) : null}
       </div>
       <div className="fit-settings__toggles">
         <label>

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  getDismissedActivityIds,
   getActiveDismissal,
   loadDismissals,
   recordDismissal,
@@ -47,6 +48,18 @@ describe("intervention cooldown", () => {
     expect(
       getActiveDismissal(storage, () => new Date("2026-09-26T09:15:00.000Z")),
     ).toBeNull();
+  });
+
+  it("returns unique activity ids that should be deprioritized after refusals", () => {
+    const storage = memoryStorage();
+    recordDismissal(storage, "neck-reset");
+    recordDismissal(storage, "neck-reset");
+    recordDismissal(storage, "shoulder-rolls");
+
+    expect(getDismissedActivityIds(storage)).toEqual([
+      "neck-reset",
+      "shoulder-rolls",
+    ]);
   });
 
   it("treats malformed storage as empty", () => {

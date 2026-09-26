@@ -94,3 +94,9 @@ export function getActiveDismissal(
     null
   );
 }
+
+export function getDismissedActivityIds(storage: CooldownStorage): string[] {
+  return [
+    ...new Set(loadDismissals(storage).map((dismissal) => dismissal.activityId)),
+  ];
+}

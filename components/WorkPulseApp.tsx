@@ -6,9 +6,11 @@ import {
   ActivitySession,
   type ActivityCompletion,
 } from "@/components/ActivitySession";
+import { ActivityFeedbackCard } from "@/components/ActivityFeedbackCard";
 import { ActivityPreferencesPanel } from "@/components/ActivityPreferencesPanel";
 import { ActivityHistory } from "@/components/ActivityHistory";
 import { DecisionCard } from "@/components/DecisionCard";
+import { OnboardingFlow } from "@/components/OnboardingFlow";
 import { ArrowIcon, CheckIcon } from "@/components/icons";
 import { ScenarioSelector } from "@/components/ScenarioSelector";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
@@ -16,15 +18,22 @@ import { WorkContextCard } from "@/components/WorkContextCard";
 import { demoScenarios } from "@/data/demo-scenarios";
 import {
   DEFAULT_ACTIVITY_PREFERENCES,
+  applyOnboardingAnswers,
   loadActivityPreferences,
+  preferredActivityIds as getOnboardingPreferredActivityIds,
   saveActivityPreferences,
   type ActivityPreferences,
+  type OnboardingAnswers,
 } from "@/lib/activity-preferences";
 import {
   loadActivityHistory,
   recordActivityCompletion,
   type ActivityHistoryEntry,
 } from "@/lib/activity-history";
+import {
+  getActivityPreferenceSignals,
+  recordActivityFeedback,
+} from "@/lib/activity-feedback";
 import {
   ACTIVITIES,
   describeActivityFit,
@@ -35,6 +44,7 @@ import { evaluateIntervention } from "@/lib/decision-engine";
 import {
   DISMISSAL_COOLDOWN_MINUTES,
   getActiveDismissal,
+  getDismissedActivityIds,
   recordDismissal,
 } from "@/lib/intervention-cooldown";
 import type { DecisionResult, WorkPulseState } from "@/lib/types";
@@ -50,6 +60,7 @@ export function WorkPulseApp() {
   const [preferences, setPreferences] = useState<ActivityPreferences>({
     ...DEFAULT_ACTIVITY_PREFERENCES,
   });
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [availableActivities, setAvailableActivities] =
     useState<readonly (typeof ACTIVITIES)[number][]>(ACTIVITIES);
 
@@ -58,7 +69,9 @@ export function WorkPulseApp() {
     void Promise.resolve().then(() => {
       if (active) {
         setHistory(loadActivityHistory(window.localStorage));
-        setPreferences(loadActivityPreferences(window.localStorage));
+        const storedPreferences = loadActivityPreferences(window.localStorage);
+        setPreferences(storedPreferences);
+        setShowOnboarding(storedPreferences.onboardingStatus === "new");
       }
     });
     return () => {
@@ -87,6 +100,21 @@ export function WorkPulseApp() {
     setCompletion(null);
   }
 
+  function completeOnboarding(answers: OnboardingAnswers) {
+    const nextPreferences = applyOnboardingAnswers(preferences, answers);
+    updatePreferences(nextPreferences);
+    setShowOnboarding(false);
+  }
+
+  function skipOnboarding() {
+    const nextPreferences: ActivityPreferences = {
+      ...preferences,
+      onboardingStatus: "skipped",
+    };
+    updatePreferences(nextPreferences);
+    setShowOnboarding(false);
+  }
+
   function availableSeconds() {
     return scenario.context.minutesToNextMeeting === null
       ? null
@@ -112,10 +140,25 @@ export function WorkPulseApp() {
     }
     const lastActivityId = history.at(-1)?.activityId;
     if (nextResult.activity) {
+      const feedbackSignals = getActivityPreferenceSignals(window.localStorage);
+      const preferredActivityIds = [
+        ...new Set([
+          ...getOnboardingPreferredActivityIds(preferences),
+          ...feedbackSignals.preferredActivityIds,
+        ]),
+      ];
+      const deprioritizedActivityIds = [
+        ...new Set([
+          ...getDismissedActivityIds(window.localStorage),
+          ...feedbackSignals.deprioritizedActivityIds,
+        ]),
+      ];
       const selection = selectActivityForContext({
         ...preferences,
         availableSeconds: availableSeconds(),
+        deprioritizedActivityIds,
         lastActivityId,
+        preferredActivityIds,
       });
       if (!selection) {
         setAvailableActivities([]);
@@ -171,6 +214,14 @@ export function WorkPulseApp() {
         </p>
       </div>
 
+      {showOnboarding ? (
+        <OnboardingFlow
+          initialAnswers={preferences.onboardingAnswers}
+          onComplete={completeOnboarding}
+          onSkip={skipOnboarding}
+        />
+      ) : null}
+
       <section className="demo-layout" aria-label="WorkPulse decision demo">
         <aside className="demo-controls">
           <ScenarioSelector
@@ -179,6 +230,7 @@ export function WorkPulseApp() {
             selectedId={selectedId}
           />
           <ActivityPreferencesPanel
+            onEditSetup={() => setShowOnboarding(true)}
             onChange={updatePreferences}
             preferences={preferences}
           />
@@ -248,29 +300,51 @@ export function WorkPulseApp() {
           ) : null}
 
           {state === "COMPLETED" ? (
-            <section className="outcome-panel" aria-live="polite">
-              <span className="outcome-panel__icon">
-                <CheckIcon />
-              </span>
-              <div>
-                <p>{completion?.verified ? "Movement verified" : "Activity complete"}</p>
-                <h2>
-                  {completion?.verified
-                    ? `Nice work. ${result?.activity?.name ?? "Movement"} verified.`
-                    : `Nice work. ${result?.activity?.name ?? "Activity"} complete.`}
-                </h2>
-                <span>
-                  {completion?.verified
-                    ? `${completion.movements} movements confirmed on this device. No video was recorded. Camera is off.`
-                    : completion?.mode === "guided"
-                      ? "Completed with on-screen guidance. No camera was used."
-                      : "Completed without camera verification."}
+            <>
+              <section className="outcome-panel" aria-live="polite">
+                <span className="outcome-panel__icon">
+                  <CheckIcon />
                 </span>
-              </div>
-              <button className="button button--quiet" onClick={runAgain} type="button">
-                Run again
-              </button>
-            </section>
+                <div>
+                  <p>{completion?.verified ? "Movement verified" : "Activity complete"}</p>
+                  <h2>
+                    {completion?.verified
+                      ? `Nice work. ${result?.activity?.name ?? "Movement"} verified.`
+                      : `Nice work. ${result?.activity?.name ?? "Activity"} complete.`}
+                  </h2>
+                  <span>
+                    {completion?.verified
+                      ? `${completion.movements} movements confirmed on this device. No video was recorded. Camera is off.`
+                      : completion?.mode === "guided"
+                        ? "Completed with on-screen guidance. No camera was used."
+                        : "Completed without camera verification."}
+                  </span>
+                </div>
+                <button className="button button--quiet" onClick={runAgain} type="button">
+                  Run again
+                </button>
+              </section>
+              {result?.activity ? (
+                <ActivityFeedbackCard
+                  activityId={result.activity.id}
+                  activityName={result.activity.name}
+                  onExclude={(activityId) =>
+                    updatePreferences({
+                      ...preferences,
+                      excludedActivityIds: [
+                        ...new Set([
+                          ...preferences.excludedActivityIds,
+                          activityId,
+                        ]),
+                      ],
+                    })
+                  }
+                  onSubmit={(feedback) =>
+                    recordActivityFeedback(window.localStorage, feedback)
+                  }
+                />
+              ) : null}
+            </>
           ) : null}
         </div>
       </section>

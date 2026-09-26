@@ -100,6 +100,32 @@ describe("selectActivityForContext", () => {
     );
   });
 
+  it("learns from positive feedback and soft-deprioritizes refusals", () => {
+    expect(
+      selectActivityForContext({
+        ...seatedContext,
+        preferredActivityIds: ["shoulder-rolls"],
+      })?.activity.id,
+    ).toBe("shoulder-rolls");
+
+    expect(
+      selectActivityForContext({
+        ...seatedContext,
+        deprioritizedActivityIds: ["neck-reset", "shoulder-rolls"],
+      })?.activity.id,
+    ).toBe("eye-care-break");
+  });
+
+  it("keeps a deprioritized activity available when it is the only fit", () => {
+    expect(
+      selectActivityForContext({
+        ...seatedContext,
+        cameraAllowed: false,
+        deprioritizedActivityIds: ["eye-care-break"],
+      })?.activity.id,
+    ).toBe("eye-care-break");
+  });
+
   it("returns no recommendation when every fitting activity is excluded", () => {
     expect(
       selectActivityForContext({

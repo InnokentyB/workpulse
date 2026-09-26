@@ -92,6 +92,8 @@ export type ActivitySelectionContext = {
   canLeaveDesk: boolean;
   canStand: boolean;
   excludedActivityIds: readonly string[];
+  deprioritizedActivityIds?: readonly string[];
+  preferredActivityIds?: readonly string[];
   lastActivityId?: string;
   quietPauseRequested?: boolean;
 };
@@ -155,20 +157,31 @@ export function selectActivityForContext(
   );
   if (eligibleActivities.length === 0) return null;
 
+  const withoutImmediateRepeat = eligibleActivities.filter(
+    (activity) => activity.id !== context.lastActivityId,
+  );
+  const variedActivities =
+    withoutImmediateRepeat.length > 0 ? withoutImmediateRepeat : eligibleActivities;
+  const prioritizedActivities = variedActivities.filter(
+    (activity) => !context.deprioritizedActivityIds?.includes(activity.id),
+  );
+  const candidates =
+    prioritizedActivities.length > 0 ? prioritizedActivities : variedActivities;
+
+  const learnedPreference = candidates.find((activity) =>
+    context.preferredActivityIds?.includes(activity.id),
+  );
+
   const preferredId = context.canLeaveDesk
     ? "purposeful-walk"
     : context.canStand
       ? "wall-push-ups"
       : undefined;
   const preferred = preferredId
-    ? eligibleActivities.find((activity) => activity.id === preferredId)
+    ? candidates.find((activity) => activity.id === preferredId)
     : undefined;
   const activity =
-    preferred ??
-    eligibleActivities.find(
-      (candidate) => candidate.id !== context.lastActivityId,
-    ) ??
-    eligibleActivities[0];
+    learnedPreference ?? preferred ?? candidates[0];
 
   return {
     activity,
