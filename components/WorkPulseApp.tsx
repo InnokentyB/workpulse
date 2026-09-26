@@ -32,6 +32,11 @@ import {
   selectActivityForContext,
 } from "@/lib/activity-selector";
 import { evaluateIntervention } from "@/lib/decision-engine";
+import {
+  DISMISSAL_COOLDOWN_MINUTES,
+  getActiveDismissal,
+  recordDismissal,
+} from "@/lib/intervention-cooldown";
 import type { DecisionResult, WorkPulseState } from "@/lib/types";
 
 const INITIAL_SCENARIO_ID = "good-window";
@@ -90,6 +95,21 @@ export function WorkPulseApp() {
 
   function evaluate() {
     const nextResult = evaluateIntervention(scenario.context);
+    const activeDismissal = getActiveDismissal(window.localStorage);
+    if (activeDismissal) {
+      setAvailableActivities([]);
+      setResult({
+        ...nextResult,
+        decision: "NOT_NOW",
+        reason: `You chose to keep working. WorkPulse will stay quiet until ${new Date(
+          activeDismissal.cooldownUntil,
+        ).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}.`,
+        activity: undefined,
+        activityReason: undefined,
+      });
+      setState("NOT_NOW");
+      return;
+    }
     const lastActivityId = history.at(-1)?.activityId;
     if (nextResult.activity) {
       const selection = selectActivityForContext({
@@ -123,6 +143,20 @@ export function WorkPulseApp() {
     setCompletion(null);
   }
 
+  function dismissRecommendation() {
+    if (!result?.activity) return;
+    recordDismissal(window.localStorage, result.activity.id);
+    setAvailableActivities([]);
+    setResult({
+      ...result,
+      decision: "NOT_NOW",
+      reason: `Okay. WorkPulse will stay quiet for ${DISMISSAL_COOLDOWN_MINUTES} minutes.`,
+      activity: undefined,
+      activityReason: undefined,
+    });
+    setState("NOT_NOW");
+  }
+
   const isResultVisible = state === "RECOMMENDED" || state === "NOT_NOW";
 
   return (
@@ -150,7 +184,7 @@ export function WorkPulseApp() {
           />
           <div className="privacy-note">
             <span aria-hidden="true">Demo</span>
-            <p>Two fixed contexts. No calendar connection or setup required.</p>
+            <p>Three fixed contexts. No calendar connection or setup required.</p>
           </div>
         </aside>
 
@@ -189,6 +223,7 @@ export function WorkPulseApp() {
                 );
               }}
               onStart={() => setState("ACTIVE")}
+              onDismiss={dismissRecommendation}
               result={result}
             />
           ) : null}

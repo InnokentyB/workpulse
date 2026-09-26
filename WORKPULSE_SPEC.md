@@ -51,7 +51,7 @@ Primary job:
 ### 4.1 In scope
 
 - One responsive web page.
-- Exactly two fixed demo scenarios.
+- Three fixed demo scenarios covering a good movement window, a meeting that starts too soon, and low movement need.
 - Visible sedentary time, time to the next meeting, and time since the last movement.
 - Visible context provenance: calendar information is labelled as demo data and camera status is explicit.
 - A deterministic decision engine with hard gates and scoring.

@@ -10,9 +10,10 @@ The core product principle is:
 
 ## Current status
 
-The MVP is a responsive single-page demo built around one proof: two contexts
-with high movement need produce different decisions because interruption cost
-is different. It includes deterministic `MOVE NOW` / `NOT NOW` decisions,
+The MVP is a responsive single-page demo built around one proof: context can
+change whether an interruption is useful. Three canonical scenarios cover a
+good movement window, a meeting that starts too soon, and a moment when movement
+need is still low. It includes deterministic `MOVE NOW` / `NOT NOW` decisions,
 clear explanations, a six-activity starter library, and a minimal `Start → Done` loop.
 The context panel labels the calendar input as demo data. During the movement
 activity, the user can explicitly enable the browser camera and let an on-device
@@ -20,7 +21,8 @@ pose model guide a four-movement neck reset. Shoulder rolls use the same optiona
 camera flow; eye care, wall push-ups, a purposeful walk, and a quiet reset use
 screen guidance. WorkPulse filters these activities by available time, whether
 the user can stand or leave the desk, camera availability, explicit exclusions,
-and the last completed activity. These preferences stay in the current browser.
+and the last completed activity. Recommendations can be dismissed; the dismissal
+is stored locally and keeps WorkPulse quiet for 15 minutes. These preferences stay in the current browser.
 Video is never recorded,
 stored, or uploaded, and the camera stops when verification completes. Completed
 activities are recorded in a local, browser-only history with time, duration,

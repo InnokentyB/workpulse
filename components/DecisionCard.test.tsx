@@ -41,6 +41,21 @@ describe("DecisionCard", () => {
     expect(onStart).toHaveBeenCalledOnce();
   });
 
+  it("lets the user dismiss a recommendation", () => {
+    const onDismiss = vi.fn();
+    render(
+      <DecisionCard
+        onDismiss={onDismiss}
+        onStart={vi.fn()}
+        result={recommendation}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /^not now$/i }));
+
+    expect(onDismiss).toHaveBeenCalledOnce();
+  });
+
   it("lets the user choose between the two available activities", () => {
     const onActivitySelect = vi.fn();
     const { container } = render(

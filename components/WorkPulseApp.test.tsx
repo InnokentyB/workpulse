@@ -101,6 +101,38 @@ describe("WorkPulseApp", () => {
     expect(screen.queryByRole("button", { name: /^start /i })).toBeNull();
   });
 
+  it("shows NOT_NOW when movement is not needed yet", () => {
+    render(<WorkPulseApp />);
+
+    fireEvent.click(
+      screen.getByRole("radio", { name: /movement not needed yet/i }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
+
+    expect(screen.getByRole("heading", { name: /not now/i })).toBeDefined();
+    expect(screen.getAllByText("LOW")).toHaveLength(2);
+    expect(screen.getAllByText(/movement need is still low/i)).toHaveLength(2);
+  });
+
+  it("records a dismissal and honors its fifteen minute cooldown", () => {
+    const firstRender = render(<WorkPulseApp />);
+    fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^not now$/i }));
+
+    expect(screen.getByText(/stay quiet for 15 minutes/i)).toBeDefined();
+    expect(
+      window.localStorage.getItem("workpulse.intervention-dismissals"),
+    ).toContain("neck-reset");
+
+    firstRender.unmount();
+    render(<WorkPulseApp />);
+    fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
+
+    expect(screen.getByRole("heading", { name: /not now/i })).toBeDefined();
+    expect(screen.getByText(/you chose to keep working/i)).toBeDefined();
+    expect(screen.queryByRole("button", { name: /^start /i })).toBeNull();
+  });
+
   it("completes the minimal activity loop and records it locally", async () => {
     render(<WorkPulseApp />);
     await screen.findByText("No completed activities yet.");

@@ -25,4 +25,16 @@ export const demoScenarios: DemoScenario[] = [
       nextMeetingTitle: "Design Review",
     },
   },
+  {
+    id: "movement-not-needed",
+    label: "Movement not needed yet",
+    description: "There is time available, but movement need is still low.",
+    context: {
+      sedentaryMinutes: 25,
+      minutesToNextMeeting: 30,
+      minutesSinceLastActivity: 25,
+      currentTime: "10:25",
+      nextMeetingTitle: "Weekly Planning",
+    },
+  },
 ];

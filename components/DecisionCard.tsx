@@ -8,6 +8,7 @@ type DecisionCardProps = {
   onActivitySelect?: (activityId: string) => void;
   result: DecisionResult;
   onStart?: () => void;
+  onDismiss?: () => void;
 };
 
 function Signal({ label, value }: { label: string; value: string }) {
@@ -24,6 +25,7 @@ export function DecisionCard({
   onActivitySelect,
   result,
   onStart,
+  onDismiss,
 }: DecisionCardProps) {
   const canMove = result.decision === "MOVE_NOW" && result.activity;
 
@@ -112,6 +114,13 @@ export function DecisionCard({
             type="button"
           >
             Start {result.activity?.name.toLowerCase()} <ArrowIcon />
+          </button>
+          <button
+            className="button button--quiet"
+            onClick={onDismiss}
+            type="button"
+          >
+            Not now
           </button>
         </div>
       ) : null}

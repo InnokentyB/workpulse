@@ -22,7 +22,7 @@ WorkPulse is a contextual coworker that can deliberately choose not to act. It b
 
 ## Operating Context
 
-The MVP is a responsive, single-page web demo for a laptop pitch and a 360px mobile viewport. It uses exactly two fixed scenarios and requires no setup or external services.
+The MVP is a responsive, single-page web demo for a laptop pitch and a 360px mobile viewport. It uses three fixed decision scenarios and requires no setup or external services.
 
 The initial commercial hypothesis is a limited team pilot, followed by per-active-employee software pricing and an enterprise tier for integrations, governance, and support. Pricing, willingness to pay, procurement, and employer outcomes remain unvalidated until tested with buyers.
 

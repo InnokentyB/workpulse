@@ -3,10 +3,11 @@ import { describe, expect, it } from "vitest";
 import { demoScenarios } from "@/data/demo-scenarios";
 
 describe("demoScenarios", () => {
-  it("contains exactly the two MVP scenarios", () => {
+  it("contains the three canonical decision scenarios", () => {
     expect(demoScenarios.map(({ id }) => id)).toEqual([
       "good-window",
       "meeting-soon",
+      "movement-not-needed",
     ]);
   });
 
@@ -27,6 +28,11 @@ describe("demoScenarios", () => {
         sedentaryMinutes: 72,
         minutesToNextMeeting: 2,
         minutesSinceLastActivity: 90,
+      },
+      {
+        sedentaryMinutes: 25,
+        minutesToNextMeeting: 30,
+        minutesSinceLastActivity: 25,
       },
     ]);
   });
