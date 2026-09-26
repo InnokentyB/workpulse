@@ -322,6 +322,7 @@ function CameraPoseSession<State extends CameraMotionState>({
   }, [runDetection]);
 
   const startCamera = useCallback(async () => {
+    let startupStep = "requesting-permission";
     const requestId = cameraRequestRef.current + 1;
     cameraRequestRef.current = requestId;
     setStatus("loading");
@@ -342,6 +343,7 @@ function CameraPoseSession<State extends CameraMotionState>({
           width: { ideal: 960 },
         },
       });
+      startupStep = "starting-preview";
 
       if (cameraRequestRef.current !== requestId) {
         stream.getTracks().forEach((track) => track.stop());
@@ -354,10 +356,12 @@ function CameraPoseSession<State extends CameraMotionState>({
       video.srcObject = stream;
       await video.play();
 
+      startupStep = "loading-pose-runtime";
       const { FilesetResolver, PoseLandmarker } = await import(
         "@mediapipe/tasks-vision"
       );
       const vision = await FilesetResolver.forVisionTasks(WASM_ROOT);
+      startupStep = "loading-pose-model";
       const landmarker = await PoseLandmarker.createFromOptions(vision, {
         baseOptions: { modelAssetPath: MODEL_URL },
         minPoseDetectionConfidence: 0.55,
@@ -380,6 +384,10 @@ function CameraPoseSession<State extends CameraMotionState>({
         runDetectionRef.current(timestamp),
       );
     } catch (error) {
+      console.warn("WorkPulse camera startup failed", {
+        name: error instanceof Error ? error.name : "UnknownError",
+        step: startupStep,
+      });
       stopCamera();
       if (error instanceof DOMException && error.name === "NotAllowedError") {
         setStatus("denied");
