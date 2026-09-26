@@ -12,6 +12,7 @@ if (!baseUrl.startsWith("https://") && !baseUrl.startsWith("http://localhost")) 
 
 const routes = [
   "/",
+  "/api/health",
   "/privacy",
   "/terms",
   "/roadmap",

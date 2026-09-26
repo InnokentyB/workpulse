@@ -23,6 +23,21 @@ disabled. Google is considered configured only when all four calendar values
 above are valid. Do not add placeholder production credentials merely to make a
 deployment look configured.
 
+## Availability monitoring
+
+`GET /api/health` returns a non-cached service status, deployment revision, and
+check time. It deliberately contains no calendar configuration, user data, or
+credentials. The `Production uptime` GitHub Actions workflow checks the public
+page and health endpoint every 15 minutes. Set the repository variable
+`WORKPULSE_PRODUCTION_URL` to the stable HTTPS production origin without a
+trailing slash. A failed workflow appears in GitHub Actions and uses the
+repository's normal workflow-failure notifications.
+
+Run the workflow manually after changing the production URL or monitoring
+configuration. This availability check complements Vercel deployment and
+function logs; it does not collect client interactions, camera data, or calendar
+payloads.
+
 ## Before merging a release
 
 - [ ] The pull request CI is green: lint, tests, production dependency audit,
