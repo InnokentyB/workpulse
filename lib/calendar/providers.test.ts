@@ -31,6 +31,9 @@ describe("calendar provider registry", () => {
       getCalendarProviders({
         GOOGLE_CALENDAR_CLIENT_ID: "client-id",
         GOOGLE_CALENDAR_CLIENT_SECRET: "client-secret",
+        GOOGLE_CALENDAR_REDIRECT_URI:
+          "https://workpulse.example/api/calendar/google/callback",
+        CALENDAR_SESSION_SECRET: "a-secure-session-secret-that-is-long-enough",
       })[0].status,
     ).toBe("configured");
 

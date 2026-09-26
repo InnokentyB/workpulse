@@ -44,9 +44,10 @@ of proposed, tentative, and exploratory features.
 The first real-calendar infrastructure is provider-neutral and documented in
 [`CALENDAR_INTEGRATION.md`](./CALENDAR_INTEGRATION.md). Google Calendar is the
 primary adapter and reads free/busy data only; Microsoft, Apple, and generic
-CalDAV are registered as planned providers. Live connection still requires
-OAuth endpoints, server-side encrypted token storage, and deployment
-credentials.
+CalDAV are registered as planned providers. The Google redirect OAuth endpoints,
+encrypted HttpOnly connection session, refresh, availability, and revocation
+paths are implemented. Public use still requires deployment credentials, a
+verified domain, Google consent-screen review, and UI wiring.
 
 ## Run locally
 

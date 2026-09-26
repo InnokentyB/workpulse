@@ -3,13 +3,19 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { WorkPulseApp } from "@/components/WorkPulseApp";
 
+function renderDemo() {
+  const view = render(<WorkPulseApp />);
+  fireEvent.click(screen.getByRole("button", { name: /demo mode/i }));
+  return view;
+}
+
 describe("WorkPulseApp", () => {
   beforeEach(() => {
     window.localStorage.clear();
   });
 
-  it("starts with the canonical good-window context", () => {
-    render(<WorkPulseApp />);
+  it("keeps fixed scenarios in a separate demo mode", () => {
+    renderDemo();
 
     expect(screen.getByText("57")).toBeDefined();
     expect(screen.getByText("in 12")).toBeDefined();
@@ -17,8 +23,41 @@ describe("WorkPulseApp", () => {
     expect(screen.getByRole("button", { name: /ask workpulse/i })).toBeDefined();
   });
 
-  it("offers skippable setup once and lets the user edit it later", async () => {
+  it("starts and ends a live workday without a calendar", () => {
     render(<WorkPulseApp />);
+
+    expect(screen.getByText(/no active session/i)).toBeDefined();
+    expect(screen.queryByRole("button", { name: /ask workpulse/i })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /start work session/i }));
+
+    expect(screen.getByText(/work session in progress/i)).toBeDefined();
+    expect(screen.getByText("No calendar connected")).toBeDefined();
+    expect(screen.getByRole("button", { name: /ask workpulse/i })).toBeDefined();
+    expect(window.localStorage.getItem("workpulse.workday-session")).toContain(
+      "startedAt",
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /end session/i }));
+    expect(screen.getByText(/no active session/i)).toBeDefined();
+    expect(window.localStorage.getItem("workpulse.workday-session")).toBeNull();
+  });
+
+  it("restores an active work session from this browser", async () => {
+    const startedAt = new Date(Date.now() - 45 * 60_000).toISOString();
+    window.localStorage.setItem(
+      "workpulse.workday-session",
+      JSON.stringify({ version: 1, session: { startedAt } }),
+    );
+
+    render(<WorkPulseApp />);
+
+    expect(await screen.findByText(/work session in progress/i)).toBeDefined();
+    expect(screen.getAllByText("45 min").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByRole("button", { name: /ask workpulse/i })).toBeDefined();
+  });
+
+  it("offers skippable setup once and lets the user edit it later", async () => {
+    renderDemo();
 
     expect(
       await screen.findByRole("heading", {
@@ -44,7 +83,7 @@ describe("WorkPulseApp", () => {
   });
 
   it("shows the complete recommendation for the good-window scenario", () => {
-    render(<WorkPulseApp />);
+    renderDemo();
 
     fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
 
@@ -58,7 +97,7 @@ describe("WorkPulseApp", () => {
   });
 
   it("recommends an activity that fits current workspace options", () => {
-    render(<WorkPulseApp />);
+    renderDemo();
 
     fireEvent.click(screen.getByRole("checkbox", { name: /i can stand/i }));
     fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
@@ -72,7 +111,7 @@ describe("WorkPulseApp", () => {
   });
 
   it("uses a screen-guided option when camera is unavailable", () => {
-    render(<WorkPulseApp />);
+    renderDemo();
 
     fireEvent.click(screen.getByRole("checkbox", { name: /camera is okay/i }));
     fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
@@ -84,11 +123,11 @@ describe("WorkPulseApp", () => {
   });
 
   it("persists workspace preferences on this device", async () => {
-    const firstRender = render(<WorkPulseApp />);
+    const firstRender = renderDemo();
     fireEvent.click(screen.getByRole("checkbox", { name: /i can stand/i }));
     firstRender.unmount();
 
-    render(<WorkPulseApp />);
+    renderDemo();
 
     await waitFor(() =>
       expect(
@@ -98,7 +137,7 @@ describe("WorkPulseApp", () => {
   });
 
   it("supports the compact selector and clears the previous decision", () => {
-    render(<WorkPulseApp />);
+    renderDemo();
 
     fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
     expect(screen.getByRole("heading", { name: /move now/i })).toBeDefined();
@@ -115,7 +154,7 @@ describe("WorkPulseApp", () => {
   });
 
   it("shows NOT_NOW without an activity when a meeting starts soon", () => {
-    render(<WorkPulseApp />);
+    renderDemo();
 
     fireEvent.click(screen.getByRole("radio", { name: /meeting starts soon/i }));
     fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
@@ -128,7 +167,7 @@ describe("WorkPulseApp", () => {
   });
 
   it("shows NOT_NOW when movement is not needed yet", () => {
-    render(<WorkPulseApp />);
+    renderDemo();
 
     fireEvent.click(
       screen.getByRole("radio", { name: /movement not needed yet/i }),
@@ -141,7 +180,7 @@ describe("WorkPulseApp", () => {
   });
 
   it("records a dismissal and honors its fifteen minute cooldown", () => {
-    const firstRender = render(<WorkPulseApp />);
+    const firstRender = renderDemo();
     fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
     fireEvent.click(screen.getByRole("button", { name: /^not now$/i }));
 
@@ -151,7 +190,7 @@ describe("WorkPulseApp", () => {
     ).toContain("neck-reset");
 
     firstRender.unmount();
-    render(<WorkPulseApp />);
+    renderDemo();
     fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
 
     expect(screen.getByRole("heading", { name: /not now/i })).toBeDefined();
@@ -160,7 +199,7 @@ describe("WorkPulseApp", () => {
   });
 
   it("completes the minimal activity loop and records it locally", async () => {
-    render(<WorkPulseApp />);
+    renderDemo();
     await screen.findByText("No completed activities yet.");
     fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
     fireEvent.click(screen.getByRole("button", { name: /start neck reset/i }));
@@ -188,7 +227,7 @@ describe("WorkPulseApp", () => {
   });
 
   it("saves optional activity feedback on this device", async () => {
-    render(<WorkPulseApp />);
+    renderDemo();
     await screen.findByText("No completed activities yet.");
     fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));
     fireEvent.click(screen.getByRole("button", { name: /start neck reset/i }));
@@ -206,7 +245,7 @@ describe("WorkPulseApp", () => {
   });
 
   it("offers camera verification for the second activity", async () => {
-    render(<WorkPulseApp />);
+    renderDemo();
     await screen.findByText("No completed activities yet.");
 
     fireEvent.click(screen.getByRole("button", { name: /ask workpulse/i }));

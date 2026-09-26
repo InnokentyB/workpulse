@@ -15,11 +15,12 @@ store, with separate values for preview and production.
 | `GOOGLE_CALENDAR_CLIENT_ID` | No | Server only | OAuth client identifier for the future live Google Calendar connection. |
 | `GOOGLE_CALENDAR_CLIENT_SECRET` | No | Server only | OAuth secret. Never expose it through a `NEXT_PUBLIC_` variable or logs. |
 | `GOOGLE_CALENDAR_REDIRECT_URI` | No | Server only | Exact callback URI registered with Google. Use the production HTTPS origin when OAuth ships. |
+| `CALENDAR_SESSION_SECRET` | No | Server only | Encrypts account-free calendar connection cookies. At least 32 characters; keep stable across deploys. |
 | `APP_BASE_URL` | Yes for smoke test | Release command only | URL checked by `npm run smoke`; the application itself does not read it. |
 
-The current beta build does not require secrets. Google Calendar remains a
-provider-neutral infrastructure preview until OAuth, token storage, and account
-identity exist. Do not add placeholder production credentials merely to make a
+The app does not require secrets when the optional Google Calendar connection is
+disabled. Google is considered configured only when all four calendar values
+above are valid. Do not add placeholder production credentials merely to make a
 deployment look configured.
 
 ## Before merging a release
@@ -31,6 +32,10 @@ deployment look configured.
 - [ ] Product scope and known limitations match the public copy.
 - [ ] Camera remains opt-in and every camera activity can finish without it.
 - [ ] Preview uses HTTPS and opens without registration, calendar, or camera.
+- [ ] If Google Calendar is enabled, the OAuth client uses the exact preview or
+      production callback URI and only the FreeBusy scope.
+- [ ] Connect, token refresh, availability, and disconnect have been checked;
+      application logs contain no tokens or calendar payloads.
 - [ ] A maintainer records the current production deployment identifier and Git
       commit as the rollback target.
 

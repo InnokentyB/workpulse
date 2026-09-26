@@ -41,6 +41,7 @@ export function SiteFooter() {
         advice.
       </p>
       <nav aria-label="Legal">
+        <Link href="/feedback">Feedback</Link>
         <Link href="/privacy">Privacy</Link>
         <Link href="/terms">Terms</Link>
       </nav>

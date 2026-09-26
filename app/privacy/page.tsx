@@ -25,7 +25,7 @@ const dataFacts = [
   {
     title: "Calendar",
     detail:
-      "The current public beta does not connect to Google Calendar. Calendar context shown in the demo is sample data. A future connection will be optional, consent-based, and limited to the availability needed to find a suitable break.",
+      "The current product UI uses a manual work session, and calendar context shown in Demo mode is sample data. Google Calendar connection infrastructure is prepared but remains disabled until production consent credentials and connection controls are ready. When enabled, it will be optional and limited to free/busy availability.",
   },
 ] as const;
 
@@ -88,9 +88,9 @@ export default function PrivacyPage() {
           </p>
           <p>
             The current beta does not use third-party analytics, advertising
-            trackers, or tracking cookies. Basic product feedback, when offered,
-            is kept locally unless you explicitly choose to send it through a
-            separate feedback channel.
+            trackers, or tracking cookies. Basic product events and activity
+            feedback stay locally in this browser unless you explicitly copy
+            feedback and choose to submit it through GitHub.
           </p>
           <LocalDataControls />
         </div>

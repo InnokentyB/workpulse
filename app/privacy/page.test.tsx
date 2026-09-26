@@ -10,7 +10,9 @@ describe("PrivacyPage", () => {
     expect(screen.getByRole("heading", { name: /movement data stays close/i })).toBeDefined();
     expect(screen.getByText(/stay in this browser’s local storage/i)).toBeDefined();
     expect(screen.getByText(/does not record, save, or upload/i)).toBeDefined();
-    expect(screen.getByText(/does not connect to google calendar/i)).toBeDefined();
+    expect(
+      screen.getByText(/connection infrastructure is prepared but remains disabled/i),
+    ).toBeDefined();
     expect(screen.getByRole("button", { name: /delete all local data/i })).toBeDefined();
   });
 

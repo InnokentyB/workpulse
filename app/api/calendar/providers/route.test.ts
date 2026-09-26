@@ -6,6 +6,14 @@ describe("calendar provider discovery API", () => {
   it("returns public metadata without leaking server credentials", async () => {
     vi.stubEnv("GOOGLE_CALENDAR_CLIENT_ID", "secret-client-id");
     vi.stubEnv("GOOGLE_CALENDAR_CLIENT_SECRET", "secret-client-value");
+    vi.stubEnv(
+      "GOOGLE_CALENDAR_REDIRECT_URI",
+      "https://workpulse.example/api/calendar/google/callback",
+    );
+    vi.stubEnv(
+      "CALENDAR_SESSION_SECRET",
+      "a-secure-session-secret-that-is-long-enough",
+    );
 
     const response = await GET();
     const body = await response.json();

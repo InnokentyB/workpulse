@@ -15,6 +15,7 @@ import { ArrowIcon, CheckIcon } from "@/components/icons";
 import { ScenarioSelector } from "@/components/ScenarioSelector";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { WorkContextCard } from "@/components/WorkContextCard";
+import { WorkdaySessionPanel } from "@/components/WorkdaySessionPanel";
 import { demoScenarios } from "@/data/demo-scenarios";
 import {
   DEFAULT_ACTIVITY_PREFERENCES,
@@ -47,11 +48,25 @@ import {
   getDismissedActivityIds,
   recordDismissal,
 } from "@/lib/intervention-cooldown";
+import { recordProductEvent } from "@/lib/product-events";
 import type { DecisionResult, WorkPulseState } from "@/lib/types";
+import {
+  DEFAULT_WORKDAY_SETTINGS,
+  createManualWorkContext,
+  endManualWorkSession,
+  isWithinWorkday,
+  loadManualWorkSession,
+  loadWorkdaySettings,
+  saveWorkdaySettings,
+  startManualWorkSession,
+  type ManualWorkSession,
+  type WorkdaySettings,
+} from "@/lib/workday-session";
 
 const INITIAL_SCENARIO_ID = "good-window";
 
 export function WorkPulseApp() {
+  const [mode, setMode] = useState<"workday" | "demo">("workday");
   const [selectedId, setSelectedId] = useState(INITIAL_SCENARIO_ID);
   const [state, setState] = useState<WorkPulseState>("IDLE");
   const [result, setResult] = useState<DecisionResult | null>(null);
@@ -61,6 +76,14 @@ export function WorkPulseApp() {
     ...DEFAULT_ACTIVITY_PREFERENCES,
   });
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [workdaySettings, setWorkdaySettings] = useState<WorkdaySettings>({
+    ...DEFAULT_WORKDAY_SETTINGS,
+  });
+  const [workSession, setWorkSession] = useState<ManualWorkSession | null>(null);
+  const [sessionPersistenceWarning, setSessionPersistenceWarning] = useState<
+    string | null
+  >(null);
+  const [now, setNow] = useState(() => new Date());
   const [availableActivities, setAvailableActivities] =
     useState<readonly (typeof ACTIVITIES)[number][]>(ACTIVITIES);
 
@@ -72,6 +95,9 @@ export function WorkPulseApp() {
         const storedPreferences = loadActivityPreferences(window.localStorage);
         setPreferences(storedPreferences);
         setShowOnboarding(storedPreferences.onboardingStatus === "new");
+        setWorkdaySettings(loadWorkdaySettings(window.localStorage));
+        setWorkSession(loadManualWorkSession(window.localStorage));
+        setNow(new Date());
       }
     });
     return () => {
@@ -79,11 +105,32 @@ export function WorkPulseApp() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!workSession) return;
+    const timer = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(timer);
+  }, [workSession]);
+
   const scenario = useMemo(
     () =>
       demoScenarios.find((item) => item.id === selectedId) ?? demoScenarios[0],
     [selectedId],
   );
+  const manualContext = useMemo(
+    () =>
+      workSession
+        ? createManualWorkContext(workSession, history, now)
+        : null,
+    [history, now, workSession],
+  );
+  const activeContext = mode === "demo" ? scenario.context : manualContext;
+
+  function selectMode(nextMode: "workday" | "demo") {
+    setMode(nextMode);
+    setState("IDLE");
+    setResult(null);
+    setCompletion(null);
+  }
 
   function selectScenario(scenarioId: string) {
     setSelectedId(scenarioId);
@@ -104,6 +151,7 @@ export function WorkPulseApp() {
     const nextPreferences = applyOnboardingAnswers(preferences, answers);
     updatePreferences(nextPreferences);
     setShowOnboarding(false);
+    recordProductEvent(window.localStorage, { name: "onboarding_completed" });
   }
 
   function skipOnboarding() {
@@ -113,16 +161,32 @@ export function WorkPulseApp() {
     };
     updatePreferences(nextPreferences);
     setShowOnboarding(false);
+    recordProductEvent(window.localStorage, { name: "onboarding_skipped" });
   }
 
   function availableSeconds() {
-    return scenario.context.minutesToNextMeeting === null
+    if (!activeContext) return null;
+    return activeContext.minutesToNextMeeting === null
       ? null
-      : scenario.context.minutesToNextMeeting * 60;
+      : activeContext.minutesToNextMeeting * 60;
   }
 
   function evaluate() {
-    const nextResult = evaluateIntervention(scenario.context);
+    if (!activeContext) return;
+    const nextResult = evaluateIntervention(activeContext);
+    if (mode === "workday" && !isWithinWorkday(workdaySettings, now)) {
+      setAvailableActivities([]);
+      setResult({
+        decision: "NOT_NOW",
+        movementNeed: nextResult.movementNeed,
+        interruptionCost: "LOW",
+        score: nextResult.score,
+        reason: `It’s outside your saved working hours (${workdaySettings.startTime}–${workdaySettings.endTime}). WorkPulse will stay quiet until your next workday.`,
+      });
+      setState("NOT_NOW");
+      recordProductEvent(window.localStorage, { name: "decision_shown" });
+      return;
+    }
     const activeDismissal = getActiveDismissal(window.localStorage);
     if (activeDismissal) {
       setAvailableActivities([]);
@@ -136,6 +200,7 @@ export function WorkPulseApp() {
         activityReason: undefined,
       });
       setState("NOT_NOW");
+      recordProductEvent(window.localStorage, { name: "decision_shown" });
       return;
     }
     const lastActivityId = history.at(-1)?.activityId;
@@ -170,6 +235,7 @@ export function WorkPulseApp() {
           activity: undefined,
         });
         setState("NOT_NOW");
+        recordProductEvent(window.localStorage, { name: "decision_shown" });
         return;
       }
       nextResult.activity = selection.activity;
@@ -178,6 +244,41 @@ export function WorkPulseApp() {
     }
     setResult(nextResult);
     setState(nextResult.decision === "MOVE_NOW" ? "RECOMMENDED" : "NOT_NOW");
+    recordProductEvent(window.localStorage, { name: "decision_shown" });
+  }
+
+  function startWorkday() {
+    const started = startManualWorkSession(window.localStorage, new Date());
+    if (!started) {
+      setSessionPersistenceWarning("We couldn’t start a session. Check your device time and try again.");
+      return;
+    }
+    setNow(new Date(started.session.startedAt));
+    setWorkSession(started.session);
+    setSessionPersistenceWarning(
+      started.persisted
+        ? null
+        : "This session will last only while this tab remains open.",
+    );
+    setState("IDLE");
+    setResult(null);
+  }
+
+  function endWorkday() {
+    const persisted = endManualWorkSession(window.localStorage);
+    setWorkSession(null);
+    setSessionPersistenceWarning(
+      persisted ? null : "The saved session could not be cleared on this device.",
+    );
+    setState("IDLE");
+    setResult(null);
+    setCompletion(null);
+  }
+
+  function updateWorkdaySettings(nextSettings: WorkdaySettings): boolean {
+    const persisted = saveWorkdaySettings(window.localStorage, nextSettings);
+    setWorkdaySettings(nextSettings);
+    return persisted;
   }
 
   function runAgain() {
@@ -189,6 +290,10 @@ export function WorkPulseApp() {
   function dismissRecommendation() {
     if (!result?.activity) return;
     recordDismissal(window.localStorage, result.activity.id);
+    recordProductEvent(window.localStorage, {
+      name: "activity_dismissed",
+      activityId: result.activity.id,
+    });
     setAvailableActivities([]);
     setResult({
       ...result,
@@ -222,28 +327,96 @@ export function WorkPulseApp() {
         />
       ) : null}
 
-      <section className="demo-layout" aria-label="WorkPulse decision demo">
+      <nav className="mode-switch" aria-label="Choose WorkPulse mode">
+        <button
+          aria-pressed={mode === "workday"}
+          onClick={() => selectMode("workday")}
+          type="button"
+        >
+          My workday
+          <span>Live time, no calendar required</span>
+        </button>
+        <button
+          aria-pressed={mode === "demo"}
+          onClick={() => selectMode("demo")}
+          type="button"
+        >
+          Demo mode
+          <span>Try three fixed scenarios</span>
+        </button>
+      </nav>
+
+      <section
+        className="demo-layout"
+        aria-label={mode === "demo" ? "WorkPulse decision demo" : "My WorkPulse workday"}
+      >
         <aside className="demo-controls">
-          <ScenarioSelector
-            onSelect={selectScenario}
-            scenarios={demoScenarios}
-            selectedId={selectedId}
-          />
+          {mode === "demo" ? (
+            <ScenarioSelector
+              onSelect={selectScenario}
+              scenarios={demoScenarios}
+              selectedId={selectedId}
+            />
+          ) : (
+            <WorkdaySessionPanel
+              key={`${workdaySettings.startTime}-${workdaySettings.endTime}`}
+              elapsedMinutes={
+                workSession
+                  ? Math.max(
+                      0,
+                      Math.floor(
+                        (now.getTime() - new Date(workSession.startedAt).getTime()) /
+                          60_000,
+                      ),
+                    )
+                  : 0
+              }
+              minutesSinceLastActivity={manualContext?.minutesSinceLastActivity ?? 0}
+              onEnd={endWorkday}
+              onSaveSettings={updateWorkdaySettings}
+              persistenceWarning={sessionPersistenceWarning}
+              session={workSession}
+              settings={workdaySettings}
+              withinWorkday={isWithinWorkday(workdaySettings, now)}
+            />
+          )}
           <ActivityPreferencesPanel
             onEditSetup={() => setShowOnboarding(true)}
             onChange={updatePreferences}
             preferences={preferences}
           />
           <div className="privacy-note">
-            <span aria-hidden="true">Demo</span>
-            <p>Three fixed contexts. No calendar connection or setup required.</p>
+            <span aria-hidden="true">{mode === "demo" ? "Demo" : "Local"}</span>
+            <p>
+              {mode === "demo"
+                ? "Three fixed contexts. No calendar connection or setup required."
+                : "Session timing and completed activities stay on this device."}
+            </p>
           </div>
         </aside>
 
         <div className="demo-stage">
-          <WorkContextCard context={scenario.context} />
+          {activeContext ? (
+            <WorkContextCard
+              context={activeContext}
+              source={mode === "demo" ? "demo" : "manual"}
+            />
+          ) : (
+            <section className="workday-empty-stage" aria-labelledby="workday-empty-heading">
+              <div>
+                <h2 id="workday-empty-heading">Your live context starts with your session.</h2>
+                <p>
+                  Start a work session to let WorkPulse use real elapsed time. You can
+                  end it at any time, and no calendar or account is required.
+                </p>
+              </div>
+              <button className="button button--evaluate" onClick={startWorkday} type="button">
+                Start work session <ArrowIcon />
+              </button>
+            </section>
+          )}
 
-          {state === "IDLE" ? (
+          {state === "IDLE" && activeContext ? (
             <section className="ready-panel" aria-labelledby="ready-heading">
               <div>
                 <span className="ready-panel__signal" aria-hidden="true" />
@@ -274,7 +447,15 @@ export function WorkPulseApp() {
                     : current,
                 );
               }}
-              onStart={() => setState("ACTIVE")}
+              onStart={() => {
+                setState("ACTIVE");
+                if (result.activity) {
+                  recordProductEvent(window.localStorage, {
+                    name: "activity_started",
+                    activityId: result.activity.id,
+                  });
+                }
+              }}
               onDismiss={dismissRecommendation}
               result={result}
             />
@@ -295,6 +476,10 @@ export function WorkPulseApp() {
                   }),
                 );
                 setState("COMPLETED");
+                recordProductEvent(window.localStorage, {
+                  name: "activity_completed",
+                  activityId: result.activity!.id,
+                });
               }}
             />
           ) : null}
@@ -339,9 +524,13 @@ export function WorkPulseApp() {
                       ],
                     })
                   }
-                  onSubmit={(feedback) =>
-                    recordActivityFeedback(window.localStorage, feedback)
-                  }
+                  onSubmit={(feedback) => {
+                    recordActivityFeedback(window.localStorage, feedback);
+                    recordProductEvent(window.localStorage, {
+                      name: "feedback_submitted",
+                      activityId: feedback.activityId,
+                    });
+                  }}
                 />
               ) : null}
             </>

@@ -2,14 +2,14 @@ import type {
   CalendarProviderDefinition,
   CalendarProviderStatus,
 } from "@/lib/calendar/types";
+import { getGoogleOAuthConfiguration } from "@/lib/calendar/google-oauth";
 
 type CalendarProviderEnvironment = Readonly<Record<string, string | undefined>>;
 
 function googleStatus(
   environment: CalendarProviderEnvironment,
 ): CalendarProviderStatus {
-  return environment.GOOGLE_CALENDAR_CLIENT_ID &&
-    environment.GOOGLE_CALENDAR_CLIENT_SECRET
+  return getGoogleOAuthConfiguration(environment).configured
     ? "configured"
     : "configuration-required";
 }

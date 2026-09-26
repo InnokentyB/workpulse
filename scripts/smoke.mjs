@@ -17,6 +17,7 @@ const routes = [
   "/roadmap",
   "/for-teams",
   "/api/calendar/providers",
+  "/api/calendar/google/status",
 ];
 let failures = 0;
 

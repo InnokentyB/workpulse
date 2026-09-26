@@ -47,4 +47,23 @@ describe("WorkContextCard", () => {
     expect(screen.getByText("No meeting scheduled")).toBeDefined();
     expect(screen.getByText("No upcoming meeting")).toBeDefined();
   });
+
+  it("labels live manual context without claiming calendar data", () => {
+    render(
+      <WorkContextCard
+        context={{
+          sedentaryMinutes: 42,
+          minutesToNextMeeting: null,
+          minutesSinceLastActivity: 42,
+          currentTime: "11:20",
+        }}
+        source="manual"
+      />,
+    );
+
+    expect(screen.getByText("No calendar connected")).toBeDefined();
+    expect(screen.getAllByText("Manual mode")).toHaveLength(2);
+    expect(screen.getByText("Open")).toBeDefined();
+    expect(screen.queryByText("Demo data")).toBeNull();
+  });
 });

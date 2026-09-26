@@ -3,6 +3,7 @@ import type { WorkContext } from "@/lib/types";
 
 type WorkContextCardProps = {
   context: WorkContext;
+  source?: "demo" | "manual";
 };
 
 function Metric({
@@ -28,9 +29,11 @@ function Metric({
   );
 }
 
-export function WorkContextCard({ context }: WorkContextCardProps) {
+export function WorkContextCard({ context, source = "demo" }: WorkContextCardProps) {
   const calendarDetail =
-    context.minutesToNextMeeting === null
+    source === "manual"
+      ? "No calendar connected"
+      : context.minutesToNextMeeting === null
       ? "No upcoming meeting"
       : `${context.nextMeetingTitle ?? "Next meeting"} · in ${context.minutesToNextMeeting} min`;
 
@@ -51,11 +54,14 @@ export function WorkContextCard({ context }: WorkContextCardProps) {
             <CalendarIcon />
           </span>
           <span className="context-source__copy">
-            <span>Calendar context</span>
+            <span>{source === "manual" ? "Availability" : "Calendar context"}</span>
             <strong>{calendarDetail}</strong>
           </span>
-          <span className="context-source__status" data-status="demo">
-            Demo data
+          <span
+            className="context-source__status"
+            data-status={source === "demo" ? "demo" : undefined}
+          >
+            {source === "manual" ? "Manual mode" : "Demo data"}
           </span>
         </div>
         <div className="context-source">
@@ -76,12 +82,18 @@ export function WorkContextCard({ context }: WorkContextCardProps) {
           value={context.sedentaryMinutes}
         />
         <Metric
-          detail={context.nextMeetingTitle ?? "No meeting scheduled"}
-          label="Next meeting"
+          detail={
+            source === "manual"
+              ? "Manual mode"
+              : context.nextMeetingTitle ?? "No meeting scheduled"
+          }
+          label={source === "manual" ? "Availability" : "Next meeting"}
           unit={context.minutesToNextMeeting === null ? undefined : "min"}
           value={
             context.minutesToNextMeeting === null
-              ? "Clear"
+              ? source === "manual"
+                ? "Open"
+                : "Clear"
               : `in ${context.minutesToNextMeeting}`
           }
         />
