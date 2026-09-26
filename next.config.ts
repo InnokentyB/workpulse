@@ -8,7 +8,7 @@ const contentSecurityPolicy = [
   "form-action 'self'",
   "frame-ancestors 'none'",
   "object-src 'none'",
-  `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'${
+  `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net${
     isDevelopment ? " 'unsafe-eval'" : ""
   }`,
   "style-src 'self' 'unsafe-inline'",
