@@ -6,6 +6,8 @@ describe("calendar provider discovery API", () => {
   it("returns public metadata without leaking server credentials", async () => {
     vi.stubEnv("GOOGLE_CALENDAR_CLIENT_ID", "secret-client-id");
     vi.stubEnv("GOOGLE_CALENDAR_CLIENT_SECRET", "secret-client-value");
+    vi.stubEnv("GOOGLE_CALENDAR_REDIRECT_URI", "http://localhost:3000/api/calendar/google/callback");
+    vi.stubEnv("CALENDAR_SESSION_SECRET", "private-test-session-key-longer-than-32-chars");
 
     const response = await GET();
     const body = await response.json();
@@ -18,6 +20,7 @@ describe("calendar provider discovery API", () => {
     });
     expect(serialized).not.toContain("secret-client-id");
     expect(serialized).not.toContain("secret-client-value");
+    expect(serialized).not.toContain("private-test-session-key");
 
     vi.unstubAllEnvs();
   });

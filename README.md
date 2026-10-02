@@ -1,5 +1,48 @@
 # WorkPulse
 
+## Build With AI: Basics project
+
+This repository imports the WorkPulse baseline from
+[`InnokentyB/workpulse`](https://github.com/InnokentyB/workpulse) at commit
+`5c047ed1ae63a4d834e07025449dcd3bdc5e21c5` (created during the
+hackathon submission period). The new work for this entry is the
+**Timing Lab** feedback loop: after Accept, Snooze or Dismiss, show the next
+appropriate movement window and explain the change. See
+[`devpost/scope.md`](./devpost/scope.md), [`devpost/prd.md`](./devpost/prd.md), and
+[`devpost/spec.md`](./devpost/spec.md). Branches and acceptance cases are in
+[`devpost/user-scenarios.md`](./devpost/user-scenarios.md) and
+[`devpost/test-scenarios.md`](./devpost/test-scenarios.md). The existing features
+described below are the imported baseline.
+
+### Timing Lab demo
+
+Open [http://localhost:3000/timing-lab](http://localhost:3000/timing-lab), or
+follow **Timing Lab** from the main navigation. The fictional day starts in a
+meeting at 09:10. Advance to the 09:30 opening, then try Accept, Snooze, and
+Dismiss, resetting between branches. Their next suitable windows are 11:00,
+09:50, and 10:30 respectively. The five-minute break requirement and 20/90-minute
+response delays are illustrative demo rules, not health guidance. The lab needs
+no calendar connection, camera, account, environment variables, or external
+runtime service. Responses live only in page memory.
+
+### Movement game
+
+Open `/play` and choose **Forest trail** or **Workshop**. Each of six completed
+cycles advances the traveler or assembles a lantern. Manual self-report can
+demonstrate the complete game without a camera; its result is unverified.
+Optional camera mode counts shoulder lift-and-return proxy cycles using the
+existing on-device tracker. It does not assess exercise form or full rotation.
+Pause preserves the count, and camera resume requires fresh calibration. A new
+run resets the scene. No game progress or reward is persisted in this version.
+Automated tests use mocked camera landmarks; real webcam recognition and a
+responsive browser walkthrough still need hands-on validation.
+
+The feature's TDPD and test catalog are
+[`devpost/character-game-tdpd.md`](./devpost/character-game-tdpd.md) and
+[`devpost/character-game-test-scenarios.md`](./devpost/character-game-test-scenarios.md).
+The current traceability matrix, completed checks and open manual acceptance
+gates are in [`devpost/character-game-validation.md`](./devpost/character-game-validation.md).
+
 **Move more. Interrupt less.**
 
 WorkPulse is a hackathon prototype for the Workplace Wellbeing track. It is an AI coworker that decides whether now is a good moment to interrupt a desk worker for a short movement break.
@@ -54,6 +97,9 @@ Open [http://localhost:3000](http://localhost:3000).
 
 - Product demo: [http://localhost:3000](http://localhost:3000)
 - Commercial presentation: [http://localhost:3000/for-teams](http://localhost:3000/for-teams)
+- Timing Lab: [http://localhost:3000/timing-lab](http://localhost:3000/timing-lab)
+- Movement game: [http://localhost:3000/play](http://localhost:3000/play)
+- Google Calendar inspector: [http://localhost:3000/calendar](http://localhost:3000/calendar) (requires local OAuth configuration; see [`CALENDAR_INTEGRATION.md`](./CALENDAR_INTEGRATION.md))
 
 ## Verify
 
@@ -79,9 +125,9 @@ WORKPULSE_SPEC.md       Canonical product, engineering, and pitch spec
 
 ## Scope guardrail
 
-The MVP exists only to prove that a correct decision not to interrupt is as
-valuable as a decision to intervene. Dismissal cooldowns, personalization,
-continuous camera monitoring, video recording, live calendar authorization,
-authentication, databases, and LLM dependencies are explicitly outside this
-slice. Provider-neutral calendar infrastructure is present, but the demo still
-uses labelled fixed calendar data until the connection flow is implemented.
+The core MVP proves that a decision not to interrupt is as valuable as a
+decision to intervene. The main demo uses labelled fixed calendar data.
+The separately approved Timing Lab, optional movement game and Google Calendar
+inspector extend that baseline. Live calendar access requires local OAuth
+configuration. Continuous camera monitoring, video recording, persistent game
+rewards, databases and LLM dependencies remain outside this slice.

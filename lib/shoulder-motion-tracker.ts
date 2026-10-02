@@ -43,8 +43,27 @@ function isVisible(landmark: PoseLandmark | undefined): landmark is PoseLandmark
     landmark &&
       Number.isFinite(landmark.x) &&
       Number.isFinite(landmark.y) &&
+      Number.isFinite(landmark.visibility ?? 1) &&
       (landmark.visibility ?? 1) >= MINIMUM_VISIBILITY,
   );
+}
+
+function trackingLost(state: ShoulderMotionState): ShoulderMotionState {
+  if (state.stage === "calibrating") {
+    return {
+      ...state,
+      tracking: "out-of-frame",
+      calibrationFrames: 0,
+      leftGapTotal: 0,
+      rightGapTotal: 0,
+    };
+  }
+  // A return after an unseen interval cannot prove an uninterrupted cycle.
+  return {
+    ...state,
+    stage: state.stage === "lower" ? "lift" : state.stage,
+    tracking: "out-of-frame",
+  };
 }
 
 export function updateShoulderMotion(
@@ -56,24 +75,30 @@ export function updateShoulderMotion(
   const rightShoulder = landmarks[RIGHT_SHOULDER];
 
   if (!isVisible(nose) || !isVisible(leftShoulder) || !isVisible(rightShoulder)) {
-    return state.stage === "calibrating"
-      ? {
-          ...state,
-          tracking: "out-of-frame",
-          calibrationFrames: 0,
-          leftGapTotal: 0,
-          rightGapTotal: 0,
-        }
-      : { ...state, tracking: "out-of-frame" };
+    return trackingLost(state);
   }
 
   const shoulderWidth = Math.abs(rightShoulder.x - leftShoulder.x);
-  if (shoulderWidth < 0.05) return { ...state, tracking: "out-of-frame" };
+  if (shoulderWidth < 0.05) return trackingLost(state);
 
   const leftGap = leftShoulder.y - nose.y;
   const rightGap = rightShoulder.y - nose.y;
 
   if (state.stage === "calibrating") {
+    if (
+      state.calibrationFrames > 0 &&
+      (Math.abs(leftGap - state.leftGapTotal / state.calibrationFrames) / shoulderWidth > LOWER_THRESHOLD ||
+        Math.abs(rightGap - state.rightGapTotal / state.calibrationFrames) / shoulderWidth > LOWER_THRESHOLD)
+    ) {
+      // Start a new stable window rather than average a lift into the baseline.
+      return {
+        ...state,
+        tracking: "ready",
+        calibrationFrames: 1,
+        leftGapTotal: leftGap,
+        rightGapTotal: rightGap,
+      };
+    }
     const calibrationFrames = state.calibrationFrames + 1;
     const leftGapTotal = state.leftGapTotal + leftGap;
     const rightGapTotal = state.rightGapTotal + rightGap;

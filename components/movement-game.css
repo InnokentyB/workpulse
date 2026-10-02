@@ -1,0 +1,31 @@
+.movement-game__intro { padding: 70px 0 44px; max-width: 800px; }
+.movement-game__intro h1 { font-size: clamp(2.8rem, 5vw, 5rem); letter-spacing: -.055em; line-height: 1.06; margin: 12px 0 18px; }
+.movement-game__intro > p:last-child { color: var(--ink-soft); font-size: 1.06rem; line-height: 1.6; }
+.movement-game__kicker { color: var(--signal); font-size: .75rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.movement-game__layout { display: grid; gap: 24px; grid-template-columns: minmax(290px, .75fr) minmax(0, 1.25fr); }
+.movement-game__controls { background: #f8f8f1; border: 1px solid var(--line); border-radius: 15px; display: flex; flex-direction: column; gap: 24px; padding: clamp(22px, 3vw, 42px); }
+.movement-game__controls fieldset { border: 0; display: flex; flex-wrap: wrap; gap: 16px; margin: 0; padding: 0; }
+.movement-game__controls legend { font-weight: 750; margin-bottom: 12px; }
+.movement-game__controls label { align-items: center; display: inline-flex; gap: 8px; }
+.movement-game__controls input { accent-color: var(--signal); }
+.movement-game__progress { border-top: 1px solid var(--line); font-size: .85rem; margin: 0; padding-top: 20px; }
+.movement-game__progress strong { display: block; font-size: 2.2rem; font-variant-numeric: tabular-nums; }
+.movement-game__actions { display: flex; flex-direction: column; gap: 10px; }
+.movement-game__actions .button { justify-content: center; }
+.movement-game__actions small { font-size: .7rem; margin-left: 5px; }
+.movement-game__controls .button--quiet, .movement-game__reset { border-color: var(--line); color: var(--ink); }
+.movement-game__reset { background: transparent; border: 1px solid var(--line); }
+.movement-game__note { color: var(--ink-soft); font-size: .78rem; line-height: 1.6; margin: auto 0 0; }
+.movement-game__stage { min-width: 0; }
+.movement-game__outcome h2 { font-size: 1.8rem; margin: 0 0 8px; }
+.movement-game__outcome p { line-height: 1.5; }
+.movement-game__camera { margin-top: 16px; }
+.movement-game__camera .activity-session--camera { padding: 18px; }
+.movement-game__camera .camera-stage { aspect-ratio: 16 / 7; max-height: 210px; margin-top: 12px; }
+.movement-game__camera .activity-session__heading h2 { font-size: 1.15rem; }
+.movement-game__camera .camera-consent { padding: 10px 0; }
+.movement-game > footer { margin-top: 80px; }
+@media (max-width: 820px) { .movement-game__layout { grid-template-columns: 1fr; } .movement-game__intro { padding-top: 42px; } }
+@media (max-width: 520px) {
+  .movement-game__camera .camera-stage { aspect-ratio: 4 / 3; max-height: 210px; }
+}

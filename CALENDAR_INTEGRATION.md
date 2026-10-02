@@ -11,7 +11,7 @@ Google Calendar is the first provider. Microsoft Outlook, Apple Calendar, and
 generic CalDAV providers are represented in the same registry so product logic
 does not depend on a vendor-specific response.
 
-## Current infrastructure slice
+## Current implementation
 
 - `lib/calendar/types.ts` owns the provider-neutral contract.
 - `lib/calendar/providers.ts` is the safe public provider registry.
@@ -21,21 +21,45 @@ does not depend on a vendor-specific response.
   `minutesToNextMeeting` and `freeWindowMinutes`.
 - `GET /api/calendar/providers` exposes readiness and capabilities, never
   credentials.
+- `/calendar` provides a Google connection and free/busy inspector. OAuth
+  `state` and PKCE protect the callback. A server-encrypted HttpOnly cookie holds
+  a short-lived access token; no refresh token, event details, or database are
+  used. The session expires and the user reconnects. Disconnect revokes the
+  token when Google responds and clears the local cookie.
+- The inspector can combine up to 20 selected calendars for the next eight
+  hours, showing whether the current calendar window can fit five minutes.
+  The Timing Lab remains a separate fictional replay; calendar availability
+  alone does not establish movement need.
 
-The Google adapter uses the narrow
-`calendar.events.freebusy` OAuth scope. Access tokens enter the adapter for one
-request and are not logged or returned.
+The Google adapter uses `calendar.events.freebusy`; listing calendar names for
+selection additionally requires `calendar.calendarlist.readonly`. Access tokens
+stay in encrypted, server-only cookies and are never returned in API payloads.
 
-## Connection flow to implement next
+## Local Google setup
 
-1. Create OAuth endpoints for Google authorization, callback, and revocation.
-2. Validate OAuth state and use PKCE where supported.
-3. Exchange the authorization code only on the server.
-4. Encrypt refresh tokens at rest in a server-side connection store.
-5. Keep short-lived access tokens out of browser storage.
-6. Add a settings screen that shows connection health and allows revocation.
-7. Fetch a bounded availability window and pass the normalized context to the
-   decision engine.
+1. In a Google Cloud project, enable the Google Calendar API and configure
+   the OAuth consent screen. For an External app in Testing, add the account
+   that will try the demo as a test user.
+2. Create an OAuth client of type **Web application**. Add the exact authorized
+   redirect URI `http://localhost:3000/api/calendar/google/callback`.
+3. Copy `.env.example` to `.env.local`; fill in client ID, client secret,
+   redirect URI and a random `CALENDAR_SESSION_SECRET` of at least 32 characters.
+   Keep `.env.local` outside Git. Run `npm run dev` and open
+   `http://localhost:3000/calendar` on the same computer as the app server.
+4. Connect, select calendars, inspect availability, then Disconnect. The
+   fixed Timing Lab at `/timing-lab` still works without OAuth.
+
+The `localhost` callback must reach this Next.js server. A cloud workspace's
+`localhost` is not the user's Mac; a hosted HTTPS URL needs its own matching
+authorized redirect URI and server-side secrets.
+
+## Production connection work still needed
+
+1. Add user identity and a durable encrypted connection store if sessions
+   should survive an hour; refresh tokens must remain server-side.
+2. Connect the live availability model to a real timing-feedback loop, including
+   consent, timezone/day boundaries, and unknown-calendar fallbacks.
+3. Add connection diagnostics and production hosting/security review.
 
 The connection store should own `userId`, `providerId`, encrypted credentials,
 granted scopes, provider account identifier, connection timestamps, and last
@@ -68,7 +92,7 @@ entries so setup copy, credentials, and support diagnostics can differ.
 
 ## Not implemented yet
 
-This slice does not include a user account system, encrypted token storage,
-OAuth callback endpoints, background sync, webhooks, event details, or a live
-calendar settings UI. Those require deployment credentials and a persistent
-server-side identity/connection store.
+This slice does not include a user account system, persistent token storage,
+background sync, webhooks, event details, or live timing replay. An encrypted
+short-lived browser cookie is suitable for local inspection, not a shared
+production account system.

@@ -144,6 +144,21 @@ describe("ActivitySession", () => {
     });
   });
 
+  it("hides standalone manual completion in game mode while showing cumulative progress", () => {
+    render(
+      <ActivitySession
+        activity={{ ...activity, id: "shoulder-rolls", name: "Shoulder rolls", guide: "camera-shoulders" }}
+        gameMode
+        progressCount={3}
+        onProgress={vi.fn()}
+        onComplete={vi.fn()}
+      />,
+    );
+    expect(screen.getByLabelText("3 of 6 shoulder rolls")).toBeDefined();
+    expect(screen.queryByRole("button", { name: /finish without camera/i })).toBeNull();
+    expect(screen.getByRole("button", { name: /enable camera/i })).toBeDefined();
+  });
+
   it("keeps a screen-guided fallback available for configured activities", () => {
     const onComplete = vi.fn();
     render(

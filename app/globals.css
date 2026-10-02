@@ -996,3 +996,58 @@ footer p { font-size: .7rem; margin: 0; }
   .commercial-steps article { grid-template-columns: 1fr; }
   .commercial-steps article > p { grid-column: auto; }
 }
+
+/* Timing Lab is a self-contained simulation inside the existing visual system. */
+.timing-lab__intro { padding: 72px 0 52px; max-width: 760px; }
+.timing-lab__intro h1 { font-size: clamp(2.7rem, 5vw, 5rem); letter-spacing: -.06em; line-height: 1.03; margin: 12px 0 20px; }
+.timing-lab__intro > p:last-child { color: var(--ink-soft); font-size: 1.1rem; line-height: 1.6; max-width: 58ch; }
+.timing-lab__eyebrow { color: var(--signal); font-size: .72rem; font-weight: 750; letter-spacing: .11em; text-transform: uppercase; }
+.timing-lab__grid { display: grid; gap: 24px; grid-template-columns: 1.05fr .95fr; }
+.timing-lab__schedule, .timing-lab__decision { border: 1px solid var(--line); border-radius: 16px; padding: clamp(24px, 3vw, 42px); }
+.timing-lab__schedule { background: #faf9f4; }
+.timing-lab__decision { align-self: stretch; background: var(--signal); color: #fff; display: flex; flex-direction: column; }
+.timing-lab__decision .timing-lab__eyebrow { color: var(--signal-bright); }
+.timing-lab__decision h2 { font-size: clamp(2.3rem, 4vw, 4.6rem); letter-spacing: -.05em; line-height: 1.04; margin: 30px 0 15px; }
+.timing-lab__section-head { align-items: center; display: flex; justify-content: space-between; gap: 16px; }
+.timing-lab__section-head h2 { font-size: 1.6rem; margin: 8px 0 0; }
+.timing-lab__clock { display: grid; font-size: 1.6rem; font-variant-numeric: tabular-nums; font-weight: 700; text-align: right; }
+.timing-lab__clock small { color: var(--ink-soft); font-size: .65rem; font-weight: 500; letter-spacing: .03em; }
+.timing-lab__reset { background: transparent; border: 1px solid var(--line); color: var(--ink); margin-left: 10px; }
+.timing-lab__hint, .timing-lab__footnote { color: var(--ink-soft); font-size: .8rem; line-height: 1.5; }
+.timing-lab__blocks { list-style: none; margin: 32px 0; padding: 0; }
+.timing-lab__blocks li { align-items: baseline; border-top: 1px solid var(--line); display: grid; gap: 14px; grid-template-columns: 140px 1fr auto; padding: 18px 0; }
+.timing-lab__blocks li[data-current="true"] { background: var(--signal-soft); border-radius: 8px; padding-inline: 12px; }
+.timing-lab__blocks li span { font-variant-numeric: tabular-nums; font-size: .8rem; }
+.timing-lab__blocks li strong { font-size: .95rem; }
+.timing-lab__blocks li small { color: var(--ink-soft); text-transform: capitalize; }
+.timing-lab__milestones { display: flex; gap: 6px; margin-bottom: 25px; }
+.timing-lab__milestones span { border: 1px solid var(--line); border-radius: 20px; color: var(--ink-soft); font-size: .68rem; padding: 7px 10px; }
+.timing-lab__milestones [aria-current="step"] { background: var(--signal); border-color: var(--signal); color: white; }
+.timing-lab__next-time { color: #d3e4d9; margin-top: 20px; }
+.timing-lab__next-time strong { color: #fff; font-variant-numeric: tabular-nums; }
+.timing-lab__result-label { color: var(--signal-bright); font-weight: 700; }
+.timing-lab__reason { color: #e0ebe2; font-size: 1.03rem; line-height: 1.65; max-width: 50ch; }
+.timing-lab__responses { border: 0; display: flex; flex-wrap: wrap; gap: 10px; margin: auto 0 0; padding: 32px 0 0; }
+.timing-lab__responses legend { font-size: .82rem; font-weight: 700; padding-bottom: 12px; }
+.timing-lab__responses .button { flex: 1 1 100px; }
+.timing-lab__decision > .button { align-self: start; margin-top: auto; }
+.timing-lab__footnote { margin: 24px 0 80px; }
+.calendar-card { background: var(--paper-raised); border: 1px solid var(--line); border-radius: 16px; max-width: 850px; padding: clamp(24px, 3vw, 42px); }
+.calendar-card__head { align-items: center; display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; }
+.calendar-card__head h2 { margin: 0; }
+.calendar-card p { color: var(--ink-soft); line-height: 1.6; }
+.calendar-card [role="alert"] { color: #9a3827; }
+.calendar-choices { border: 0; display: grid; gap: 10px; margin: 22px 0; padding: 0; }
+.calendar-choices legend { font-weight: 700; margin-bottom: 12px; }
+.calendar-choices label { align-items: center; display: flex; gap: 10px; overflow-wrap: anywhere; }
+.calendar-choices input { accent-color: var(--signal); width: 18px; height: 18px; }
+.calendar-result { border-top: 1px solid var(--line); margin-top: 30px; padding-top: 20px; }
+.calendar-result li { font-variant-numeric: tabular-nums; margin: 5px 0; }
+@media (max-width: 760px) {
+  .timing-lab__intro { padding: 48px 0 30px; }
+  .timing-lab__grid { grid-template-columns: 1fr; }
+  .timing-lab__blocks li { grid-template-columns: 115px 1fr; }
+  .timing-lab__blocks li small { grid-column: 2; }
+  .timing-lab__decision { min-height: 350px; }
+  .timing-lab__milestones { flex-wrap: wrap; }
+}

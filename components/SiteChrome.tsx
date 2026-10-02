@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { PulseMark } from "@/components/icons";
 
-export function SiteHeader({ current }: { current: "demo" | "roadmap" | "teams" }) {
+export function SiteHeader({ current }: { current: "demo" | "lab" | "calendar" | "play" | "roadmap" | "teams" }) {
   return (
     <header className="site-header">
       <Link className="brand" href="/#top" aria-label="WorkPulse home">
@@ -15,6 +15,15 @@ export function SiteHeader({ current }: { current: "demo" | "roadmap" | "teams" 
           Live demo
         </Link>
         <Link href="/#history">History</Link>
+        <Link aria-current={current === "lab" ? "page" : undefined} href="/timing-lab">
+          Timing Lab
+        </Link>
+        <Link aria-current={current === "play" ? "page" : undefined} href="/play">
+          Movement game
+        </Link>
+        <Link aria-current={current === "calendar" ? "page" : undefined} href="/calendar">
+          Calendar
+        </Link>
         <Link
           aria-current={current === "roadmap" ? "page" : undefined}
           href="/roadmap"

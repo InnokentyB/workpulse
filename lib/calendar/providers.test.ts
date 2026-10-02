@@ -26,11 +26,13 @@ describe("calendar provider registry", () => {
     );
   });
 
-  it("marks Google configured only when both server credentials exist", () => {
+  it("marks Google configured only when all server OAuth settings exist", () => {
     expect(
       getCalendarProviders({
         GOOGLE_CALENDAR_CLIENT_ID: "client-id",
         GOOGLE_CALENDAR_CLIENT_SECRET: "client-secret",
+        GOOGLE_CALENDAR_REDIRECT_URI: "http://localhost:3000/api/calendar/google/callback",
+        CALENDAR_SESSION_SECRET: "test-secret-longer-than-thirty-two-characters",
       })[0].status,
     ).toBe("configured");
 

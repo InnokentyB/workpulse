@@ -63,6 +63,11 @@ export type ActivityCompletion = {
 type ActivitySessionProps = {
   activity: Activity;
   onComplete: (completion: ActivityCompletion) => void;
+  /** Optional live count for experiences that own completion outside this session. */
+  onProgress?: (newCycles: number) => void;
+  progressCount?: number;
+  gameMode?: boolean;
+  onCameraFailure?: () => void;
 };
 
 function preferredScrollBehavior(): ScrollBehavior {
@@ -71,17 +76,18 @@ function preferredScrollBehavior(): ScrollBehavior {
     : "smooth";
 }
 
-function useWorkingAreaFocus<T extends HTMLElement>() {
+function useWorkingAreaFocus<T extends HTMLElement>(enabled = true) {
   const elementRef = useRef<T>(null);
 
   useEffect(() => {
+    if (!enabled) return;
     const element = elementRef.current;
     element?.focus({ preventScroll: true });
     element?.scrollIntoView?.({
       behavior: preferredScrollBehavior(),
       block: "start",
     });
-  }, []);
+  }, [enabled]);
 
   return elementRef;
 }
@@ -221,10 +227,14 @@ function CameraPoseSession<State extends CameraMotionState>({
   activity,
   guide,
   onComplete,
+  onProgress,
+  progressCount,
+  gameMode = false,
+  onCameraFailure,
 }: ActivitySessionProps & { guide: CameraMotionGuide<State> }) {
   const [status, setStatus] = useState<CameraStatus>("idle");
   const [motion, setMotion] = useState(guide.initialState);
-  const sessionRef = useWorkingAreaFocus<HTMLElement>();
+  const sessionRef = useWorkingAreaFocus<HTMLElement>(!gameMode);
   const cameraStageRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -235,6 +245,7 @@ function CameraPoseSession<State extends CameraMotionState>({
   const cameraRequestRef = useRef(0);
   const lastInferenceRef = useRef(0);
   const motionRef = useRef(guide.initialState);
+  const reportedMovementsRef = useRef(0);
 
   const stopCamera = useCallback(() => {
     cameraRequestRef.current += 1;
@@ -289,6 +300,11 @@ function CameraPoseSession<State extends CameraMotionState>({
             (landmarks ?? []) as PoseLandmark[],
           );
           motionRef.current = nextMotion;
+          if (gameMode && nextMotion.movements > reportedMovementsRef.current) {
+            const increment = nextMotion.movements - reportedMovementsRef.current;
+            reportedMovementsRef.current = nextMotion.movements;
+            onProgress?.(increment);
+          }
           if (
             nextMotion.stage !== previousMotion.stage ||
             nextMotion.movements !== previousMotion.movements ||
@@ -299,11 +315,17 @@ function CameraPoseSession<State extends CameraMotionState>({
           lastInferenceRef.current = timestamp;
 
           if (nextMotion.stage === "complete") {
-            finish(true, guide.targetMovements);
+            if (gameMode) {
+              stopCamera();
+              setStatus("idle");
+            } else {
+              finish(true, guide.targetMovements);
+            }
             return;
           }
         } catch {
           stopCamera();
+          onCameraFailure?.();
           setStatus("error");
           return;
         }
@@ -313,7 +335,7 @@ function CameraPoseSession<State extends CameraMotionState>({
         runDetectionRef.current(nextTimestamp),
       );
     },
-    [finish, guide, stopCamera],
+    [finish, gameMode, guide, onCameraFailure, onProgress, stopCamera],
   );
 
   useEffect(() => {
@@ -326,9 +348,11 @@ function CameraPoseSession<State extends CameraMotionState>({
     setStatus("loading");
     setMotion(guide.initialState);
     motionRef.current = guide.initialState;
+    reportedMovementsRef.current = 0;
 
     if (!navigator.mediaDevices?.getUserMedia) {
       setStatus("unavailable");
+      onCameraFailure?.();
       return;
     }
 
@@ -379,7 +403,9 @@ function CameraPoseSession<State extends CameraMotionState>({
         runDetectionRef.current(timestamp),
       );
     } catch (error) {
+      if (cameraRequestRef.current !== requestId) return;
       stopCamera();
+      onCameraFailure?.();
       if (error instanceof DOMException && error.name === "NotAllowedError") {
         setStatus("denied");
       } else if (
@@ -391,7 +417,7 @@ function CameraPoseSession<State extends CameraMotionState>({
         setStatus("error");
       }
     }
-  }, [guide, stopCamera]);
+  }, [guide, onCameraFailure, stopCamera]);
 
   useEffect(() => stopCamera, [stopCamera]);
 
@@ -406,7 +432,7 @@ function CameraPoseSession<State extends CameraMotionState>({
   }, []);
 
   useEffect(() => {
-    if (status !== "loading" && status !== "active") return;
+    if (gameMode || (status !== "loading" && status !== "active")) return;
     positionCameraStage(preferredScrollBehavior());
 
     const reposition = () => positionCameraStage("auto");
@@ -416,7 +442,7 @@ function CameraPoseSession<State extends CameraMotionState>({
       window.removeEventListener("resize", reposition);
       window.visualViewport?.removeEventListener("resize", reposition);
     };
-  }, [positionCameraStage, status]);
+  }, [gameMode, positionCameraStage, status]);
 
   const showCamera = status === "loading" || status === "active";
   const showError =
@@ -435,9 +461,9 @@ function CameraPoseSession<State extends CameraMotionState>({
         </div>
         <div
           className="movement-progress"
-          aria-label={`${motion.movements} of ${guide.targetMovements} ${guide.progressLabel}`}
+          aria-label={`${progressCount ?? motion.movements} of ${guide.targetMovements} ${guide.progressLabel}`}
         >
-          <strong>{motion.movements}</strong>
+          <strong>{progressCount ?? motion.movements}</strong>
           <span>/ {guide.targetMovements}</span>
         </div>
       </div>
@@ -527,7 +553,7 @@ function CameraPoseSession<State extends CameraMotionState>({
             Stop camera
           </button>
         ) : null}
-        {status !== "loading" && status !== "active" ? (
+        {!gameMode && status !== "loading" && status !== "active" ? (
           <button
             className="button button--quiet"
             onClick={() => finish(false, motion.movements)}
