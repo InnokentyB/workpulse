@@ -19,6 +19,48 @@ function expectProgress(value: number) {
 }
 
 describe("MovementGame", () => {
+  it.each(["Forest trail", "Workshop"])("plays a seated dance in %s without camera claims", (world) => {
+    vi.useFakeTimers();
+    try {
+      render(<MovementGame />);
+      fireEvent.click(screen.getByLabelText("Camera recognition"));
+      fireEvent.click(screen.getByLabelText("Desk dance"));
+      expect(screen.getByLabelText("Camera recognition")).toHaveProperty("disabled", true);
+      expect(screen.getByLabelText("Manual self-report")).toHaveProperty("checked", true);
+      fireEvent.click(screen.getByLabelText(world));
+      fireEvent.click(screen.getByRole("button", { name: "Start movement game" }));
+      expect(screen.queryByRole("button", { name: /I completed a movement/ })).toBeNull();
+      expect(screen.queryByRole("region", { name: "Camera guide" })).toBeNull();
+      for (let i = 0; i < 6; i++) {
+        fireEvent.click(screen.getByRole("button", { name: "Start phrase" }));
+        act(() => vi.advanceTimersByTime(6000));
+        fireEvent.click(screen.getByRole("button", { name: "I followed this phrase" }));
+      }
+      expectProgress(6);
+      expect(screen.getByRole("heading", { name: "Scene complete" })).toBeDefined();
+      expect(screen.getByText(/Six dance phrases self-reported/)).toBeDefined();
+    } finally { vi.useRealTimers(); }
+  });
+  it.each(["Forest trail", "Workshop"])("plays all four neck movements in %s and locks the exercise until reset", (world) => {
+    render(<MovementGame />);
+    fireEvent.click(screen.getByLabelText(world));
+    fireEvent.click(screen.getByLabelText(/Neck reset/));
+    const controls = screen.getByRole("region", { name: "Movement game controls" });
+    expect(within(controls).getByText("0 / 4", { selector: "strong" })).toBeDefined();
+    fireEvent.click(screen.getByRole("button", { name: "Start movement game" }));
+    expect(screen.getByLabelText(/Neck reset/).closest("fieldset")).toHaveProperty("disabled", true);
+    for (let i = 0; i < 3; i++) fireEvent.click(screen.getByRole("button", { name: /I completed a movement/ }));
+    expect(screen.queryByRole("heading", { name: "Scene complete" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /I completed a movement/ }));
+    expect(screen.getByRole("heading", { name: "Scene complete" })).toBeDefined();
+    expect(within(controls).getByText("4 / 4", { selector: "strong" })).toBeDefined();
+    expect(screen.getByText(/Four movements self-reported/)).toBeDefined();
+    expect(screen.getByRole("img", { name: /(?:stop 4 of 4|4 of 4 steps.*Lantern glowing)/ })).toBeDefined();
+    fireEvent.click(screen.getByRole("button", { name: "New run" }));
+    fireEvent.click(screen.getByLabelText(/Shoulder rolls/));
+    expectProgress(0);
+  });
+
   it("previews both distinct scenes before starting while progress stays at zero", () => {
     render(<MovementGame />);
     expect(screen.getByRole("img", { name: /Summit trail.*stop 0 of 6/i })).toBeDefined();

@@ -1,9 +1,30 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ACTIVITY_HISTORY_STORAGE_KEY } from "@/lib/activity-history";
 
 import { WorkPulseApp } from "@/components/WorkPulseApp";
 
 describe("WorkPulseApp", () => {
+  it("runs the dance from a recommendation and records a guided unverified completion", async () => {
+    vi.useFakeTimers();
+    try {
+      render(<WorkPulseApp />);
+      await act(async () => { await Promise.resolve(); });
+      fireEvent.click(screen.getByRole("button", { name: "Ask WorkPulse" }));
+      fireEvent.click(screen.getByRole("radio", { name: /Desk dance/ }));
+      expect(screen.getByRole("link", { name: "Play this exercise" }).getAttribute("href")).toBe("/play?activity=desk-dance");
+      fireEvent.click(screen.getByRole("button", { name: "Start desk dance" }));
+      expect(screen.queryByRole("button", { name: "Enable camera" })).toBeNull();
+      for (let i = 0; i < 6; i++) {
+        fireEvent.click(screen.getByRole("button", { name: "Start phrase" }));
+        act(() => vi.advanceTimersByTime(6000));
+        fireEvent.click(screen.getByRole("button", { name: "I followed this phrase" }));
+      }
+      const history = JSON.parse(window.localStorage.getItem(ACTIVITY_HISTORY_STORAGE_KEY)!);
+      expect(history.entries.at(-1)).toMatchObject({ activityId: "desk-dance", completionMode: "guided", movements: 6 });
+      expect(screen.getByText("Completed with on-screen guidance. No camera was used.")).toBeDefined();
+    } finally { vi.useRealTimers(); }
+  });
   beforeEach(() => {
     window.localStorage.clear();
   });

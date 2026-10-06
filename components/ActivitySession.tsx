@@ -29,6 +29,7 @@ import {
   updateShoulderMotion,
   type ShoulderMotionState,
 } from "@/lib/shoulder-motion-tracker";
+import { DanceSession } from "@/components/DanceSession";
 import type { Activity } from "@/lib/types";
 
 const WASM_ROOT =
@@ -62,6 +63,8 @@ export type ActivityCompletion = {
 
 type ActivitySessionProps = {
   activity: Activity;
+  neckCheckpoint?: NeckMotionState;
+  onNeckCheckpoint?: (checkpoint: NeckMotionState) => void;
   onComplete: (completion: ActivityCompletion) => void;
   /** Optional live count for experiences that own completion outside this session. */
   onProgress?: (newCycles: number) => void;
@@ -155,6 +158,8 @@ type CameraMotionGuide<State extends CameraMotionState> = {
   targetMovements: number;
   trackingMessage: (motion: State) => string;
   updateMotion: (state: State, landmarks: PoseLandmark[]) => State;
+  resumeMotion?: (calibrated: State, checkpoint: State) => State;
+  gameProgress?: (motion: State) => number;
 };
 
 const NECK_GUIDE: CameraMotionGuide<NeckMotionState> = {
@@ -164,6 +169,14 @@ const NECK_GUIDE: CameraMotionGuide<NeckMotionState> = {
   targetMovements: TARGET_NECK_MOVEMENTS,
   trackingMessage: neckTrackingMessage,
   updateMotion: updateNeckMotion,
+  resumeMotion: (calibrated, checkpoint) => ({
+    ...calibrated,
+    stage: checkpoint.stage,
+    movements: checkpoint.movements,
+    firstSideDirection: checkpoint.firstSideDirection,
+  }),
+  // The final point includes the neutral return, not just lifting the gaze.
+  gameProgress: (motion) => motion.stage === "complete" ? motion.movements : Math.min(3, motion.movements),
 };
 
 const SHOULDER_GUIDE: CameraMotionGuide<ShoulderMotionState> = {
@@ -231,7 +244,9 @@ function CameraPoseSession<State extends CameraMotionState>({
   progressCount,
   gameMode = false,
   onCameraFailure,
-}: ActivitySessionProps & { guide: CameraMotionGuide<State> }) {
+  checkpoint,
+  onCheckpoint,
+}: ActivitySessionProps & { guide: CameraMotionGuide<State>; checkpoint?: State; onCheckpoint?: (state: State) => void }) {
   const [status, setStatus] = useState<CameraStatus>("idle");
   const [motion, setMotion] = useState(guide.initialState);
   const sessionRef = useWorkingAreaFocus<HTMLElement>(!gameMode);
@@ -246,6 +261,8 @@ function CameraPoseSession<State extends CameraMotionState>({
   const lastInferenceRef = useRef(0);
   const motionRef = useRef(guide.initialState);
   const reportedMovementsRef = useRef(0);
+  const checkpointRef = useRef(checkpoint);
+  const reportedAtStartRef = useRef(0);
 
   const stopCamera = useCallback(() => {
     cameraRequestRef.current += 1;
@@ -295,14 +312,22 @@ function CameraPoseSession<State extends CameraMotionState>({
           drawPose(canvas, video, landmarks);
 
           const previousMotion = motionRef.current;
-          const nextMotion = guide.updateMotion(
+          let nextMotion = guide.updateMotion(
             previousMotion,
             (landmarks ?? []) as PoseLandmark[],
           );
+          if (gameMode && previousMotion.stage === "calibrating" && nextMotion.stage !== "calibrating" && checkpointRef.current && guide.resumeMotion) {
+            nextMotion = guide.resumeMotion(nextMotion, checkpointRef.current);
+          }
           motionRef.current = nextMotion;
-          if (gameMode && nextMotion.movements > reportedMovementsRef.current) {
-            const increment = nextMotion.movements - reportedMovementsRef.current;
-            reportedMovementsRef.current = nextMotion.movements;
+          if (gameMode && nextMotion.stage !== "calibrating") {
+            checkpointRef.current = nextMotion;
+            onCheckpoint?.(nextMotion);
+          }
+          const gameProgress = guide.gameProgress?.(nextMotion) ?? nextMotion.movements;
+          if (gameMode && gameProgress > reportedMovementsRef.current) {
+            const increment = gameProgress - reportedMovementsRef.current;
+            reportedMovementsRef.current = gameProgress;
             onProgress?.(increment);
           }
           if (
@@ -335,7 +360,7 @@ function CameraPoseSession<State extends CameraMotionState>({
         runDetectionRef.current(nextTimestamp),
       );
     },
-    [finish, gameMode, guide, onCameraFailure, onProgress, stopCamera],
+    [finish, gameMode, guide, onCameraFailure, onCheckpoint, onProgress, stopCamera],
   );
 
   useEffect(() => {
@@ -348,7 +373,7 @@ function CameraPoseSession<State extends CameraMotionState>({
     setStatus("loading");
     setMotion(guide.initialState);
     motionRef.current = guide.initialState;
-    reportedMovementsRef.current = 0;
+    reportedMovementsRef.current = gameMode && guide.resumeMotion ? reportedAtStartRef.current : 0;
 
     if (!navigator.mediaDevices?.getUserMedia) {
       setStatus("unavailable");
@@ -417,7 +442,12 @@ function CameraPoseSession<State extends CameraMotionState>({
         setStatus("error");
       }
     }
-  }, [guide, onCameraFailure, stopCamera]);
+  }, [gameMode, guide, onCameraFailure, stopCamera]);
+
+  // Keep already awarded neck points when this camera is stopped/retried.
+  useEffect(() => {
+    reportedAtStartRef.current = progressCount ?? 0;
+  }, [progressCount]);
 
   useEffect(() => stopCamera, [stopCamera]);
 
@@ -632,6 +662,9 @@ function GuidedStepsSession({
 }
 
 export function ActivitySession(props: ActivitySessionProps) {
+  if (props.activity.guide === "guided-dance") {
+    return <DanceSession onComplete={props.onComplete} />;
+  }
   if (props.activity.guide === "guided-steps") {
     return <GuidedStepsSession {...props} />;
   }
@@ -640,5 +673,5 @@ export function ActivitySession(props: ActivitySessionProps) {
     return <CameraPoseSession {...props} guide={SHOULDER_GUIDE} />;
   }
 
-  return <CameraPoseSession {...props} guide={NECK_GUIDE} />;
+  return <CameraPoseSession {...props} guide={NECK_GUIDE} checkpoint={props.neckCheckpoint} onCheckpoint={props.onNeckCheckpoint} />;
 }

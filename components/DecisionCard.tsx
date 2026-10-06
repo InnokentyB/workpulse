@@ -1,5 +1,6 @@
 import {
   ArrowIcon,
+  DanceIcon,
   NeckResetIcon,
   ShoulderRollsIcon,
 } from "@/components/icons";
@@ -22,6 +23,7 @@ function Signal({ label, value }: { label: string; value: string }) {
 }
 
 function ActivityIcon({ activity }: { activity: Activity }) {
+  if (activity.guide === "guided-dance") return <DanceIcon />;
   return activity.id === "shoulder-rolls" ? (
     <ShoulderRollsIcon />
   ) : (
@@ -115,6 +117,9 @@ export function DecisionCard({
           >
             Start {result.activity?.name.toLowerCase()} <ArrowIcon />
           </button>
+          <a className="button button--quiet" href={`/play?activity=${encodeURIComponent(result.activity!.id)}`}>
+            Play this exercise
+          </a>
         </div>
       ) : null}
     </section>

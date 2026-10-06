@@ -15,7 +15,7 @@ describe("selectActivity", () => {
   });
 
   it("provides a second camera-verified shoulder activity", () => {
-    expect(ACTIVITIES).toHaveLength(2);
+    expect(ACTIVITIES).toHaveLength(3);
     expect(selectActivity("shoulder-rolls")).toMatchObject({
       id: "shoulder-rolls",
       name: "Shoulder rolls",
@@ -27,5 +27,9 @@ describe("selectActivity", () => {
 
   it("falls back to the neck reset for an unknown id", () => {
     expect(selectActivity("unknown")).toBe(ACTIVITIES[0]);
+  });
+
+  it("offers a screen-guided dance with six phrases", () => {
+    expect(selectActivity("desk-dance")).toMatchObject({ id: "desk-dance", name: "Desk dance", guide: "guided-dance", movementCount: 6 });
   });
 });

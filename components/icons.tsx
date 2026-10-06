@@ -2,6 +2,10 @@ type IconProps = {
   className?: string;
 };
 
+export function DanceIcon({ className }: IconProps) {
+  return <svg aria-hidden="true" className={className} data-icon="dance" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V5l11-2v13M9 8l11-2" /><ellipse cx="6" cy="18" rx="3" ry="2" /><ellipse cx="17" cy="16" rx="3" ry="2" /></svg>;
+}
+
 export function PulseMark({ className }: IconProps) {
   return (
     <svg

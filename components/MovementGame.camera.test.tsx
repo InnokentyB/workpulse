@@ -49,6 +49,75 @@ afterEach(() => {
 });
 
 describe("movement game real camera integration", () => {
+  it("keeps neck direction after Stop camera and clears it on Reset game", async () => {
+    render(<MovementGame initialActivityId="neck-reset" />);
+    fireEvent.click(screen.getByLabelText("Camera recognition"));
+    fireEvent.click(screen.getByRole("button", { name: "Start movement game" }));
+    const enable = async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Enable camera" }));
+      await screen.findByText("Camera active");
+      for (let i = 0; i < 8; i++) frame();
+    };
+    const neckPose = (x: number) => { const p = pose(); p[0] = { x, y: .2, visibility: 1 }; return p; };
+    const progress = () => within(screen.getByRole("region", { name: "Movement game controls" })).getByText(/\d \/ 4/, { selector: "strong" }).textContent;
+    await enable();
+    frame(neckPose(.43));
+    fireEvent.click(screen.getByRole("button", { name: "Stop camera" }));
+    await enable();
+    frame(neckPose(.43));
+    expect(progress()).toBe("1 / 4");
+    frame(neckPose(.57));
+    expect(progress()).toBe("2 / 4");
+    fireEvent.click(screen.getByRole("button", { name: "Reset game" }));
+    fireEvent.click(screen.getByRole("button", { name: "Start movement game" }));
+    await enable();
+    expect(progress()).toBe("0 / 4");
+    frame(neckPose(.57));
+    expect(progress()).toBe("1 / 4");
+    expect(screen.getByText(/Now turn through center to the other side/)).toBeDefined();
+  });
+
+  it.each(["Forest trail", "Workshop"])("finishes the neck sequence in %s only after returning to center", async (world) => {
+    render(<MovementGame />);
+    fireEvent.click(screen.getByLabelText(world));
+    fireEvent.click(screen.getByLabelText(/Neck reset/));
+    fireEvent.click(screen.getByLabelText("Camera recognition"));
+    fireEvent.click(screen.getByRole("button", { name: "Start movement game" }));
+    fireEvent.click(screen.getByRole("button", { name: "Enable camera" }));
+    await screen.findByText("Camera active");
+    for (let i = 0; i < 8; i++) frame();
+    const neckPose = (x: number, y = .2) => { const p = pose(); p[0] = { x, y, visibility: 1 }; return p; };
+    frame(neckPose(.57));
+    const progress = () => within(screen.getByRole("region", { name: "Movement game controls" })).getByText(/\d \/ 4/, { selector: "strong" }).textContent;
+    expect(progress()).toBe("1 / 4");
+    fireEvent.click(screen.getByRole("button", { name: "Pause game" }));
+    fireEvent.click(screen.getByRole("button", { name: "Resume game" }));
+    fireEvent.click(screen.getByRole("button", { name: "Enable camera" }));
+    await screen.findByText("Camera active");
+    for (let i = 0; i < 8; i++) frame();
+    frame(neckPose(.57)); // Repeating the first side must not score again.
+    expect(progress()).toBe("1 / 4");
+    frame(neckPose(.43));
+    expect(progress()).toBe("2 / 4");
+    frame(neckPose(.5, .25));
+    expect(progress()).toBe("3 / 4");
+    frame(neckPose(.5, .16));
+    expect(screen.queryByRole("heading", { name: "Scene complete" })).toBeNull();
+    expect(screen.getByText(/Return to a comfortable neutral position/)).toBeDefined();
+    // Retry must preserve the final return-to-center requirement.
+    mediaPipe.detect.mockImplementationOnce(() => { throw new Error("Inference failed"); });
+    frame();
+    fireEvent.click(screen.getByRole("button", { name: "Try camera again" }));
+    await screen.findByText("Camera active");
+    for (let i = 0; i < 8; i++) frame();
+    frame();
+    expect(progress()).toBe("4 / 4");
+    expect(screen.getByRole("heading", { name: "Scene complete" })).toBeDefined();
+    expect(screen.getByText(/Four guided neck movements recognized/)).toBeDefined();
+    expect(frames.size).toBe(0);
+    expect(stop).toHaveBeenCalledTimes(3);
+  });
+
   it("preserves two recognized cycles through inference failure and retry without duplicate evidence", async () => {
     render(<MovementGame />);
     const progress = () => within(screen.getByRole("region", { name: "Movement game controls" })).getByText(/\d \/ 6/, { selector: "strong" }).textContent;

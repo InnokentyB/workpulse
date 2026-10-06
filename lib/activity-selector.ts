@@ -24,6 +24,15 @@ export const ACTIVITIES: readonly Activity[] = [
       "Finish with three slow shoulder circles backward.",
     ],
   },
+  {
+    id: "desk-dance",
+    name: "Desk dance",
+    durationSeconds: 36,
+    guide: "guided-dance",
+    instructions: "Follow six gentle eight-beat phrases, seated or standing. Use the optional rhythm or move in silence, then confirm each phrase yourself.",
+    movementCount: 6,
+  },
+
 ];
 
 export function selectActivity(activityId = ACTIVITIES[0].id): Activity {

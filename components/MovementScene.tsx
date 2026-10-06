@@ -3,6 +3,7 @@ import "./movement-scene.css";
 export type MovementSceneProps = {
   scene: "trail" | "workshop";
   completedCycles: number;
+  targetMovements?: number;
   status: "ready" | "active" | "paused" | "complete";
 };
 
@@ -32,8 +33,9 @@ function Traveler({ x, y, facing = 1 }: { x: number; y: number; facing?: number 
   );
 }
 
-function Trail({ cycles }: { cycles: number }) {
-  const traveler = trailStops[cycles];
+function Trail({ cycles, target }: { cycles: number; target: number }) {
+  const stops = Array.from({ length: target + 1 }, (_, index) => trailStops[Math.floor(index * 6 / target)]);
+  const traveler = stops[cycles];
   return (
     <svg viewBox="0 0 640 300" className="movement-scene__art" aria-hidden="true" focusable="false">
       <path d="M0 226 Q110 199 199 221 T391 191 T640 151 V300 H0Z" fill="#e7ecd9" />
@@ -41,10 +43,10 @@ function Trail({ cycles }: { cycles: number }) {
       <circle cx="551" cy="45" r="25" fill="#e7f7a3" />
       <path d="M0 276 Q100 266 183 272 T359 251 T640 230 V300 H0Z" fill="#adca9c" />
       <path d="M52 244 C192 227 264 206 334 170 C426 121 507 115 577 63" fill="none" stroke="#7b9b76" strokeWidth="3" strokeDasharray="5 8" strokeLinecap="round" />
-      {trailStops.map((stop, index) => (
+      {stops.map((stop, index) => (
         <g key={index}>
           <ellipse cx={stop.x} cy={stop.y + 6} rx="28" ry="7" fill={index <= cycles ? "#b8f36b" : "#f8f8ee"} stroke="#376650" strokeWidth="2" />
-          <text x={stop.x} y={stop.y + 1} textAnchor="middle" fill="#254b39" fontSize="10" fontWeight="700">{index === 0 ? "START" : index === 6 ? "TOP" : String(index).padStart(2, "0")}</text>
+          <text x={stop.x} y={stop.y + 1} textAnchor="middle" fill="#254b39" fontSize="10" fontWeight="700">{index === 0 ? "START" : index === target ? "TOP" : String(index).padStart(2, "0")}</text>
         </g>
       ))}
       <path d="M567 49 V18 l31 11-31 10" fill="#b8f36b" stroke="#183e2f" strokeWidth="2" strokeLinejoin="round" />
@@ -55,8 +57,9 @@ function Trail({ cycles }: { cycles: number }) {
   );
 }
 
-function Workshop({ cycles }: { cycles: number }) {
-  const steps = ["Frame", "Panels", "Handle", "Wick", "Light", "Glow"];
+function Workshop({ cycles, target }: { cycles: number; target: number }) {
+  const steps = target === 4 ? ["Frame", "Panels & handle", "Wick", "Light & glow"] : ["Frame", "Panels", "Handle", "Wick", "Light", "Glow"];
+  const visualStage = Math.floor(cycles * 6 / target);
   return (
     <svg viewBox="0 0 640 300" className="movement-scene__art" aria-hidden="true" focusable="false">
       <rect x="0" y="0" width="640" height="300" fill="#e6ebdb" />
@@ -68,15 +71,15 @@ function Workshop({ cycles }: { cycles: number }) {
       <text x="130" y="120" fill="#3d6f50" fontSize="11" fontWeight="700" letterSpacing="2">FIELD NOTES</text>
       <Traveler x={344} y={220} facing={-1} />
       <ellipse cx="478" cy="220" rx="64" ry="8" fill="#244d38" opacity=".15" />
-      {cycles >= 1 && <path d="M449 217 L455 151 L501 151 L507 217Z" fill="none" stroke="#365d45" strokeWidth="5" strokeLinejoin="round" />}
-      {cycles >= 2 && <path d="M455 153 L501 153 L499 213 L457 213Z" fill="#e9f3cc" stroke="#365d45" strokeWidth="2" />}
-      {cycles >= 3 && <path d="M462 151 Q478 112 494 151" fill="none" stroke="#365d45" strokeWidth="5" strokeLinecap="round" />}
-      {cycles >= 4 && <path d="M479 215 V190 M471 193 H487" stroke="#895e40" strokeWidth="3" strokeLinecap="round" />}
-      {cycles >= 5 && <><circle cx="478" cy="184" r="21" fill="#d5fa79" opacity=".48" /><path d="M478 194 C466 182 475 177 478 167 C484 178 491 184 478 194Z" fill="#d6e34e" stroke="#7d8b37" strokeWidth="1.5" /></>}
-      {cycles >= 6 && <><circle cx="478" cy="183" r="39" fill="#eaffaa" opacity=".37" /><path d="M537 164 l6-7 M531 130 v-9 M558 188 h10" stroke="#719147" strokeWidth="3" strokeLinecap="round" /></>}
+      {visualStage >= 1 && <path d="M449 217 L455 151 L501 151 L507 217Z" fill="none" stroke="#365d45" strokeWidth="5" strokeLinejoin="round" />}
+      {visualStage >= 2 && <path d="M455 153 L501 153 L499 213 L457 213Z" fill="#e9f3cc" stroke="#365d45" strokeWidth="2" />}
+      {visualStage >= 3 && <path d="M462 151 Q478 112 494 151" fill="none" stroke="#365d45" strokeWidth="5" strokeLinecap="round" />}
+      {visualStage >= 4 && <path d="M479 215 V190 M471 193 H487" stroke="#895e40" strokeWidth="3" strokeLinecap="round" />}
+      {visualStage >= 5 && <><circle cx="478" cy="184" r="21" fill="#d5fa79" opacity=".48" /><path d="M478 194 C466 182 475 177 478 167 C484 178 491 184 478 194Z" fill="#d6e34e" stroke="#7d8b37" strokeWidth="1.5" /></>}
+      {visualStage >= 6 && <><circle cx="478" cy="183" r="39" fill="#eaffaa" opacity=".37" /><path d="M537 164 l6-7 M531 130 v-9 M558 188 h10" stroke="#719147" strokeWidth="3" strokeLinecap="round" /></>}
       <path d="M412 217 H541" stroke="#355943" strokeWidth="3" strokeLinecap="round" />
       {steps.map((step, index) => (
-        <g key={step} transform={`translate(${113 + index * 79} 260)`}>
+        <g key={step} transform={`translate(${113 + index * (395 / (steps.length - 1))} 260)`}>
           <circle r="7" fill={index < cycles ? "#15684a" : "#f7f7ee"} stroke="#51765c" strokeWidth="2" />
           <text y="23" textAnchor="middle" fill="#365845" fontSize="10" fontWeight="600">{step}</text>
         </g>
@@ -86,20 +89,22 @@ function Workshop({ cycles }: { cycles: number }) {
   );
 }
 
-export default function MovementScene({ scene, completedCycles, status }: MovementSceneProps) {
-  const cycles = Number.isFinite(completedCycles) ? Math.max(0, Math.min(6, Math.floor(completedCycles))) : 0;
+export default function MovementScene({ scene, completedCycles, status, targetMovements = 6 }: MovementSceneProps) {
+  const target = targetMovements === 4 ? 4 : 6;
+  const cycles = Number.isFinite(completedCycles) ? Math.max(0, Math.min(target, Math.floor(completedCycles))) : 0;
+  const visualStage = Math.floor(cycles * 6 / target);
   const label = scene === "trail" ? "Summit trail" : "Lantern workshop";
   const description = scene === "trail"
-    ? `Traveler has reached stop ${cycles} of 6 on the summit trail.`
-    : `Lantern assembly has completed ${cycles} of 6 steps. ${lanternStages[cycles]}.`;
+    ? `Traveler has reached stop ${cycles} of ${target} on the summit trail.`
+    : `Lantern assembly has completed ${cycles} of ${target} steps. ${lanternStages[visualStage]}.`;
   return (
     <figure className="movement-scene" data-scene={scene} data-status={status}>
       <div className="movement-scene__header">
         <span className="movement-scene__eyebrow">{scene === "trail" ? "A small journey" : "A little craft"}</span>
-        <span className="movement-scene__count">{cycles} / 6</span>
+        <span className="movement-scene__count">{cycles} / {target}</span>
       </div>
       <div role="img" aria-label={`${label}. ${description}`} className="movement-scene__canvas">
-        {scene === "trail" ? <Trail cycles={cycles} /> : <Workshop cycles={cycles} />}
+        {scene === "trail" ? <Trail cycles={cycles} target={target} /> : <Workshop cycles={cycles} target={target} />}
       </div>
       <figcaption className="movement-scene__caption">
         <strong>{label}</strong>

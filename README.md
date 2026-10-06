@@ -25,17 +25,33 @@ response delays are illustrative demo rules, not health guidance. The lab needs
 no calendar connection, camera, account, environment variables, or external
 runtime service. Responses live only in page memory.
 
+### Desk dance
+
+Desk dance is available in the exercise catalog, ordinary guided activity flow,
+and both game scenes at `/play?activity=desk-dance`. Choose seated or standing:
+six eight-beat phrases at 80 BPM provide about 36 seconds of movement, with
+user-paced transitions. Follow the visual beat or enable the optional on-device
+synthesized rhythm. Confirm each phrase yourself after its eight beats; dance
+has no camera verification. Pause stops sound and restarts the unfinished phrase.
+Ordinary completion records a guided, unverified history entry.
+See [`devpost/desk-dance.md`](./devpost/desk-dance.md) for scope and verification.
+
 ### Movement game
 
-Open `/play` and choose **Forest trail** or **Workshop**. Each of six completed
-cycles advances the traveler or assembles a lantern. Manual self-report can
+Open `/play` and choose **Neck reset** (four movements) or **Shoulder rolls**
+(six cycles), then **Forest trail** or **Workshop**. Each completed movement
+advances the traveler or assembles a lantern. The recommendation screen also
+offers **Play this exercise**, which preselects the exercise. Manual self-report can
 demonstrate the complete game without a camera; its result is unverified.
-Optional camera mode counts shoulder lift-and-return proxy cycles using the
-existing on-device tracker. It does not assess exercise form or full rotation.
-Pause preserves the count, and camera resume requires fresh calibration. A new
+Optional camera mode uses the selected exercise's on-device tracker: four guided
+neck movements with a final return to neutral, or six shoulder lift-and-return
+proxy cycles. It does not assess exercise form or full rotation.
+Pause preserves the count and neck sequence; camera resume requires fresh calibration. A new
 run resets the scene. No game progress or reward is persisted in this version.
-Automated tests use mocked camera landmarks; real webcam recognition and a
-responsive browser walkthrough still need hands-on validation.
+Automated tests use mocked camera landmarks. All four exercise/world combinations
+have passed manual browser smoke checks; real webcam recognition still needs
+hands-on validation. The extension's scenarios and evidence are recorded in
+[`devpost/all-exercises-game.md`](./devpost/all-exercises-game.md).
 
 The feature's TDPD and test catalog are
 [`devpost/character-game-tdpd.md`](./devpost/character-game-tdpd.md) and
@@ -56,7 +72,7 @@ The core product principle is:
 The MVP is a responsive single-page demo built around one proof: two contexts
 with high movement need produce different decisions because interruption cost
 is different. It includes deterministic `MOVE NOW` / `NOT NOW` decisions,
-clear explanations, two selectable activities, and a minimal `Start → Done` loop.
+clear explanations, three selectable activities, and a minimal `Start → Done` loop.
 The context panel labels the calendar input as demo data. During the movement
 activity, the user can explicitly enable the browser camera and let an on-device
 pose model guide a four-movement neck reset. The shoulder-roll activity can use

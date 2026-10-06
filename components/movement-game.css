@@ -1,3 +1,5 @@
+.movement-game { width: 100%; }
+.movement-game .site-nav { flex-wrap: wrap; }
 .movement-game__intro { padding: 70px 0 44px; max-width: 800px; }
 .movement-game__intro h1 { font-size: clamp(2.8rem, 5vw, 5rem); letter-spacing: -.055em; line-height: 1.06; margin: 12px 0 18px; }
 .movement-game__intro > p:last-child { color: var(--ink-soft); font-size: 1.06rem; line-height: 1.6; }
@@ -8,6 +10,9 @@
 .movement-game__controls legend { font-weight: 750; margin-bottom: 12px; }
 .movement-game__controls label { align-items: center; display: inline-flex; gap: 8px; }
 .movement-game__controls input { accent-color: var(--signal); }
+.movement-game__exercise h2 { font-size: 1.1rem; margin: 0 0 10px; }
+.movement-game__exercise h2 span { color: var(--ink-soft); display: block; font-size: .8rem; font-weight: 500; margin-top: 6px; }
+.movement-game__exercise p { color: var(--ink-soft); line-height: 1.6; margin: 0 0 10px; }
 .movement-game__progress { border-top: 1px solid var(--line); font-size: .85rem; margin: 0; padding-top: 20px; }
 .movement-game__progress strong { display: block; font-size: 2.2rem; font-variant-numeric: tabular-nums; }
 .movement-game__actions { display: flex; flex-direction: column; gap: 10px; }

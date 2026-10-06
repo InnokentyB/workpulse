@@ -22,6 +22,10 @@ const recommendation: DecisionResult = {
 };
 
 describe("DecisionCard", () => {
+  it.each(ACTIVITIES)("links $name to its selected exercise in the game", (activity) => {
+    render(<DecisionCard result={{ ...recommendation, activity }} />);
+    expect(screen.getByRole("link", { name: /Play this exercise/ }).getAttribute("href")).toBe(`/play?activity=${activity.id}`);
+  });
   it("renders the decision, signals, explanation, and activity", () => {
     render(<DecisionCard result={recommendation} onStart={vi.fn()} />);
 
