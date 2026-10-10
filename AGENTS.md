@@ -7,3 +7,11 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## TDPD 0.13
+
+Read `.tdpd/core/FRAMEWORK.md` and `.tdpd/core/QUICKSTART.md` before product work.
+Shape/Plan/Audit do not authorize implementation.
+Approve LOCK (goal/specification), QAR (measurable non-functional requirements), ARCH (architecture) and RISK (security/adversarial review) with the human before scenarios.
+Keep TRUN scenario-level results and errors for each build; automated GREEN requires owner UAT.
+Historical local onboarding work is preserved in `backup/workpulse-pre-tdpd-sync-20261010`; reconcile individual features against the current product before restoring them.
