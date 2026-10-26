@@ -57,3 +57,14 @@ describe("MovementScene", () => {
     expect(screen.getByRole("img", { name: /completed 0 of 6 steps/ })).toBeTruthy();
   });
 });
+
+it('gives eight-step rounds a distinct destination for every acknowledged step',()=>{
+ const {rerender,container}=render(<MovementScene scene="trail" targetMovements={8} completedCycles={0} status="active"/>);
+ const positions=new Set<string>();
+ for(let count=0;count<=8;count++){rerender(<MovementScene scene="trail" targetMovements={8} completedCycles={count} status="active"/>);expect(screen.getByText(`${count} / 8`)).toBeTruthy();positions.add(container.querySelector('.movement-scene__traveler')!.getAttribute('transform')!);}
+ expect(positions.size).toBe(9);
+ rerender(<MovementScene scene="workshop" targetMovements={8} completedCycles={1} status="active"/>);
+ expect(container.querySelectorAll('circle[fill="#15684a"]').length).toBe(1);
+ expect(container.querySelector('svg')!.querySelector('path[stroke-width="5"]')).not.toBeNull();
+ rerender(<MovementScene scene="workshop" targetMovements={8} completedCycles={8} status="complete"/>);expect(screen.getByRole('img',{name:/completed 8 of 8 steps/})).toBeTruthy();
+});

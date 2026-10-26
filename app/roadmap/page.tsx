@@ -158,7 +158,7 @@ export default function RoadmapPage() {
             no medical diagnosis, and no raw camera retention by default.
           </p>
         </div>
-        <Link className="button button--evaluate" href="/">
+        <Link className="button button--evaluate" href="/demo">
           Return to live demo <ArrowIcon />
         </Link>
       </section>

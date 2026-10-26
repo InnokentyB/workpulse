@@ -1,3 +1,5 @@
+Current route acceptance and evidence are in [route-demo.md](route-demo.md). The older Timing Lab test matrix below is a separate journey, not an owner camera verdict.
+
 # WorkPulse Timing Lab — acceptance and test scenarios
 
 **Status:** implementation test catalog. Traceability target: `user-scenarios.md` (US IDs), `prd.md` and `spec.md`. The fixed example below is the implemented demo fixture.

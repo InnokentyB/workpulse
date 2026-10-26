@@ -102,7 +102,7 @@ export function ActivityHistory({ entries }: { entries: ActivityHistoryEntry[] }
         {entries.length === 0 ? (
           <div className="history-empty">
             <strong>No completed activities yet.</strong>
-            <p>Finish either activity and its details will appear here.</p>
+            <p>Finish an activity in the live demo and its details will appear here.</p>
           </div>
         ) : (
           <ol className="history-list">

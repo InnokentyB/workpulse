@@ -26,7 +26,7 @@ describe("RoadmapPage", () => {
     expect(screen.getByText("A practical starter library")).toBeDefined();
     expect(screen.getByRole("link", { name: /return to live demo/i })).toHaveProperty(
       "pathname",
-      "/",
+      "/demo",
     );
     expect(screen.getAllByRole("heading", { level: 3 })[0].textContent).toBe(
       "Real calendar connection",

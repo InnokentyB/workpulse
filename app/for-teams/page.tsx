@@ -66,7 +66,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
           <span>WorkPulse</span>
         </Link>
         <nav aria-label="Primary navigation">
-          <Link className="business-nav-link" href="/">
+          <Link className="business-nav-link" href="/demo">
             Product demo
           </Link>
           <a className="button button--business" href="#pilot-model">
@@ -86,7 +86,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
             and stays quiet when focus or a meeting matters more.
           </p>
           <div className="business-hero__actions">
-            <Link className="button button--business" href="/">
+            <Link className="button button--business" href="/demo">
               See the live decision <ArrowIcon />
             </Link>
             <a className="business-text-link" href="#commercial-model">
@@ -305,7 +305,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
           The working demo already proves the core behaviour: sometimes the
           best intervention is the one WorkPulse decides not to make.
         </p>
-        <Link className="button button--business" href="/">
+        <Link className="button button--business" href="/demo">
           Try both decisions <ArrowIcon />
         </Link>
       </section>

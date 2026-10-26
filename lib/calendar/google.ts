@@ -110,7 +110,7 @@ export function createGoogleCalendarAdapter(
         );
       }
 
-      if (!payload.calendars || typeof payload.calendars !== "object") {
+      if (!payload || typeof payload !== "object" || Array.isArray(payload) || !payload.calendars || typeof payload.calendars !== "object" || Array.isArray(payload.calendars)) {
         throw new CalendarIntegrationError(
           "invalid-provider-response",
           "Google Calendar returned an invalid response.",
@@ -119,15 +119,21 @@ export function createGoogleCalendarAdapter(
 
       const busy = calendarIds.flatMap((calendarId) => {
         const calendar = payload.calendars?.[calendarId];
-        if (!calendar || calendar.errors?.length) {
+        if (!calendar || typeof calendar !== "object" || Array.isArray(calendar) || (calendar.errors !== undefined && !Array.isArray(calendar.errors))) {
+          throw new CalendarIntegrationError("invalid-provider-response", "Google Calendar returned an invalid calendar entry.");
+        }
+        if (calendar.errors?.length) {
           throw new CalendarIntegrationError(
             "provider-unavailable",
             "Google Calendar could not read one of the selected calendars.",
           );
         }
 
-        return (calendar.busy ?? []).map((period) => {
-          if (!isDateTime(period.start) || !isDateTime(period.end)) {
+        if (!Array.isArray(calendar.busy)) {
+          throw new CalendarIntegrationError("invalid-provider-response", "Google Calendar did not return busy intervals for a selected calendar.");
+        }
+        return calendar.busy.map((period) => {
+          if (!period || typeof period !== "object" || Array.isArray(period) || !isDateTime(period.start) || !isDateTime(period.end)) {
             throw new CalendarIntegrationError(
               "invalid-provider-response",
               "Google Calendar returned an invalid busy period.",

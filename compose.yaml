@@ -1,0 +1,49 @@
+name: workpulse-build-ai
+services:
+  web:
+    image: workpulse-build-ai:local
+    environment:
+      WORKPULSE_PUBLIC_ORIGIN: ${WORKPULSE_PUBLIC_ORIGIN:-http://127.0.0.1:13002}
+    build:
+      context: .
+      target: runtime
+    platform: linux/amd64
+    init: true
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${WORKPULSE_PORT:-13002}:3000"
+    mem_limit: 1g
+    cpus: 2.0
+    pids_limit: 128
+    read_only: true
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,size=128m,mode=1777
+      - /app/.next/cache:rw,nosuid,nodev,size=128m,uid=1000,gid=1000
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/calendar/providers').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      start_period: 20s
+      retries: 6
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+  checks:
+    profiles: [tools]
+    build:
+      context: .
+      target: source
+    platform: linux/amd64
+    init: true
+    restart: "no"
+    command: ["npm", "test"]
+    mem_limit: 2g
+    cpus: 2.0
+    pids_limit: 256
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "2"}

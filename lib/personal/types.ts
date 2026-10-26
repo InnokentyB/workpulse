@@ -1,0 +1,11 @@
+import type { ExerciseId } from './exercises';
+export type Goal = 'trail' | 'workshop';
+export type MovementVersion = 'route-v1';
+export type PersonalRun = { exerciseId?:ExerciseId; source?:'scheduled'|'chosen'; target?:number; startedAt?:number; movementVersion?:MovementVersion; id:string; goal:Goal; count:number; status:'active'|'paused'|'complete'; lease:string; updatedAt:number };
+export type PersonalHistory = { exerciseId?:ExerciseId; source?:'scheduled'|'chosen'; elapsedSeconds?:number; movementVersion?:MovementVersion; id:string; goal:Goal; steps:number; completedAt:number };
+export type BusyInterval = { start:number; end:number };
+export type ForecastReason = 'start-work'|'unknown'|'due-now'|'after-due'|'after-busy'|'no-window';
+export type ForecastState = { timeline:{start:number;end:number;busy:BusyInterval[];observedAt:number}|null; breakForecast:BusyInterval|null; forecastReason:ForecastReason };
+export type Availability = { busy?:BusyInterval[]; horizonStart?:number; observedAt:number; horizonEnd:number; selectionVersion:number; isBusy:boolean; freeMinutes:number; reason:string };
+export type PersonalRecord = { version:1|2; accessToken:string; refreshToken:string; expiresAt:number; calendars:Array<{id:string;name:string;primary:boolean}>; selected:string[]; selectionVersion:number; workStartedAt:number|null; dueAt:number|null; lastCompletedAt:number|null; history:PersonalHistory[]; run:PersonalRun|null; availability:Availability|null; fixture?:'due'|'busy'|'blocked'|'stale'|'unavailable' };
+export type PersonalState = ForecastState & { configured:boolean; connected:boolean; calendars?:PersonalRecord['calendars']; selected:string[]; workStartedAt:number|null; dueAt:number|null; lastCompletedAt:number|null; history:PersonalHistory[]; run:Omit<PersonalRun,'lease'|'updatedAt'>|null; availability:Omit<Availability,'selectionVersion'|'horizonEnd'|'horizonStart'|'busy'>|null; decision:'setup'|'start-work'|'wait'|'move'|'unknown'; runLease?:string; error?:string; warning?:string };

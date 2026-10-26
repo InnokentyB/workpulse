@@ -1,5 +1,5 @@
-import { WorkPulseApp } from "@/components/WorkPulseApp";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return <WorkPulseApp />;
+  redirect('/personal');
 }

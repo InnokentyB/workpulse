@@ -1,3 +1,5 @@
+Current route scenarios and version-specific evidence are in [route-demo.md](route-demo.md). The Timing Lab scenarios below are historical and do not establish camera-route UAT.
+
 # WorkPulse Timing Lab — user scenarios
 
 **Status:** implementation companion to the approved `scope.md`, `prd.md` and `spec.md`.

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 
 import {
   ActivitySession,
@@ -79,12 +80,14 @@ export function WorkPulseApp() {
       <SiteHeader current="demo" />
 
       <div className="intro" id="top">
+        <p><strong>Demo mode · fictional calendar</strong></p>
         <h1>Your workday has a rhythm. Find the right moment to move.</h1>
         <p>
           WorkPulse weighs movement need against interruption cost, then makes
           one clear call — without another noisy reminder.
         </p>
       </div>
+      <p>These scenarios and their local demo history are separate from your real workday. <Link className="button button--quiet" href="/personal#exercises">Open exercises in My day</Link></p>
 
       <section className="demo-layout" aria-label="WorkPulse decision demo">
         <aside className="demo-controls">
@@ -116,6 +119,7 @@ export function WorkPulseApp() {
           ) : null}
 
           {isResultVisible && result ? (
+            <>
             <DecisionCard
               activities={ACTIVITIES}
               onActivitySelect={(activityId) =>
@@ -128,6 +132,8 @@ export function WorkPulseApp() {
               onStart={() => setState("ACTIVE")}
               result={result}
             />
+            <Link href={`/personal?exercise=${result.activity?.id==='neck-reset'||result.activity?.id==='shoulder-rolls'?result.activity.id:'lantern-route'}#exercises`}>Do a saved camera exercise in My day</Link>
+            </>
           ) : null}
 
           {state === "ACTIVE" && result?.activity ? (

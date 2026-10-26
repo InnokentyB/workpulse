@@ -31,7 +31,7 @@ The initial commercial hypothesis is a limited team pilot, followed by per-activ
 - Show sedentary time, time to the next meeting, and time since the last movement.
 - Identify calendar context as demo data and keep camera state visible at all times.
 - Deterministically return `MOVE NOW` or `NOT NOW`, movement need, interruption cost, and a reason.
-- Offer two prototype activities only for `MOVE NOW`: a 45-second neck reset and 60-second shoulder rolls.
+- Offer three prototype activities only for `MOVE NOW`: a 45-second neck reset, 60-second shoulder rolls, and a 36-second guided desk dance.
 - Support optional on-device verification for four guided neck movements and six shoulder rolls, plus a manual fallback for either activity.
 - Keep a browser-only history of completed activities with time, estimated duration, verification mode, and movement count when local storage is available; summarize today's count and the latest completion.
 - Request camera access only after the user explicitly enables it during either activity and stop it immediately after completion or cancellation.

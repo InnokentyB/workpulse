@@ -1,0 +1,12 @@
+# Optional private calendar persistence. Use with compose.yaml, not on its own.
+# Set WORKPULSE_PERSONAL_ENV to an owner-private env file outside this repository.
+services:
+  web:
+    env_file:
+      - ${WORKPULSE_PERSONAL_ENV:?Set WORKPULSE_PERSONAL_ENV to a private env file}
+    environment:
+      WORKPULSE_PERSONAL_DATA_DIR: /data/personal
+    volumes:
+      - personal:/data/personal
+volumes:
+  personal:

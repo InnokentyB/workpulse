@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 
 type Calendar = { id: string; name: string; primary: boolean };
@@ -69,7 +70,8 @@ export function CalendarConnection() {
     <SiteHeader current="calendar" />
     <header className="timing-lab__intro">
       <p className="timing-lab__eyebrow">WorkPulse / Calendar</p>
-      <h1>Find a free moment in your day.</h1>
+      <h1>Check your Google connection.</h1>
+      <p>For a calendar timeline and suggested movement breaks, <Link href="/personal">open My day</Link>. Connect there once to keep access between visits.</p>
       <p>Connect Google Calendar to inspect free/busy time. WorkPulse reads no meeting titles, people, or descriptions.</p>
     </header>
     <section className="calendar-card" aria-label="Google Calendar connection">

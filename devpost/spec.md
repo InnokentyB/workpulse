@@ -3,7 +3,48 @@ doc: spec
 status: approved
 ---
 
-# WorkPulse Timing Lab — Technical Spec
+# Current review implementation — camera route, 26 October 2026
+
+Same Next/React/TypeScript and MediaPipe stack; no new dependencies for the route.
+`lib/route-motion-tracker.ts` composes the existing alternating foot tracker for
+six cycles, then validates visible shoulders/elbows/wrists for sideways and
+overhead stages. Each arm stage requires at least600ms/seven distinct samples
+and three neutral-return samples. Whole-body framing, neutral recalibration,
+timestamp monotonicity and a750ms gap guard prevent unseen partial progress.
+This is pattern recognition, not assessment of medical/exercise form.
+
+`StepTouchChallenge` owns explicit camera lifecycle, generation guards, current
+cue, example, eight acknowledged milestones and bounded save retry. `RouteScene`
+shows approach, gate and lantern using acknowledged count. Pause/hide/unmount/
+failure/finish stops tracks; microphone, recording and video upload are absent.
+Default route-v1 is used by `/move`; existing personal rounds without a movement
+version keep steps-v1. New personal runs/history carry route-v1. Existing
+encrypted store, origin/PKCE checks, leases and cooldown are unchanged.
+
+Local reproduction from repository root uses reviewed Docker/Compose:
+
+```sh
+docker compose build web
+docker compose --profile tools run --rm checks npm test -- --maxWorkers=2
+docker compose up -d --no-build --wait web
+docker compose ps
+docker compose logs --tail=50 web
+docker compose stop web
+```
+
+Default local practice: http://127.0.0.1:13002/move. No Google keys are required;
+initial camera use downloads MediaPipe WASM/model from documented upstreams.
+The private owner preview uses a separate13001 port; it is not a public judge URL.
+Do not enable fixture routes in a judge build or point fixtures at personal data.
+Earlier host-native examples below describe historical development; Tower
+execution always uses Docker. See README and [demo/scenarios](route-demo.md).
+
+Engineering evidence: runtime source fb4164b,241tests/33files, lint/build PASS,
+final bounded synthetic browser10/10 PASS. The preceding99c648e browser13/13
+matrix predates the mobile CSS-only adjustment. Neither is owner camera UAT.
+This documentation update does not claim a new runtime build or human acceptance.
+
+# Historical plan — WorkPulse Timing Lab Technical Spec
 
 Revised after the decision to import the existing WorkPulse application. The baseline is the public `InnokentyB/workpulse` repository at commit `5c047ed1ae63a4d834e07025449dcd3bdc5e21c5`; the timing-feedback extension is implemented here. Status: approved implementation baseline.
 
@@ -93,4 +134,6 @@ The new experiment uses a fixed day and explicit rules; it does not add real cal
 
 The optional `/play` experience adds movement-powered character scenes beside the Timing Lab. The implementation contract and branch catalog are in `character-game-tdpd.md`; acceptance checks are in `character-game-test-scenarios.md`. The user authorized this extension and implementation on 2 October 2026.
 
-Two original SVG scenes share a six-cycle progression: Trail raises a traveler to a summit, Workshop assembles a lantern. Camera progress comes from the existing shoulder lift-and-return tracker. Explicit manual demo input is self-reported and unverified. A paused run retains progress; camera resume recalibrates. The game requires no Google credentials or live calendar, and has no persistent rewards in this slice.
+Two original SVG scenes share activity-specific progression: Trail raises a traveler to a summit, Workshop assembles a lantern. Neck reset uses four guided movements plus final neutral return; shoulder rolls use six lift-and-return proxy cycles. Optional camera progress comes from the corresponding on-device tracker. Desk dance uses six eight-beat phrases at 80 BPM, seated or standing, with optional synthesized audio and explicit self-report after each phrase; it has no camera recognition. Explicit manual demo input is self-reported and unverified. A paused run retains progress; camera resume recalibrates. The game requires no Google credentials or live calendar, and has no persistent rewards in this slice.
+
+Current extension contracts: `all-exercises-game.md` and `desk-dance.md` (6 October). `/play?activity=ID` preselects the catalog activity. Pause preserves completed progress, stops audio/tracking and restarts an unfinished dance phrase; a new run clears progress. Ordinary dance completion records a guided, unverified history entry. Real camera/phone acceptance is a separate optional-feature gate, not a dependency of the core simulated Timing Lab submission.

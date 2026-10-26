@@ -105,4 +105,9 @@ describe("Google Calendar availability adapter", () => {
       code: "invalid-provider-response",
     });
   });
+  it.each([{}, { busy: null }, { busy: {} }, { busy: [null] }])('rejects a selected calendar with missing or malformed busy data: %j', async (calendar) => {
+    const adapter = createGoogleCalendarAdapter(vi.fn<typeof fetch>().mockResolvedValue(Response.json({ calendars: { primary: calendar } })));
+    await expect(adapter.readAvailability(request)).rejects.toMatchObject({ code: 'invalid-provider-response' });
+  });
+
 });

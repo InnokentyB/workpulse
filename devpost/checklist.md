@@ -3,7 +3,26 @@ doc: checklist
 status: approved
 ---
 
-# Character Game Build Checklist
+# Current review checkpoint — 26 October 2026
+
+Current route contract: [LOCK-003](personal-use/LOCK-003.md).
+Demo mechanics, scenarios and version-specific evidence: [route-demo.md](route-demo.md).
+The older character-game checklist below remains historical; its open human
+checks have not been silently accepted by the new engineering results.
+
+- [x] Engineering route evidence recorded: six walking cycles plus two arm
+  gestures, eight milestones; runtime baseline fb4164b, bounded browser10/10.
+- [x] README/scope/PRD/spec and recording instructions identify the current route
+  and explicitly retain the earlier eight-step version as separate evidence.
+- [ ] Owner completes the real-camera route and confirms count/goal/Pause.
+- [ ] Owner confirms final review and the learning wrap-up; their earlier
+  explanation of personal motivation and motion capture is preserved in chat,
+  not turned into agent-authored submission answers.
+- [ ] New actual-camera video recorded and public link checked.
+- [ ] Exact reviewed source/MIT published with permission; eligibility resolved
+  or honestly disclosed, authorized Devpost form completed, receipt retained.
+
+# Historical Character Game Build Checklist
 
 Build mode: fast. The user authorized full TDPD preparation and implementation on 2 October 2026; implementation details are filled in under the previously agreed two-scene direction. Existing Timing Lab and Google Calendar work precede this checklist.
 

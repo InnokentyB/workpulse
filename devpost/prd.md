@@ -3,7 +3,35 @@ doc: prd
 status: approved
 ---
 
-# WorkPulse Timing Lab — Product Requirements
+# Current review requirements — camera route, 26 October 2026
+
+This current addition follows the owner's [LOCK-003](personal-use/LOCK-003.md).
+The earlier approved Timing Lab PRD below remains planning history.
+
+1. Open `/move` without Google configuration. The page labels practice and no
+   saved workday completion. Both goal choices use the same movement sequence.
+2. Explicitly enable the camera, fit the whole body and hands in frame, and stand
+   neutral for calibration. The prominent cue reports calibration and the next
+   action; an animated/static reduced-motion example shows the current movement.
+3. Six alternating side steps with complete returns advance the character to a
+   closed gate. Wrong-side/partial/no-body motion produces no milestone.
+4. After neutral calibration, hold both arms sideways then lower them. The gate
+   opens only after recognition; holding alone does not complete this milestone.
+5. After neutral calibration, hold arms overhead then lower them. The lantern
+   lights and the round ends at8/8. Pose sample animation never scores.
+6. Pause, hide, leave, failure or completion stops capture. Resume recalibrates;
+   incomplete gestures do not carry over. No manual scoring or camera upload.
+
+Acceptance: the visible gate/lantern milestones, current instruction and camera
+state agree. Camera failure offers retry; synthetic injection is fixture-only.
+`/move` practice resets with a new run; `/personal` persists acknowledged counts
+and once-only completion under the existing connection/lease contract. Old
+unversioned saved rounds retain eight-step behavior; new runs are route-v1.
+Real human recognition/comfort remain pending owner acceptance. Live calendar
+setup/consent and selected-calendar checks remain separate pending acceptance.
+See [route scenarios and minimal UAT](route-demo.md).
+
+# Historical plan — WorkPulse Timing Lab Product Requirements
 
 **One line:** A WorkPulse extension that shows how context and feedback change the timing of a movement suggestion. Sources: `scope.md > The Unique Kernel`, `Who It's For`, `The Core Loop`.
 
@@ -76,12 +104,16 @@ Connect a real calendar with consent; test opt-in preferences across days; offer
 ## Non-Goals
 
 - No clinical, productivity, or employer-outcome claims.
-- No camera, financial penalties, or real notifications.
+- No camera dependency in the core Timing Lab, financial penalties, or real notifications. Optional camera features belong to the separate movement extension.
 - No hidden AI claim: the demo should accurately describe its deterministic simulation. Source: `scope.md > Explicitly Cut`.
 
 ## Implementation Choices
 
-The optional `/play` route is a separate approved extension: choose Trail or Workshop, start a six-cycle movement session, see each completed cycle advance the scene, pause/resume and replay. Camera counting does not validate exercise form; manual demo input is self-reported. See `character-game-tdpd.md` and `character-game-test-scenarios.md` for the full contract.
+The optional `/play` route is a separate approved extension: choose Trail or Workshop, choose neck reset (four movements), shoulder rolls (six cycles) or desk dance (six self-reported phrases), start a session, see each completed cycle advance the scene, pause/resume and replay. Camera counting does not validate exercise form; manual demo input is self-reported. See `character-game-tdpd.md` and `character-game-test-scenarios.md` for the full contract.
 
 - The one-page lab uses Accept, Snooze and Dismiss. The sample day runs 09:00–17:00, starts exploration at 09:10, and requires a five-minute open interval. Accept waits at least 90 minutes, Snooze at least 20 minutes, and Dismiss skips the current open interval. These are simulation parameters, not health guidance.
 - The imported visual language supplies the copy, colors and type scale. The lab remains separate from camera and live calendar features.
+
+### Current optional extension — 6 October expansion
+
+Both Trail and Workshop support all three activities. Dance offers seated/standing instructions and optional on-device synthesized rhythm, eight beats per phrase at 80 BPM, followed by explicit self-report. Neck/shoulder camera recognition is optional and does not assess form. Recommendation links preselect the selected activity. See `all-exercises-game.md` and `desk-dance.md`. These additions do not change the core Timing Lab acceptance scope.
