@@ -31,3 +31,6 @@ Owner rejects disappearance of Shoulder lifts. Restoremaincatalogue explicitly r
 
 ## Latest real-camera UAT rejection after shoulder/arms changes
 Owner reports movements still not recognized reliably and framing requires too much distance for normal desk use. Exact failing exercise/landmark trace not supplied. Do not infer that syntheticGREEN resolves this rejection. Earlier Neck reset reportedly worked; full seated challenge remains unaccepted. Owner subsequently authorizes publicpublication of41ced70 and verified current-run fixes; this is publication permission, not UATacceptance.
+
+## Recalibration loop on lowering hands —26October2026
+Owner screenshot armscalibration0/8 repeatedly after lowering. Anyrequiredwrist/elbow occlusion resetfullbaseline; 'arms down' instruction encouraged handsoutsideframe. LOCK009preservescorecalibration, cancelsincompletegesture, requiresvisibleneutralrearm, explicitinframehandreturncue. No unseencompletion/inferredmovement.

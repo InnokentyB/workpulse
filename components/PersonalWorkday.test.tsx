@@ -45,7 +45,7 @@ describe('Personal workday user boundary',()=>{
   vi.stubGlobal('fetch',vi.fn().mockResolvedValue(json({...base,workStartedAt:1,dueAt:1,decision:'move'})));
   render(<PersonalWorkday/>);
   await screen.findByRole('button',{name:'Start camera challenge'});
-  expect(screen.getByText(/Arms sideways, lower; arms overhead, lower/)).toBeTruthy();
+  expect(screen.getByText(/Raise sideways, return hands to chest; raise overhead, return/)).toBeTruthy();
  });
  it('labels an unversioned saved round as the earlier exercise',async()=>{
   vi.stubGlobal('fetch',vi.fn().mockResolvedValue(json({...base,run:{id:'legacy',goal:'trail',count:6,status:'paused'}})));
