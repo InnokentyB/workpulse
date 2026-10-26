@@ -23,7 +23,7 @@ export function SiteHeader({ current }: { current: "personal" | "demo" | "lab" |
           Timing Lab
         </Link>
         <Link aria-current={current === "play" ? "page" : undefined} href="/play">
-          Movement game
+          Camera game
         </Link>
         <Link aria-current={current === "calendar" ? "page" : undefined} href="/calendar">
           Connection check

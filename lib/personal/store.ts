@@ -19,7 +19,7 @@ export const connectionId=()=>randomBytes(32).toString('base64url');
 export function validId(id:string|undefined):id is string{return !!id&&/^[A-Za-z0-9_-]{43}$/.test(id);}
 const location=(id:string,c:PersonalConfig)=>join(c.directory,createHash('sha256').update(id).digest('hex')+'.enc');
 export async function readRecord(id:string,c:PersonalConfig):Promise<PersonalRecord|null>{
- try{const raw=await readFile(location(id,c),'utf8');const record=unseal<PersonalRecord>(raw,c.secret);if(!record||(record.version!==1&&record.version!==2)||typeof record.accessToken!=='string'||typeof record.refreshToken!=='string'||!Number.isFinite(record.expiresAt)||!Array.isArray(record.selected)||!Array.isArray(record.calendars)||!Array.isArray(record.history))throw new PersonalError(503,'Connection store is unreadable.');return record;}
+ try{const raw=await readFile(location(id,c),'utf8');const record=unseal<PersonalRecord>(raw,c.secret);if(!record||(record.version!==1&&record.version!==2&&record.version!==3)||typeof record.accessToken!=='string'||typeof record.refreshToken!=='string'||!Number.isFinite(record.expiresAt)||!Array.isArray(record.selected)||!Array.isArray(record.calendars)||!Array.isArray(record.history))throw new PersonalError(503,'Connection store is unreadable.');return record;}
  catch(e){if((e as NodeJS.ErrnoException).code==='ENOENT')return null;if(e instanceof PersonalError)throw e;throw new PersonalError(503,'Connection store is unavailable.');}
 }
 export async function saveRecord(id:string,record:PersonalRecord,c:PersonalConfig){

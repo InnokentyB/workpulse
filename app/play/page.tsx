@@ -1,9 +1,10 @@
-import { MovementGame } from "@/components/MovementGame";
+import { redirect } from 'next/navigation';
 
 export default async function PlayPage({ searchParams }: {
   searchParams: Promise<{ activity?: string | string[] }>;
 }) {
   const { activity } = await searchParams;
-  const activityId = typeof activity === "string" ? activity : "shoulder-rolls";
-  return <MovementGame key={activityId} initialActivityId={activityId} />;
+  if(activity==='desk-dance')redirect('/demo/game?activity=desk-dance');
+  const exercise=activity==='neck-reset'||activity==='shoulder-rolls'||activity==='lantern-route'?activity:'lantern-arms';
+  redirect(`/personal?exercise=${exercise}&scene=trail#exercises`);
 }

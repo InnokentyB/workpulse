@@ -30,3 +30,9 @@ describe("side-step motion recognition",()=>{
   it("does not average a moving/open posture into calibration",()=>{let s=initialStepTouchState();for(let i=0;i<30;i++)s=updateStepTouch(s,pose(i%2?.08:0,true),i*100);expect(s.phase).toBe("calibrating");expect(s.count).toBe(0);});
   it("does not join opening and return across a stalled sample gap",()=>{let s=cycle(calibrated());const count=s.count;let t=s.lastTimestamp;for(let i=0;i<3;i++)s=updateStepTouch(s,pose(.08,true),t+=100);expect(s.phase).toBe("return");s=updateStepTouch(s,pose(),t+=751);expect(s.phase).toBe("calibrating");expect(s.count).toBe(count);for(let i=0;i<3;i++)s=updateStepTouch(s,pose(),t+=100);expect(s.count).toBe(count);});
 });
+
+it('requires both ankles below the hips, matching the live avatar framing rule',()=>{
+ let s=calibrated();const raised=pose(-.08,true);raised[27].y=.45;
+ s=updateStepTouch(s,raised,s.lastTimestamp+100);
+ expect(s.tracking).toBe('lost');expect(s.phase).toBe('calibrating');expect(s.count).toBe(0);
+});

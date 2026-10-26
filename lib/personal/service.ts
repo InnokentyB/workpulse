@@ -64,15 +64,19 @@ export async function mutate(record:PersonalRecord,body:Record<string,unknown>,c
    if(!record.workStartedAt)throw new PersonalError(409,'Start a work session first.');
    if(!fresh(record))await refresh(record,c);const s=state(record);if(s.decision!=='move')throw new PersonalError(409,'A fresh suitable calendar window and due break are required.');
   }
-  if(!resume){record.version=2;record.run={...(exercise!.id==='lantern-route'?{movementVersion:'route-v1' as const}:{}),exerciseId:exercise!.id,source:chosen?'chosen':'scheduled',target:exercise!.target,startedAt:now,id:randomBytes(16).toString('hex'),goal:goal as Goal,count:0,status:'active',lease:randomBytes(24).toString('base64url'),updatedAt:now};}
+  if(!resume){record.version=exercise!.id==='lantern-arms'||record.version===3?3:2;record.run={...(exercise!.id==='lantern-route'?{movementVersion:'route-v1' as const}:{}),exerciseId:exercise!.id,source:chosen?'chosen':'scheduled',target:exercise!.target,startedAt:now,id:randomBytes(16).toString('hex'),goal:goal as Goal,count:0,status:'active',lease:randomBytes(24).toString('base64url'),updatedAt:now};}
   else{record.run!.lease=randomBytes(24).toString('base64url');record.run!.status='active';record.run!.updatedAt=now;}
   return record.run!.lease;
+ }
+ case 'discard-run':{
+  if(!record.run||record.run.id!==body.runId||record.run.status==='complete')throw new PersonalError(409,'No matching unfinished run to discard.');
+  record.run=null;break;
  }
  case 'progress':case 'pause-run':case 'cancel-run':{
   const run=record.run;if(!run||run.id!==body.runId||typeof body.lease!=='string'||run.lease!==body.lease)throw new PersonalError(409,'This run changed in another tab. Resume again.');
   if(body.action==='cancel-run'){if(run.status==='complete')throw new PersonalError(409,'Completed run cannot be cancelled.');record.run=null;break;}
   if(body.action==='pause-run'){if(run.status==='complete')throw new PersonalError(409,'Run is already complete.');run.status='paused';run.updatedAt=now;break;}
-  if((run.exerciseId==='neck-reset'||run.exerciseId==='shoulder-rolls')&&body.exerciseId!==run.exerciseId)throw new PersonalError(409,'Reload My day to use this exercise.');
+  if((run.exerciseId==='neck-reset'||run.exerciseId==='shoulder-rolls'||run.exerciseId==='lantern-arms')&&body.exerciseId!==run.exerciseId)throw new PersonalError(409,'Reload My day to use this exercise.');
   const target=getExercise(run.exerciseId)?.target??8;
   if(!Number.isInteger(body.count)||Number(body.count)<1||Number(body.count)>target)throw new PersonalError(400,'Invalid recognized step count.');
   if(body.count===run.count)break;

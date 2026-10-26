@@ -1,5 +1,6 @@
 /** Shared display catalogue. Targets are owned by the server, never request input. */
 export const exercises = [
+ {id:'lantern-arms',name:'Lantern arms',target:4},
  {id:'lantern-route',name:'Lantern route',target:8},
  {id:'neck-reset',name:'Neck reset',target:4},
  {id:'shoulder-rolls',name:'Shoulder lifts',target:6},

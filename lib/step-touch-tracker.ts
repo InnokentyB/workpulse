@@ -38,7 +38,7 @@ export function updateStepTouch(state: StepTouchState, landmarks: PoseLandmark[]
   const span = Math.abs(landmarks[28].x - landmarks[27].x);
   const shouldersY = (landmarks[11].y + landmarks[12].y) / 2;
   const hipsY = (landmarks[23].y + landmarks[24].y) / 2;
-  if (width < .08 || hipsY - shouldersY < .12 || Math.max(landmarks[27].y, landmarks[28].y) <= hipsY + .15)
+  if (width < .08 || hipsY - shouldersY < .12 || Math.min(landmarks[27].y, landmarks[28].y) <= hipsY + .15)
     return lost(state, timestamp);
   const current = { ...state, tracking: "ready" as const, lastTimestamp: timestamp };
   if (state.phase === "calibrating") {

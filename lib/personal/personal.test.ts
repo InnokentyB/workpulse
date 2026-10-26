@@ -118,3 +118,45 @@ describe('older browser movement identity guard',()=>{
   expect((await post({...p,exerciseId})).status).toBe(200);
  });
 });
+
+describe('seated Lantern arms identity',()=>{
+ it('persists four acknowledged arm events across rotated resume lease and completes exactly once',async()=>{
+  const a=await post({action:'start-exercise',exerciseId:'lantern-arms'});expect(a.status).toBe(200);expect(a.data.run).toMatchObject({exerciseId:'lantern-arms',target:4,source:'chosen'});
+  const p={action:'progress',runId:a.data.run.id,lease:a.data.runLease,exerciseId:'lantern-arms'};
+  expect((await post({...p,exerciseId:undefined,count:1})).status).toBe(409);expect((await post({...p,exerciseId:'neck-reset',count:1})).status).toBe(409);
+  expect((await post({...p,count:1})).status).toBe(200);await post({action:'pause-run',runId:a.data.run.id,lease:a.data.runLease});
+  const b=await post({action:'resume-run',runId:a.data.run.id});expect(b.data.run.count).toBe(1);expect(b.data.runLease).not.toBe(a.data.runLease);
+  expect((await post({...p,count:2})).status).toBe(409);
+  const resumed={...p,lease:b.data.runLease};expect((await post({...resumed,count:5})).status).toBe(400);
+  for(let count=2;count<=4;count++)expect((await post({...resumed,count})).status).toBe(200);
+  const duplicate=await post({...resumed,count:4});expect(duplicate.data.history).toHaveLength(1);expect(duplicate.data.history[0]).toMatchObject({exerciseId:'lantern-arms',steps:4});
+  const s=await (await GET(new NextRequest('http://localhost:3000/api/personal',{headers:{cookie}}))).json();expect(s.history).toEqual(duplicate.data.history);expect(s.run.status).toBe('complete');
+ });
+ it('keeps the existing full-body route at eight events',async()=>{
+  const a=await post({action:'start-exercise',exerciseId:'lantern-route'});expect(a.status).toBe(200);expect(a.data.run).toMatchObject({target:8,movementVersion:'route-v1'});
+ });
+});
+
+describe('arms format rollback guard',()=>{
+ it('marks new arms format3 and never downgrades after a later existing exercise',async()=>{
+  const a=await post({action:'start-exercise',exerciseId:'lantern-arms'});expect(a.status).toBe(200);
+  const id=cookie.split('=')[1],c=personalConfig()!;expect((await readRecord(id,c))!.version).toBe(3);
+  await post({action:'cancel-run',runId:a.data.run.id,lease:a.data.runLease});expect((await post({action:'start-exercise',exerciseId:'neck-reset'})).status).toBe(200);
+  expect((await readRecord(id,c))!.version).toBe(3);
+ });
+});
+
+describe('explicit discard of the current unfinished run',()=>{
+ it.each(['busy','unavailable'] as const)('discards a scheduled paused run with %s calendars without a refresh',async fixture=>{
+  const a=await post({action:'start-run',goal:'trail'}),id=cookie.split('=')[1],c=personalConfig()!,r=(await readRecord(id,c))!;
+  r.run!.status='paused';r.fixture=fixture;r.availability=null;await saveRecord(id,r,c);
+  const previousDue=r.dueAt,previousCompleted=r.lastCompletedAt;
+  const discarded=await post({action:'discard-run',runId:a.data.run.id});expect(discarded.status).toBe(200);expect(discarded.data.run).toBeNull();expect(discarded.data.history).toEqual([]);expect(discarded.data.dueAt).toBe(previousDue);expect(discarded.data.lastCompletedAt).toBe(previousCompleted);expect(discarded.data.availability).toBeNull();
+  expect((await post({action:'progress',runId:a.data.run.id,lease:a.data.runLease,count:1})).status).toBe(409);
+ });
+ it('rejects a different run ID and an already completed run',async()=>{
+  const a=await post({action:'start-exercise',exerciseId:'neck-reset'});expect((await post({action:'discard-run',runId:'different'})).status).toBe(409);
+  for(let count=1;count<=4;count++)await post({action:'progress',runId:a.data.run.id,lease:a.data.runLease,exerciseId:'neck-reset',count});
+  expect((await post({action:'discard-run',runId:a.data.run.id})).status).toBe(409);
+ });
+});

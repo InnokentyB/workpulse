@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import Link from 'next/link';
 
 import { ActivitySession } from "@/components/ActivitySession";
 import { DanceSession } from "@/components/DanceSession";
@@ -93,7 +94,9 @@ export function MovementGame({ initialActivityId = "shoulder-rolls" }: { initial
       <SiteHeader current="play" />
       <header className="movement-game__intro">
         <p className="movement-game__kicker">WorkPulse / Movement game</p>
+        <p><strong>Legacy game demo · manual and self-reported modes</strong></p>
         <h1>Move a little. See the world change.</h1>
+        <p>For the camera-controlled mountain game and saved activity, <Link href="/personal?exercise=lantern-route#exercises">open Camera game in My day</Link>.</p>
         <p>Bring a scene to life with a neck reset, shoulder rolls or a short desk dance. Choose a comfortable way to move.</p>
       </header>
 

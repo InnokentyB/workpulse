@@ -6,6 +6,24 @@ afterEach(()=>{cleanup();vi.restoreAllMocks();vi.useRealTimers();});
 const base={configured:true,connected:true,calendars:[{id:'primary',name:'My calendar',primary:true}],selected:['primary'],workStartedAt:null,dueAt:null,lastCompletedAt:null,history:[],run:null,timeline:{start:Date.now(),end:Date.now()+8*3600000,busy:[],observedAt:Date.now()},breakForecast:null,forecastReason:'start-work',availability:{observedAt:Date.now(),isBusy:false,freeMinutes:20,reason:'Free'},decision:'start-work'};
 const json=(v:unknown,status=200)=>new Response(JSON.stringify(v),{status,headers:{'Content-Type':'application/json'}});
 describe('Personal workday user boundary',()=>{
+ it('defaults to a desk-friendly arms challenge rather than a full-body route',async()=>{
+  const fetcher=vi.fn().mockResolvedValue(json(base));vi.stubGlobal('fetch',fetcher);render(<PersonalWorkday/>);
+  const arms=await screen.findByRole('radio',{name:/Lantern arms/});expect((arms as HTMLInputElement).checked).toBe(true);
+  expect(screen.getByRole('radio',{name:/Shoulder lifts/})).toBeTruthy();
+  expect(screen.queryByRole('radio',{name:/Lantern route/})).toBeNull();
+  fireEvent.click(screen.getByRole('button',{name:'Start exercise now'}));
+  await waitFor(()=>expect(fetcher).toHaveBeenCalledTimes(2));
+  expect(JSON.parse(fetcher.mock.calls[1][1].body)).toEqual({action:'start-exercise',exerciseId:'lantern-arms',goal:'trail'});
+ });
+ it('lets the user discard an unfinished older exercise before choosing arms, without enabling camera',async()=>{
+  const old={id:'old-shoulders',goal:'trail',count:1,status:'paused',exerciseId:'shoulder-rolls',target:6,source:'chosen'};
+  const fetcher=vi.fn().mockResolvedValueOnce(json({...base,run:old})).mockResolvedValueOnce(json(base));
+  vi.stubGlobal('fetch',fetcher);render(<PersonalWorkday/>);
+  fireEvent.click(await screen.findByRole('button',{name:'Discard unfinished round'}));
+  await waitFor(()=>expect(fetcher).toHaveBeenCalledTimes(2));
+  expect(JSON.parse(fetcher.mock.calls[1][1].body)).toEqual({action:'discard-run',runId:old.id});
+  expect((screen.getByRole('radio',{name:/Lantern arms/}) as HTMLInputElement).checked).toBe(true);
+ });
  it('starts a chosen neck exercise before the scheduled break and records it in the same history',async()=>{
   const now=Date.now(),run={id:'neck-run',goal:'trail',count:0,status:'active',exerciseId:'neck-reset',source:'chosen',target:4,startedAt:now};
   const fetcher=vi.fn().mockResolvedValueOnce(json({...base,workStartedAt:now,dueAt:now+2700000,decision:'wait'})).mockResolvedValueOnce(json({...base,run,runLease:'neck-lease'})).mockResolvedValueOnce(json({...base,run:{...run,count:1}}));
@@ -23,11 +41,11 @@ describe('Personal workday user boundary',()=>{
   render(<PersonalWorkday/>);await screen.findByRole('heading',{name:'Activity history'});
   const history=within(screen.getByRole('region',{name:'Activity history'}));expect(history.getByText(/4 camera-recognized movements/)).toBeTruthy();expect(history.getByText(/42 sec elapsed/)).toBeTruthy();
  });
- it('explains the three movement stages before starting a round',async()=>{
+ it('explains desk-friendly movement before starting a round',async()=>{
   vi.stubGlobal('fetch',vi.fn().mockResolvedValue(json({...base,workStartedAt:1,dueAt:1,decision:'move'})));
   render(<PersonalWorkday/>);
   await screen.findByRole('button',{name:'Start camera challenge'});
-  expect(screen.getByText(/Six side steps.*arms out.*arms up/i)).toBeTruthy();
+  expect(screen.getByText(/Arms sideways, lower; arms overhead, lower/)).toBeTruthy();
  });
  it('labels an unversioned saved round as the earlier exercise',async()=>{
   vi.stubGlobal('fetch',vi.fn().mockResolvedValue(json({...base,run:{id:'legacy',goal:'trail',count:6,status:'paused'}})));

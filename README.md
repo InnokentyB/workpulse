@@ -321,3 +321,25 @@ code reads formats1and2. Old builds intentionally reject format2 rather than
 misinterpreting a four/six-movement run as eight. After new data is written,
 rollback must preserve it and use a compatible build; do not overwrite it with
 an earlier snapshot. Actual-device movement recognition remains owner UAT.
+
+### Camera-driven game
+
+The primary **Camera game** link (`/play`) opens the real camera exercise in
+My day; the former manual game is retained at `/demo/game` and labelled legacy
+self-reported demo. `/play?activity=neck-reset` or `shoulder-rolls` selects that
+real exercise. The old guided dance remains explicitly a demo.
+
+With the camera enabled, the character responds to the current visible pose.
+Recognized and saved movements advance it up the mountain; pose following alone
+never awards progress. The same existing4/6/8 targets, gate/lantern rules and
+history acknowledgement remain. Pause, missing framing and camera shutdown must
+not leave a stale pose presented as live. Pose processing stays on-device and
+requires acceptance on the owner's actual camera.
+
+### Desk camera challenge (26 October follow-up)
+The main exercise catalogue offers **Lantern arms** (four alternating sideways/overhead hold-and-lower gestures, no hips or legs required), Neck reset and seated Shoulder lifts. Gate opens after two gestures; lantern lights after four. The legacy eight-movement full-body route keeps its saved meaning. Shoulder lifts keep the existing six-cycle ID and history; the camera wrapper now uses head and shoulders only, with explicit lift/return and head-bob rejection. Real owner-camera acceptance of that fix remains pending. Use Discard unfinished round to switch from an older paused exercise. `/move` is unsaved arms practice; `/play` defaults to the personal arms challenge. Local explicit tab recording is available at `/record-own-camera.html`; it downloads to the user's computer without uploading.
+
+New arms sessions mark encrypted records format3 to prevent older fallback-eight readers from misinterpreting the four-movement target. Current reader accepts1/2/3; version never downgrades. After arms data exists, rollback must keep a format3-compatible reader; never restore stale personal data over current sessions. Real-camera acceptance remains distinct from deterministic pose tests.
+
+### Current real-camera acceptance status
+The owner's desk-camera trial still found unreliable movement recognition and inconvenient framing. Automated and synthetic-pose checks do **not** establish real-person recognition quality. Neck reset was reported working in an earlier owner trial; the complete seated challenge has not been accepted. Treat camera exercises as experimental. Improving the desk-distance setup, recognition feedback and real-camera reliability remains open. The current app records recognized patterns, not exercise form or medical outcomes.

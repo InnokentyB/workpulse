@@ -1,13 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import MovementScene from "./MovementScene";
 import RouteScene from "./RouteScene";
 import {initialRouteState,updateRoute} from "@/lib/route-motion-tracker";
 import { initialStepTouchState, updateStepTouch } from "@/lib/step-touch-tracker";
 import {INITIAL_NECK_MOTION_STATE,updateNeckMotion,type NeckMotionState,type PoseLandmark} from "@/lib/neck-motion-tracker";
 import {INITIAL_SHOULDER_MOTION_STATE,updateShoulderMotion,type ShoulderMotionState} from "@/lib/shoulder-motion-tracker";
 import {getExercise,type ExerciseId} from "@/lib/personal/exercises";
+import {initialLanternArms,updateLanternArms,type LanternArmsState} from "@/lib/lantern-arms-tracker";
+import {projectCameraPose,type CameraPose} from "@/lib/camera-avatar";
 import "./step-touch.css";
 
 export type StepTouchChallengeProps = {
@@ -35,7 +36,7 @@ function MovementExample({route,count}:{route:boolean;count:number}) {
   const armStage=route&&count>=6;
   return <section className="step-example" aria-labelledby="step-example-title">
     <h3 id="step-example-title">Movement example</h3>
-    <p>{armStage ? count===6 ? "Open both arms sideways. Hold briefly, then lower both arms to open the gate." : "Raise both arms overhead. Hold briefly, then lower both arms to light the lantern." : "Step out → return to centre. Alternate sides. Only the foot-and-body pattern is counted."}</p>
+    <p>{armStage ? count===6 ? "Open both arms sideways. Hold briefly, then lower both arms to open the gate." : "Raise both arms overhead, keeping your hands apart. Hold briefly, then lower both arms to light the lantern." : "Step out → return to centre. Alternate sides. Only the foot-and-body pattern is counted."}</p>
     <svg className={`step-example__figure ${armStage ? count===6 ? "step-example--side" : "step-example--up" : ""}`} viewBox="0 0 360 230" role="img" aria-label={armStage ? count===6 ? "Example: arms sideways, hold, lower" : "Example: arms overhead, hold, lower" : "Example: step left, return to centre, step right, return to centre"}>
       <path d="M30 209H330" stroke="currentColor" strokeWidth="2" opacity=".25"/>
       <g className="step-example__body" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round">
@@ -54,31 +55,32 @@ function MovementExample({route,count}:{route:boolean;count:number}) {
 type UpperMotion = {
   count:number;lastTimestamp:number;neck:NeckMotionState;shoulder:ShoulderMotionState;
   candidate:string;stableFrames:number;candidateSince:number;liftedAt:number|null;
-  anchor:{x:number;y:number;headHip:number;shoulderGap:number;width:number}|null;
+  anchor:{x:number;y:number;noseY:number;leftY:number;rightY:number;width:number}|null;
 };
 function initialUpper(count:number):UpperMotion{return {count,lastTimestamp:-1,neck:{...INITIAL_NECK_MOTION_STATE,movements:count,firstSideDirection:-1},shoulder:{...INITIAL_SHOULDER_MOTION_STATE,movements:count},candidate:'',stableFrames:0,candidateSince:0,liftedAt:null,anchor:null};}
 function neckStage(count:number):NeckMotionState['stage']{return count===0?'first-side':count===1?'opposite-side':count===2?'down':count===3?'up':'complete';}
 /** Existing deterministic trackers, with continuous visible samples and neutral recalibration.
- * Shoulder scoring additionally requires torso-relative shoulder lift and a still head.
+ * Shoulder scoring additionally requires actual bilateral shoulder rise and a
+ * shoulder-versus-head differential; seated recognition never depends on hips.
  */
 function updateUpper(previous:UpperMotion,p:PoseLandmark[],t:number,neck:boolean):UpperMotion{
  if(!Number.isFinite(t)||t<=previous.lastTimestamp)return previous;
  const reset=()=>({...initialUpper(previous.count),lastTimestamp:t});
  if(previous.lastTimestamp>=0&&t-previous.lastTimestamp>750)return reset();
- const required=neck?[0,11,12]:[0,11,12,23,24];
+ const required=[0,11,12];
  if(required.some(i=>!p[i]||!Number.isFinite(p[i].x)||!Number.isFinite(p[i].y)||!Number.isFinite(p[i].visibility)||(p[i].visibility??0)<.65||p[i].x<.015||p[i].x>.985||p[i].y<.015||p[i].y>.985))return reset();
  const width=Math.abs(p[12].x-p[11].x),midX=(p[11].x+p[12].x)/2,midY=(p[11].y+p[12].y)/2;
  if(width<.08)return reset();
- const hipY=neck?0:(p[23].y+p[24].y)/2;
- const current={x:(p[0].x-midX)/width,y:(p[0].y-midY)/width,headHip:(p[0].y-hipY)/width,shoulderGap:(hipY-midY)/width,width};
+ const current={x:(p[0].x-midX)/width,y:(p[0].y-midY)/width,noseY:p[0].y,leftY:p[11].y,rightY:p[12].y,width};
  const stage=neck?previous.neck.stage:previous.shoulder.stage;
  const anchor=previous.anchor;
  if(anchor&&Math.abs(width-anchor.width)>.3*anchor.width)return reset();
- if(!neck&&(hipY-midY<.12||anchor&&Math.abs(current.headHip-anchor.headHip)>.025))return reset();
  if(stage==='calibrating'){
-  if(anchor&&(Math.abs(current.x-anchor.x)>.03||neck&&Math.abs(current.y-anchor.y)>.03||!neck&&Math.abs(current.shoulderGap-anchor.shoulderGap)>.025))return reset();
+  if(anchor&&(Math.abs(current.x-anchor.x)>.03||neck&&Math.abs(current.y-anchor.y)>.03||!neck&&(Math.abs(current.leftY-anchor.leftY)>width*.025||Math.abs(current.rightY-anchor.rightY)>width*.025)))return reset();
   if(neck){let next=updateNeckMotion(previous.neck,p);if(next.stage!=='calibrating')next={...next,stage:neckStage(previous.count),movements:previous.count,firstSideDirection:-1};return {...previous,lastTimestamp:t,anchor:anchor??current,neck:next};}
-  return {...previous,lastTimestamp:t,anchor:anchor??current,shoulder:updateShoulderMotion(previous.shoulder,p)};
+  const next=updateShoulderMotion(previous.shoulder,p),frames=next.calibrationFrames;
+  const averaged=!anchor||frames<=1?current:{...current,noseY:anchor.noseY+(current.noseY-anchor.noseY)/frames,leftY:anchor.leftY+(current.leftY-anchor.leftY)/frames,rightY:anchor.rightY+(current.rightY-anchor.rightY)/frames};
+  return {...previous,lastTimestamp:t,anchor:averaged,shoulder:next};
  }
  const state={...previous,lastTimestamp:t};
  if(neck){
@@ -93,7 +95,14 @@ function updateUpper(previous:UpperMotion,p:PoseLandmark[],t:number,neck:boolean
  }
  const next=updateShoulderMotion(previous.shoulder,p);
  if(next.stage===previous.shoulder.stage)return {...state,candidate:'',stableFrames:0};
- if(next.stage==='lower'&&anchor&&current.shoulderGap-anchor.shoulderGap<.055)return {...state,candidate:'',stableFrames:0};
+ if(anchor){
+  const leftRise=(anchor.leftY-p[11].y)/width,rightRise=(anchor.rightY-p[12].y)/width,headRise=(anchor.noseY-p[0].y)/width;
+  // Head bob alone has no absolute shoulder rise; whole-body translation has
+  // no shoulder-versus-head differential. Neither is a shoulder lift.
+  if(next.stage==='lower'&&(leftRise<.055||rightRise<.055||leftRise-headRise<.055||rightRise-headRise<.055))return {...state,candidate:'',stableFrames:0};
+  // Looking up while keeping shoulders raised cannot substitute for lowering.
+  if(previous.shoulder.stage==='lower'&&(leftRise>.025||rightRise>.025))return {...state,candidate:'',stableFrames:0};
+ }
  const stableFrames=previous.candidate===next.stage?previous.stableFrames+1:1;
  const candidateSince=previous.candidate===next.stage?previous.candidateSince:t;
  if(stableFrames<3||t-candidateSince<200||previous.shoulder.stage==='lower'&&(previous.liftedAt===null||t-previous.liftedAt<600))return {...state,candidate:next.stage,stableFrames,candidateSince};
@@ -105,17 +114,21 @@ function upperInstruction(s:UpperMotion,neck:boolean){
  if(!neck)return stage==='lower'?'Lower both shoulders back to the relaxed position.':'Gently lift both shoulders toward your ears; keep your head still.';
  return stage==='first-side'?'Gently move your head left in the camera picture.':stage==='opposite-side'?'Gently move your head right in the camera picture.':stage==='down'?'Return to the centre and gently lower your chin.':stage==='up'?'Gently raise your chin within a comfortable range.':'Return your head to the relaxed centre position.';
 }
+function armsInstruction(s:LanternArmsState){return s.phase==='calibrating'?`Sit comfortably with arms down; keep your head, shoulders, elbows and wrists visible — calibrating ${s.calibrationFrames} / 8`:s.phase==='lower'?'Lower both arms to your sides and hold briefly.':s.gesture==='sideways'?'Open both arms sideways at shoulder height and hold for 0.6 seconds.':'Raise both arms overhead with hands apart and hold for 0.6 seconds.';}
+function SeatedArmsExample({count}:{count:number}){const up=count%2===1;return <section className="step-example" aria-labelledby="step-example-title"><h3 id="step-example-title">Movement example</h3><p>Sit comfortably. {up?'Raise both arms overhead, keeping your hands apart.':'Open both arms sideways at shoulder height.'} Hold for 0.6 seconds, then lower both arms fully.</p><svg viewBox="0 0 360 180" role="img" aria-label={up?'Static example: arms overhead, hold, lower':'Static example: arms sideways, hold, lower'}><g fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round"><circle cx="180" cy="50" r="19"/><path d="M180 70V140M155 88H205"/><path d={up?'M155 88L140 55L135 12M205 88L220 55L225 12':'M155 88H100H45M205 88H260H315'}/><path d="M155 88L150 115V145M205 88L210 115V145" strokeDasharray="5 7" opacity=".45"/></g></svg><ol><li>Frame your head, both shoulders, elbows and wrists. Legs and hips are not needed.</li><li>Sideways → lower → overhead → lower. Repeat once.</li><li>The gate opens after two saved movements. The lantern lights after four.</li></ol><p>Move within a comfortable range; stop if uncomfortable.</p></section>;}
 function UpperExample({neck}:{neck:boolean}){
- return <section className="step-example" aria-labelledby="step-example-title"><h3 id="step-example-title">Movement example</h3><p>{neck?'Keep your shoulders still. Move your head gently left, right, down, up, then return to centre.':'Keep your head still. Raise both shoulders toward your ears, then lower them fully. Repeat six times.'}</p><svg viewBox="0 0 360 180" role="img" aria-label={neck?'Static example: head left, right, chin down, chin up, centre':'Static example: both shoulders relaxed, raised, then relaxed'}><g fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round"><circle cx="180" cy="50" r="24"/><path d="M180 74V130M180 90L120 110M180 90L240 110"/>{neck?<><path d="M125 50H80L90 40M80 50L90 60M235 50H280L270 40M280 50L270 60M180 12V2M180 145V165"/></>:<><path d="M115 90V65L105 75M115 65L125 75M245 90V65L235 75M245 65L255 75"/><path d="M180 90L120 80M180 90L240 80" strokeDasharray="6 7"/></>}</g></svg><ol>{neck?<><li>Frame your head and both shoulders.</li><li>Follow the current direction slowly. Keep each position steady briefly.</li><li>Four directions count only in order; finish by returning to centre.</li></>:<><li>Frame your head, both shoulders and hips.</li><li>Lift both shoulders, then relax them fully. Keep your head still.</li><li>Six complete lift-and-lower patterns finish the round.</li></>}</ol><p>Use a small comfortable range. Stop if uncomfortable. The camera checks a movement pattern, not exercise form.</p></section>;
+ return <section className="step-example" aria-labelledby="step-example-title"><h3 id="step-example-title">Movement example</h3><p>{neck?'Keep your shoulders still. Move your head gently left, right, down, up, then return to centre.':'Keep your head still. Raise both shoulders toward your ears, then lower them fully. Repeat six times.'}</p><svg viewBox="0 0 360 180" role="img" aria-label={neck?'Static example: head left, right, chin down, chin up, centre':'Static example: both shoulders relaxed, raised, then relaxed'}><g fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round"><circle cx="180" cy="50" r="24"/><path d="M180 74V130M180 90L120 110M180 90L240 110"/>{neck?<><path d="M125 50H80L90 40M80 50L90 60M235 50H280L270 40M280 50L270 60M180 12V2M180 145V165"/></>:<><path d="M115 90V65L105 75M115 65L125 75M245 90V65L235 75M245 65L255 75"/><path d="M180 90L120 80M180 90L240 80" strokeDasharray="6 7"/></>}</g></svg><ol>{neck?<><li>Frame your head and both shoulders.</li><li>Follow the current direction slowly. Keep each position steady briefly.</li><li>Four directions count only in order; finish by returning to centre.</li></>:<><li>Sit comfortably and frame your head and both shoulders. Hips are not required.</li><li>Lift both shoulders, then relax them fully. Keep your head still.</li><li>Six complete lift-and-lower patterns finish the round.</li></>}</ol><p>Use a small comfortable range. Stop if uncomfortable. The camera checks a movement pattern, not exercise form.</p></section>;
 }
 
 export function StepTouchChallenge({ goal, initialCount = 0, exerciseId = "lantern-route", movementVersion = "route-v1", onCycle, onPause, onCancel, onComplete, detectorFactory }: StepTouchChallengeProps) {
-  const upper=exerciseId!=="lantern-route",neck=exerciseId==="neck-reset";
+  const upper=exerciseId!=="lantern-route",neck=exerciseId==="neck-reset",arms=exerciseId==="lantern-arms";
   const route = !upper&&movementVersion === "route-v1";
   const target=getExercise(exerciseId)?.target??8;
   const safeInitial = Math.min(target,initialStepTouchState(initialCount).count);
   const upperMotion=useRef(initialUpper(safeInitial));
+  const armsMotion=useRef(initialLanternArms(safeInitial));
   const [count, setCount] = useState(safeInitial);
+  const [livePose,setLivePose]=useState<CameraPose|null>(null);
   const [status, setStatus] = useState<Status>(safeInitial === target ? "complete" : "idle");
   const [instruction, setInstruction] = useState("Keep your head, shoulders, hips, knees and feet visible.");
   const [error, setError] = useState("");
@@ -133,6 +146,7 @@ export function StepTouchChallenge({ goal, initialCount = 0, exerciseId = "lante
   useEffect(() => { callbacks.current = { onCycle, onPause, onCancel, onComplete, detectorFactory }; }, [onCycle,onPause,onCancel,onComplete,detectorFactory]);
   const stopCamera = useCallback(() => {
     generation.current += 1;
+    if(mounted.current)setLivePose(null);
     interruptSave.current?.();
     interruptSave.current = null;
     if (startupTimer.current !== null) clearTimeout(startupTimer.current);
@@ -142,6 +156,7 @@ export function StepTouchChallenge({ goal, initialCount = 0, exerciseId = "lante
     stream.current?.getTracks().forEach(track => track.stop()); stream.current = null;
     model.current?.close(); model.current = null;
     if (video.current) video.current.srcObject = null;
+    if(canvas.current)canvas.current.getContext("2d")?.clearRect(0,0,canvas.current.width,canvas.current.height);
   }, []);
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; stopCamera(); }; }, [stopCamera]);
   useEffect(() => {
@@ -193,10 +208,11 @@ export function StepTouchChallenge({ goal, initialCount = 0, exerciseId = "lante
   useEffect(() => {
     runFrame.current = (timestamp: number) => {
       if (!stream.current || !model.current) return;
-      if (saving.current || pending.current !== null) {
+      if (!video.current || video.current.readyState < 2) {
+        setLivePose(null);
         frameId.current = requestAnimationFrame(t => runFrame.current(t)); return;
       }
-      if (!video.current || video.current.readyState < 2 || timestamp - lastInference.current < 90) {
+      if (timestamp - lastInference.current < 90) {
         frameId.current = requestAnimationFrame(t => runFrame.current(t)); return;
       }
       lastInference.current = timestamp;
@@ -212,10 +228,17 @@ export function StepTouchChallenge({ goal, initialCount = 0, exerciseId = "lante
         if (ctx && canvas.current) {
           ctx.clearRect(0,0,canvas.current.width,canvas.current.height);
           ctx.strokeStyle = "#b8f36b"; ctx.lineWidth = 4;
-          for (const [a,b] of EDGES) { const p=points[a],q=points[b]; if (!p||!q||(p.visibility??0)<.65||(q.visibility??0)<.65) continue;
+          for (const [a,b] of EDGES) { if((arms||exerciseId==="shoulder-rolls")&&(a>=23||b>=23))continue; const p=points[a],q=points[b]; if (!p||!q||(p.visibility??0)<.65||(q.visibility??0)<.65) continue;
             ctx.beginPath();ctx.moveTo(p.x*canvas.current.width,p.y*canvas.current.height);ctx.lineTo(q.x*canvas.current.width,q.y*canvas.current.height);ctx.stroke(); }
         }
-        if(upper){
+        const displayPoints=exerciseId==="shoulder-rolls"?points.map((point,i)=>i>=23?{...point,visibility:0}:point):points;
+        setLivePose(projectCameraPose(displayPoints,arms?"arms":upper?"upper":"full"));
+        // Pose display remains live while persistence waits; only recognition pauses.
+        if(saving.current||pending.current!==null){frameId.current=requestAnimationFrame(t=>runFrame.current(t));return;}
+        if(arms){
+          const next=updateLanternArms(armsMotion.current,points,timestamp);armsMotion.current=next;setInstruction(armsInstruction(next));
+          if(next.count>acknowledged.current){pending.current=next.count;setPendingCount(next.count);void acknowledge();}
+        }else if(upper){
           const next=updateUpper(upperMotion.current,points,timestamp,neck);upperMotion.current=next;
           setInstruction(upperInstruction(next,neck));
           if(next.count>acknowledged.current){pending.current=next.count;setPendingCount(next.count);void acknowledge();}
@@ -223,8 +246,8 @@ export function StepTouchChallenge({ goal, initialCount = 0, exerciseId = "lante
         const next = route ? updateRoute(motion.current, points as PoseLandmark[], timestamp) : {...motion.current,...updateStepTouch(motion.current, points as PoseLandmark[], timestamp)}; motion.current = next;
         setInstruction(next.tracking === "lost" ? "Stand still with arms down. Keep your head, both hands and both feet visible in the frame."
           : next.phase === "calibrating" ? `Stand still with feet close${route && next.count>=6 ? " and arms down" : ""} — calibrating ${Math.min(next.calibrationFrames,15)} / 15`
-          : route && next.count >= 6 ? next.armPhase === "lower" ? "Now lower both arms to your sides." : next.count === 6 ? "Open both arms sideways and hold for 0.6 seconds." : "Raise both arms overhead and hold for 0.6 seconds."
-          : next.phase === "return" ? "Return to the centre with your feet close."
+          : route && next.count >= 6 ? next.armPhase === "lower" ? "Now lower both arms to your sides." : next.count === 6 ? "Open both arms sideways and hold for 0.6 seconds." : "Raise both arms overhead with hands apart and hold for 0.6 seconds."
+          : next.phase === "return" ? "Return to the centre with your feet close. Hold until the step is saved."
           : `Step ${next.expectedSide} in the camera picture, then return to centre.`);
         if (next.count > acknowledged.current) { pending.current = next.count; setPendingCount(next.count); void acknowledge(); }
         }
@@ -233,12 +256,12 @@ export function StepTouchChallenge({ goal, initialCount = 0, exerciseId = "lante
       }
       if (stream.current) frameId.current = requestAnimationFrame(t => runFrame.current(t));
     };
-  }, [acknowledge, stopCamera, route,upper,neck]);
+  }, [acknowledge, stopCamera, route,upper,neck,arms,exerciseId]);
 
   async function startCamera() {
     if (pending.current !== null) return;
     stopCamera(); const run = generation.current;
-    setStatus("loading");setError("");setInstruction(upper?"Keep your head still and shoulders relaxed — calibrating":"Stand still with feet close and arms down — calibrating");upperMotion.current=initialUpper(acknowledged.current);motion.current=initialRouteState(acknowledged.current);lastInference.current=-1;
+    setStatus("loading");setError("");setInstruction(arms?"Sit comfortably with arms down — calibrating":upper?"Keep your head still and shoulders relaxed — calibrating":"Stand still with feet close and arms down — calibrating");upperMotion.current=initialUpper(acknowledged.current);armsMotion.current=initialLanternArms(acknowledged.current);motion.current=initialRouteState(acknowledged.current);lastInference.current=-1;
     startupTimer.current = setTimeout(() => {
       if (generation.current !== run) return;
       stopCamera(); setStatus("error");
@@ -277,11 +300,11 @@ export function StepTouchChallenge({ goal, initialCount = 0, exerciseId = "lante
   function cancel() { stopCamera();setStatus(pending.current !== null ? "save-error" : "paused");if(pending.current !== null)setError("The recognized step has an unknown save result. Retry saving the same step to reconcile its result.");callbacks.current.onCancel?.(); }
 
   return <section className="step-challenge" aria-label={upper?"Camera exercise challenge":"Camera side-step challenge"}>
-    <div className="step-challenge__heading"><div><h2>{upper?getExercise(exerciseId)?.name:route ? "Lantern route" : "Side-step challenge"}</h2><p>{upper?neck?"Four gentle head directions, then return to centre.":"Six complete bilateral shoulder lifts and returns.":route ? "Walk six steps, open the gate, then light the lantern with your arms." : goal === "trail" ? "Reach the summit in eight recognized steps." : "Build and light the lantern in eight recognized steps."}</p></div><strong data-testid="step-count" aria-live="polite">{count} / {target}</strong></div>
-    {upper?<section className="movement-scene" aria-label="Acknowledged exercise progress"><h3>{count===target?"Exercise complete":"Your exercise"}</h3><progress value={count} max={target} aria-label="Saved movements"/><p>{count} of {target} movements saved</p></section>:route ? <RouteScene count={count} goal={goal}/> : <MovementScene scene={goal} completedCycles={count} targetMovements={8} status={status === "complete" ? "complete" : status === "active" ? "active" : status === "idle" ? "ready" : "paused"}/>}
-    <div className="step-route-cue" data-testid="movement-cue" aria-live="polite"><span>{upper?getExercise(exerciseId)?.name:route ? count<6 ? `Walk to the gate · step ${count+1} of 6` : count===6 ? "Open the gate · arms sideways" : count===7 ? "Light the lantern · arms overhead" : "Route complete · lantern lit" : "Alternate side steps and return to centre"}</span><strong>{status === "active" ? pendingCount !== null ? "Saving recognized movement…" : instruction : status === "complete" ? `All ${target} movements acknowledged` : status === "loading" ? upper?"Starting camera — keep your head still and shoulders relaxed":"Starting camera — stand with feet close and arms down" : upper?"Enable the camera, then keep your head still and shoulders relaxed":"Enable the camera, then stand still with feet close and arms down"}</strong></div>
-    <div className="step-challenge__guides">{upper?<UpperExample neck={neck}/>:<MovementExample route={route} count={count}/>}<section className="step-camera" aria-labelledby="step-camera-title">
-      <h3 id="step-camera-title">Your camera</h3><p>{upper?neck?"Head and both shoulders in the picture.":"Head, both shoulders and hips in the picture.":"Head to feet in the picture."} The video stays on your device; it is not recorded or uploaded.</p>
+    <div className="step-challenge__heading"><div><h2>{upper?getExercise(exerciseId)?.name:route ? "Lantern route" : "Side-step challenge"}</h2><p>{arms?"Four seated arm movements: sideways, overhead, and repeat. No hips or legs needed.":upper?neck?"Four gentle head directions, then return to centre.":"Six complete bilateral shoulder lifts and returns.":route ? "Walk six steps, open the gate, then light the lantern with your arms." : goal === "trail" ? "Reach the summit in eight recognized steps." : "Build and light the lantern in eight recognized steps."}</p></div><strong data-testid="step-count" aria-live="polite">{count} / {target}</strong></div>
+    <RouteScene count={count} goal={goal} target={target} mode={arms?"arms":route?"route":"exercise"} pose={livePose} poseStatus={status==="active"?"tracking":"off"}/>
+    <div className="step-route-cue" data-testid="movement-cue" aria-live="polite"><span>{upper?getExercise(exerciseId)?.name:route ? count<6 ? `Walk to the gate · step ${count+1} of 6` : count===6 ? "Open the gate · arms sideways" : count===7 ? "Light the lantern · arms overhead" : "Route complete · lantern lit" : "Alternate side steps and return to centre"}</span><strong>{status === "active" ? pendingCount !== null ? "Saving recognized movement…" : instruction : status === "complete" ? `All ${target} movements acknowledged` : status === "loading" ? arms?"Starting camera — sit with arms down and hands visible":upper?"Starting camera — keep your head still and shoulders relaxed":"Starting camera — stand with feet close and arms down" : arms?"Enable the camera, then sit with arms down and hands visible":upper?"Enable the camera, then keep your head still and shoulders relaxed":"Enable the camera, then stand still with feet close and arms down"}</strong></div>
+    <div className="step-challenge__guides">{arms?<SeatedArmsExample count={count}/>:upper?<UpperExample neck={neck}/>:<MovementExample route={route} count={count}/>}<section className="step-camera" aria-labelledby="step-camera-title">
+      <h3 id="step-camera-title">Your camera</h3><p>{arms?"Four seated arm movements: sideways, overhead, and repeat. No hips or legs needed.":upper?neck?"Head and both shoulders in the picture.":"Head and both shoulders in the picture. Sit comfortably; hips are not required.":"Head to feet in the picture."} The video stays on your device; it is not recorded or uploaded.</p>
       <div className="step-camera__preview"><video ref={video} muted playsInline aria-label="Live camera preview"/><canvas ref={canvas} width={960} height={720} aria-hidden="true"/>{status !== "active" && <span>Camera off</span>}</div>
       <p role="status">{status === "active" ? "Camera active" : status === "loading" ? "Starting camera…" : status === "complete" ? "Camera off — round finished" : "Camera paused or off"}</p>
       {status === "active" && <p className="step-camera__instruction">{instruction}</p>}
